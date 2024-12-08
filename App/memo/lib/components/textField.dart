@@ -4,7 +4,7 @@ class TextFieldComponent extends StatelessWidget {
   final String hintText;
   final bool obscureText;
   final controller;
-  final Color colorLight = const Color.fromARGB(255, 245, 234, 255);
+  final Color colorLight = const Color.fromARGB(255, 248, 240, 255);
   final Color colorDark = const Color(0xFF7f31c6);
 
   const TextFieldComponent({

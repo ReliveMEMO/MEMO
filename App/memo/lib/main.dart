@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:memo/pages/login_page.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/signup_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+void main() async {
+  await Supabase.initialize(
+    anonKey:
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFicXdiZXBweWxpYXZ2ZnpyeXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM1ODU5NTcsImV4cCI6MjA0OTE2MTk1N30.dKEe4wJ7lJq87GKHzgIR-U-jUYpV3pZWgXQuMpeU9DU",
+    url: "https://qbqwbeppyliavvfzryze.supabase.co",
+  );
+
   runApp(const MyApp());
 }
 
@@ -18,6 +26,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
+        '/profile': (context) => ProfilePage(),
       },
     );
   }

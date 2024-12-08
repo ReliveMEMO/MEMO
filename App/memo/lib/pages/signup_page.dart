@@ -2,15 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:memo/components/authButton.dart';
 import 'package:memo/components/googleLog.dart';
 import 'package:memo/components/textField.dart';
+import 'package:memo/services/auth_service.dart';
 
 void signupPage() {
   runApp(SignupPage());
 }
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends StatefulWidget {
+  SignupPage({super.key});
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  SignupPage({super.key});
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController fullnameController = TextEditingController();
+  final authService = AuthService();
+
+  void signup() async {
+    final email = emailController.text;
+    final userName = usernameController.text;
+    final fullName = fullnameController.text;
+    final password = passwordController.text;
+
+    try {
+      await authService.signUpWithEmailPassword(
+          email, password, userName, fullName);
+
+      Navigator.pushNamed(context, '/login');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+    }
+  }
 
   // This widget is the root of your application.
   @override
@@ -70,7 +102,7 @@ class SignupPage extends StatelessWidget {
             TextFieldComponent(
               hintText: "Email",
               obscureText: false,
-              controller: usernameController,
+              controller: emailController,
             ),
             TextFieldComponent(
               hintText: "Username",
@@ -80,7 +112,7 @@ class SignupPage extends StatelessWidget {
             TextFieldComponent(
               hintText: "Full Name",
               obscureText: false,
-              controller: usernameController,
+              controller: fullnameController,
             ),
 
             //Password textfield
@@ -91,7 +123,7 @@ class SignupPage extends StatelessWidget {
             ),
 
             //Login button
-            Authbutton(buttonText: "LOGIN", onTap: () {}),
+            Authbutton(buttonText: "LOGIN", onTap: signup),
 
             const SizedBox(
               height: 30,

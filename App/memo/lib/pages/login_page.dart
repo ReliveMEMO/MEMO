@@ -2,15 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:memo/components/authButton.dart';
 import 'package:memo/components/googleLog.dart';
 import 'package:memo/components/textField.dart';
+import 'package:memo/services/auth_service.dart';
 
 void loginPage() {
   runApp(LoginPage());
 }
 
-class LoginPage extends StatelessWidget {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+class LoginPage extends StatefulWidget {
   LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController usernameController = TextEditingController();
+
+  final TextEditingController passwordController = TextEditingController();
+  final AuthService authService = AuthService();
+
+  void login() async {
+    final email = usernameController.text;
+    final password = passwordController.text;
+
+    try {
+      await authService.signInWithEmailPassword(email, password);
+      Navigator.pushNamed(context, '/profile');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+    }
+  }
 
   // This widget is the root of your application.
   @override
@@ -31,7 +58,7 @@ class LoginPage extends StatelessWidget {
 
             //Username textfield
             TextFieldComponent(
-              hintText: "Username",
+              hintText: "Email",
               obscureText: false,
               controller: usernameController,
             ),
@@ -59,7 +86,7 @@ class LoginPage extends StatelessWidget {
               ),
             ),
             //Login button
-            Authbutton(buttonText: "LOGIN", onTap: () {}),
+            Authbutton(buttonText: "LOGIN", onTap: login),
 
             const SizedBox(
               height: 10,

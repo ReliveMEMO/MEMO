@@ -53,7 +53,7 @@ class _SignupPageState extends State<SignupPage> {
       body: Center(
         child: Column(
           children: [
-             SizedBox(height: screenHeight * 0.15),
+             SizedBox(height: screenHeight * 0.11),
             //Logo
             Image.asset(
               "assets/images/BrandingImage.png",

@@ -29,7 +29,9 @@ class _SignupPageState extends State<SignupPage> {
     try {
       await authService.signUpWithEmailPassword(email, password, userName);
 
-      Navigator.pushNamed(context, '/login');
+      if (mounted) {
+        Navigator.pushNamed(context, '/create-profile');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -116,7 +118,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
 
             //Login button
-            Authbutton(buttonText: "LOGIN", onTap: signup),
+            Authbutton(buttonText: "SIGNUP", onTap: signup),
 
             const SizedBox(
               height: 30,

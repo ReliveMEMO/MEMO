@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: Column(
           children: [
-           SizedBox(height: screenHeight * 0.10),
+            SizedBox(height: screenHeight * 0.10),
             //Logo
             Image.asset(
               "assets/images/BrandingImage.png",

@@ -60,7 +60,7 @@ class DropdownComponent extends StatelessWidget {
                   style: TextStyle(
                     color: textColor,
                     fontSize: 16,
-                    fontFamily: 'Poppins',
+                    fontFamily: 'Times New Roman',
                     fontWeight: FontWeight.w400,
                   ),
                 ),

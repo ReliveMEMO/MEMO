@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/signup_page.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
+        '/create-profile': (context) => CreateProfile(),
       },
     );
   }

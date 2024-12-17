@@ -42,12 +42,13 @@ class _LoginPageState extends State<LoginPage> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
           children: [
-            const SizedBox(height: 160),
+           SizedBox(height: screenHeight * 0.10),
             //Logo
             Image.asset(
               "assets/images/BrandingImage.png",

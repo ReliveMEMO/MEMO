@@ -15,12 +15,9 @@ class AuthService {
     String email,
     String password,
     String userName,
-    String fullName,
   ) async {
-    return await _supabase.auth.signUp(
-        email: email,
-        password: password,
-        data: {'userName': userName, 'fullName': fullName});
+    return await _supabase.auth
+        .signUp(email: email, password: password, data: {'userName': userName});
   }
 
   Future<void> signOut() async {

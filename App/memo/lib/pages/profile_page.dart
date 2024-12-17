@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memo/services/auth_service.dart';
+import 'package:memo/components/dropDown.dart'; 
 
 void profilePage() {
   runApp(ProfilePage());
@@ -14,6 +15,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final authService = AuthService();
+  String? selectedProgram; 
 
   void logout() async {
     await authService.signOut();
@@ -39,7 +41,18 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             Text(
               'Welcome $userLoggedIn',
-              style: const TextStyle(fontSize: 24),
+              style: const TextStyle(fontSize: 24, fontFamily: 'Poppins'),
+            ),
+            const SizedBox(height: 20), 
+            DropdownComponent(
+              hintText: ' Programme',
+              items: ['Software Engineering', 'Computer Science', 'AI and Data Science', 'Business Information Systems'], // Dropdown options
+              onChanged: (value) {
+                setState(() {
+                  selectedProgram = value; 
+                });
+              },
+              selectedValue: selectedProgram, 
             ),
           ],
         ),

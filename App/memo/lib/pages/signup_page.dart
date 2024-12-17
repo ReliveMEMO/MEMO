@@ -19,18 +19,15 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController fullnameController = TextEditingController();
   final authService = AuthService();
 
   void signup() async {
     final email = emailController.text;
     final userName = usernameController.text;
-    final fullName = fullnameController.text;
     final password = passwordController.text;
 
     try {
-      await authService.signUpWithEmailPassword(
-          email, password, userName, fullName);
+      await authService.signUpWithEmailPassword(email, password, userName);
 
       Navigator.pushNamed(context, '/login');
     } catch (e) {
@@ -53,7 +50,7 @@ class _SignupPageState extends State<SignupPage> {
       body: Center(
         child: Column(
           children: [
-             SizedBox(height: screenHeight * 0.11),
+            SizedBox(height: screenHeight * 0.11),
             //Logo
             Image.asset(
               "assets/images/BrandingImage.png",
@@ -109,11 +106,6 @@ class _SignupPageState extends State<SignupPage> {
               hintText: "Username",
               obscureText: false,
               controller: usernameController,
-            ),
-            TextFieldComponent(
-              hintText: "Full Name",
-              obscureText: false,
-              controller: fullnameController,
             ),
 
             //Password textfield

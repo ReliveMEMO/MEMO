@@ -6,7 +6,7 @@ class DropdownComponent extends StatelessWidget {
   final ValueChanged<String?> onChanged;
   final String? selectedValue;
   final Color backgroundColor = const Color(0xFFF8F0FF);
-  final Color textColor = const Color(0xFF7f31c6); 
+  final Color textColor = const Color(0xFF7f31c6);
 
   const DropdownComponent({
     super.key,
@@ -50,8 +50,9 @@ class DropdownComponent extends StatelessWidget {
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
             ),
-            dropdownColor: backgroundColor, 
-            borderRadius: BorderRadius.circular(15), 
+            dropdownColor: backgroundColor,
+            borderRadius: BorderRadius.circular(15),
+            elevation: 1, // Reduced shadow opacity
             items: items.map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
@@ -60,7 +61,7 @@ class DropdownComponent extends StatelessWidget {
                   style: TextStyle(
                     color: textColor,
                     fontSize: 16,
-                    fontFamily: 'Times New Roman',
+                    fontFamily: 'poppins',
                     fontWeight: FontWeight.w400,
                   ),
                 ),

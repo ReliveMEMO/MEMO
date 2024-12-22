@@ -1,15 +1,14 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Dart
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["*"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["*"]
+
+env:
+  ROOT_DIR: ./App/memo # Specify your root directory here
+  TEST_BRANCH: DevTest
 
 jobs:
   build:
@@ -17,26 +16,57 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: ${{ env.ROOT_DIR }}
 
-      # Note: This workflow uses the latest stable version of the Dart SDK.
-      # You can specify other versions if desired, see documentation here:
-      # https://github.com/dart-lang/setup-dart/blob/main/README.md
-      # - uses: dart-lang/setup-dart@v1
       - uses: dart-lang/setup-dart@9a04e6d73cca37bd455e0608d7e5092f881fd603
 
       - name: Install dependencies
         run: dart pub get
+        working-directory: ${{ env.ROOT_DIR }}
 
-      # Uncomment this step to verify the use of 'dart format' on each commit.
-      # - name: Verify formatting
-      #   run: dart format --output=none --set-exit-if-changed .
-
-      # Consider passing '--fatal-infos' for slightly stricter analysis.
       - name: Analyze project source
         run: dart analyze
+        working-directory: ${{ env.ROOT_DIR }}
 
-      # Your project will need to have tests in test/ and a dependency on
-      # package:test for this step to succeed. Note that Flutter projects will
-      # want to change this to 'flutter test'.
       - name: Run tests
         run: dart test
+        working-directory: ${{ env.ROOT_DIR }}
+
+  merge-to-test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.ROOT_DIR }}
+
+      - name: Merge changes into test branch
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout ${{ env.TEST_BRANCH }}
+          git merge ${{ github.ref }} --no-ff -m "Auto-merge from ${{ github.ref }}"
+        working-directory: ${{ env.ROOT_DIR }}
+
+  auto-merge:
+    runs-on: ubuntu-latest
+    needs: merge-to-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.ROOT_DIR }}
+
+      - name: Merge changes into other branches
+        uses: peter-evans/merge@v2
+        with:
+          source_branch: ${{ env.TEST_BRANCH }}
+          target_branch: "Sandinu, Thisas, malsha, monali, sachin, sadinsa" # List your branches here
+          method: merge
+          commit_message: "Auto-merge from test"
+          merge_method: merge
+          author_name: "github-actions[bot]"
+          author_email: "github-actions[bot]@users.noreply.github.com"
+          working-directory: ${{ env.ROOT_DIR }}

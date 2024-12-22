@@ -47,15 +47,32 @@ class _AvatarUploadState extends State<AvatarUpload> {
     return Container(
       child: Column(
         children: [
-          _imageFile != null
-              ? Image.file(_imageFile!)
-              : const Text("No image selected"),
-          FloatingActionButton(
-              onPressed: pickImage,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100)),
-              elevation: 0,
-              child: const Icon(Icons.add)),
+          Stack(
+            alignment: Alignment.bottomCenter,
+            clipBehavior: Clip.none,
+            children: [
+              ClipOval(
+                child: SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: _imageFile != null
+                      ? Image.file(_imageFile!, fit: BoxFit.cover)
+                      : Image.asset("assets/images/user.png",
+                          fit: BoxFit.cover),
+                ),
+              ),
+              Positioned(
+                bottom: -20,
+                child: FloatingActionButton(
+                    onPressed: pickImage,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100)),
+                    elevation: 0,
+                    child: const Icon(Icons.add)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 30),
           ElevatedButton(
               onPressed: uploadImage, child: const Text("Upload Image")),
         ],

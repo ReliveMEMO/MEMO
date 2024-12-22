@@ -63,6 +63,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: auto-merge-to-test
 
+    permissions:
+      contents: write # Required for accessing branches and performing merges
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -72,7 +75,7 @@ jobs:
         with:
           script: |
             const excludedBranches = ["${{ env.EXCLUDE_BRANCHES }}"];
-            const branches = await github.repos.listBranches({
+            const branches = await github.rest.repos.listBranches({
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
@@ -83,7 +86,7 @@ jobs:
 
             for (const branch of targetBranches) {
               try {
-                await github.repos.merge({
+                await github.rest.repos.merge({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   base: branch,

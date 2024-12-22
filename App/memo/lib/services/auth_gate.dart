@@ -19,7 +19,7 @@ class authGate extends StatelessWidget {
           );
         }
 
-        final session = snapshot.hasData ? snapshot.data : null;
+        final session = snapshot.data?.session;
 
         if (session != null) {
           return ProfilePage();

@@ -50,11 +50,11 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Attempt to merge PR into DevTest
+      - name: Attempt to merge PR branch into DevTest
         run: |
           git fetch origin
           git checkout ${{ env.TEST_BRANCH }}
-          git merge ${{ github.head_ref }} --no-ff -m "Auto-merge from ${{ github.head_ref }}"
+          git merge ${{ github.event.pull_request.head.ref }} --no-ff -m "Auto-merge from ${{ github.event.pull_request.head.ref }}"
         working-directory: ${{ env.ROOT_DIR }}
         continue-on-error: true
 

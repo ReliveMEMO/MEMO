@@ -7,7 +7,7 @@ on:
     branches: ["*"]
 
 env:
-  ROOT_DIR: /App/memo # Specify your root directory here
+  ROOT_DIR: MEMO/App/memo # Specify your root directory here
   TEST_BRANCH: DevTest
 
 jobs:

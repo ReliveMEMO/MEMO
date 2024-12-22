@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
         '/create-profile': (context) => CreateProfile(),
-        //Testing the CI pipeline
+        //Testing the CI pipeline xoxo
       },
     );
   }

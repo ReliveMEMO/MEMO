@@ -1,14 +1,14 @@
 name: Dart
 
 on:
-  push:
-    branches: ["*"]
   pull_request:
-    branches: ["*"]
+    branches:
+      - "*"
 
 env:
-  ROOT_DIR: App/memo # Adjusted to match your directory structure
+  ROOT_DIR: App/memo # Adjust to match your directory structure
   TEST_BRANCH: DevTest
+  EXCLUDE_BRANCHES: main
 
 jobs:
   build:
@@ -38,38 +38,59 @@ jobs:
       #   run: dart test
       #   working-directory: ${{ env.ROOT_DIR }}
 
-  merge-to-test:
+  auto-merge-to-test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Merge changes into test branch
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Attempt to merge PR into DevTest
+        run: |
           git fetch origin
-          git checkout DevTest
-          git merge ${{ github.ref }} --no-ff -m "Auto-merge from ${{ github.ref }}"
+          git checkout ${{ env.TEST_BRANCH }}
+          git merge ${{ github.head_ref }} --no-ff -m "Auto-merge from ${{ github.head_ref }}"
         working-directory: ${{ env.ROOT_DIR }}
         continue-on-error: true
 
-  auto-merge:
+  auto-merge-to-other:
     runs-on: ubuntu-latest
-    needs: merge-to-test
-    steps:
-      - uses: actions/checkout@v4
+    needs: auto-merge-to-test
 
-      - name: Merge changes into other branches
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Script
         uses: actions/github-script@v6
         with:
           script: |
-            const branches = ["Sandinu", "Thisas", "malsha", "monali", "sachin", "sadinsa"];
-            for (const branch of branches) {
-              await github.repos.merge({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                base: branch,
-                head: "DevTest",
-                commit_message: "Auto-merge from DevTest"
-              });
+            const excludedBranches = ["${{ env.EXCLUDE_BRANCHES }}"];
+            const branches = await github.repos.listBranches({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const targetBranches = branches.data
+              .map(branch => branch.name)
+              .filter(branch => branch !== "${{ env.TEST_BRANCH }}" && !excludedBranches.includes(branch));
+
+            for (const branch of targetBranches) {
+              try {
+                await github.repos.merge({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  base: branch,
+                  head: "${{ env.TEST_BRANCH }}",
+                  commit_message: `Auto-merge from ${{ env.TEST_BRANCH }}`,
+                });
+                console.log(`Successfully merged into ${branch}`);
+              } catch (error) {
+                console.error(`Failed to merge into ${branch}:`, error.message);
+              }
             }

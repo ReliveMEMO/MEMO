@@ -54,7 +54,7 @@ jobs:
         run: |
           git fetch origin
           git checkout ${{ env.TEST_BRANCH }}
-          git merge ${{ github.event.pull_request.head.ref }} --no-ff -m "Auto-merge from ${{ github.event.pull_request.head.ref }}"
+          git merge origin/${{ github.event.pull_request.head.ref }} --no-ff -m "Auto-merge from ${{ github.event.pull_request.head.ref }}"
         working-directory: ${{ env.ROOT_DIR }}
         continue-on-error: true
 

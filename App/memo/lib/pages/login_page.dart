@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memo/components/authButton.dart';
 import 'package:memo/components/googleLog.dart';
-import 'package:memo/components/textField.dart';
+//import 'package:memo/components/textField.dart';
 import 'package:memo/services/auth_service.dart';
 
 void loginPage() {
@@ -21,9 +21,22 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final AuthService authService = AuthService();
 
+  //final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String? emailError;
+  String? passwordError;
+
   void login() async {
     final email = usernameController.text;
     final password = passwordController.text;
+
+    setState(() {
+      emailError = email.isEmpty ? 'Email is required' : null;
+      passwordError = password.isEmpty ? 'Password is required' : null;
+    });
+
+    if (emailError != null || passwordError != null) {
+      return; // Stop login attempt if there's an error
+    }
 
     try {
       await authService.signInWithEmailPassword(email, password);
@@ -42,12 +55,13 @@ class _LoginPageState extends State<LoginPage> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
           children: [
-            const SizedBox(height: 160),
+            SizedBox(height: screenHeight * 0.10),
             //Logo
             Image.asset(
               "assets/images/BrandingImage.png",
@@ -57,19 +71,95 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 30),
 
             //Username textfield
-            TextFieldComponent(
-              hintText: "Email",
-              obscureText: false,
-              controller: usernameController,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              child: TextFormField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  hintText: "Email",
+                  errorText: emailError,
+                  errorStyle: const TextStyle(color: Colors.red),
+                  hintStyle: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w300,
+                  ),
+                  fillColor: const Color.fromARGB(255, 248, 240, 255),
+                  filled: true,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: emailError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border if error
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: emailError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border when error is present
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: emailError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border when error
+                    ),
+                  ),
+                ),
+              ),
             ),
 
             //Password textfield
-            TextFieldComponent(
-              hintText: "Password",
-              obscureText: true,
-              controller: passwordController,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              child: TextFormField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                  hintText: "Password",
+                  errorText: passwordError,
+                  errorStyle: const TextStyle(color: Colors.red),
+                  hintStyle: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w300,
+                  ),
+                  fillColor: const Color.fromARGB(255, 248, 240, 255),
+                  filled: true,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: passwordError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border if error
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: passwordError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border when error is present
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: passwordError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border when error
+                    ),
+                  ),
+                ),
+              ),
             ),
+
             //Forgot password
+
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
               child: Row(

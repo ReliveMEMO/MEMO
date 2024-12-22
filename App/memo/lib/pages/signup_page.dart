@@ -19,20 +19,19 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController fullnameController = TextEditingController();
   final authService = AuthService();
 
   void signup() async {
     final email = emailController.text;
     final userName = usernameController.text;
-    final fullName = fullnameController.text;
     final password = passwordController.text;
 
     try {
-      await authService.signUpWithEmailPassword(
-          email, password, userName, fullName);
+      await authService.signUpWithEmailPassword(email, password, userName);
 
-      Navigator.pushNamed(context, '/login');
+      if (mounted) {
+        Navigator.pushNamed(context, '/create-profile');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -47,12 +46,13 @@ class _SignupPageState extends State<SignupPage> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
           children: [
-            const SizedBox(height: 120),
+            SizedBox(height: screenHeight * 0.11),
             //Logo
             Image.asset(
               "assets/images/BrandingImage.png",
@@ -109,11 +109,6 @@ class _SignupPageState extends State<SignupPage> {
               obscureText: false,
               controller: usernameController,
             ),
-            TextFieldComponent(
-              hintText: "Full Name",
-              obscureText: false,
-              controller: fullnameController,
-            ),
 
             //Password textfield
             TextFieldComponent(
@@ -123,7 +118,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
 
             //Login button
-            Authbutton(buttonText: "LOGIN", onTap: signup),
+            Authbutton(buttonText: "SIGNUP", onTap: signup),
 
             const SizedBox(
               height: 30,

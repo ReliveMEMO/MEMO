@@ -11,36 +11,36 @@ env:
   EXCLUDE_BRANCHES: main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  # build:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: "3.5.4"
+  #     - uses: dart-lang/setup-dart@v1
+  #       with:
+  #         sdk: "3.5.4"
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.24.4" # Use the desired Flutter version
+  #     - name: Set up Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: "3.24.4" # Use the desired Flutter version
 
-      - name: Install dependencies
-        run: dart pub get
-        working-directory: ${{ env.ROOT_DIR }}
+  #     - name: Install dependencies
+  #       run: dart pub get
+  #       working-directory: ${{ env.ROOT_DIR }}
 
-      # - name: Analyze project source
-      #   run: dart analyze
-      #   working-directory: ${{ env.ROOT_DIR }}
+  #     # - name: Analyze project source
+  #     #   run: dart analyze
+  #     #   working-directory: ${{ env.ROOT_DIR }}
 
-      # - name: Run tests
-      #   run: dart test
-      #   working-directory: ${{ env.ROOT_DIR }}
+  #     # - name: Run tests
+  #     #   run: dart test
+  #     #   working-directory: ${{ env.ROOT_DIR }}
 
   auto-merge-to-test:
     runs-on: ubuntu-latest
-    needs: build
+    #needs: build
 
     steps:
       - name: Checkout repository

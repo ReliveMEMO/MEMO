@@ -44,13 +44,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create or Checkout Test Branch
+        run: |
+          git fetch origin
+          if git rev-parse --verify origin/${{ env.TEST_BRANCH }}; then
+            git checkout ${{ env.TEST_BRANCH }}
+          else
+            git checkout -b ${{ env.TEST_BRANCH }}
+          fi
+
       - name: Merge changes into test branch
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout ${{ env.TEST_BRANCH }}
           git merge ${{ github.ref }} --no-ff -m "Auto-merge from ${{ github.ref }}"
         working-directory: ${{ env.ROOT_DIR }}
+        continue-on-error: true
 
   auto-merge:
     runs-on: ubuntu-latest

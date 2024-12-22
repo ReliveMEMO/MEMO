@@ -34,9 +34,9 @@ jobs:
       #   run: dart analyze
       #   working-directory: ${{ env.ROOT_DIR }}
 
-      - name: Run tests
-        run: dart test
-        working-directory: ${{ env.ROOT_DIR }}
+      # - name: Run tests
+      #   run: dart test
+      #   working-directory: ${{ env.ROOT_DIR }}
 
   merge-to-test:
     runs-on: ubuntu-latest

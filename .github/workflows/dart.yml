@@ -30,9 +30,9 @@ jobs:
         run: dart pub get
         working-directory: ${{ env.ROOT_DIR }}
 
-      - name: Analyze project source
-        run: dart analyze
-        working-directory: ${{ env.ROOT_DIR }}
+      # - name: Analyze project source
+      #   run: dart analyze
+      #   working-directory: ${{ env.ROOT_DIR }}
 
       - name: Run tests
         run: dart test

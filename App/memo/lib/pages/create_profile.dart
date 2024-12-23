@@ -5,6 +5,7 @@ import 'package:memo/components/avatar_upload.dart';
 import 'package:memo/components/dropDown.dart';
 import 'package:memo/components/textField.dart';
 import 'package:intl/intl.dart';
+import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateProfile extends StatefulWidget {
@@ -15,6 +16,7 @@ class CreateProfile extends StatefulWidget {
 }
 
 class _CreateProfileState extends State<CreateProfile> {
+  final authService = AuthService();
   String? selectedProgram;
   String? selectedStatus;
   final TextEditingController fullnameController = TextEditingController();
@@ -59,8 +61,21 @@ class _CreateProfileState extends State<CreateProfile> {
   Future<void> createProfile() async {
     try {
       _validateFields();
-      //await uploadImage();
-      print(avatarUrl);
+      await uploadImage();
+
+      final userId = authService.getCurrentUserID();
+
+      final response = await Supabase.instance.client.from('User_Info').insert({
+        'id': userId,
+        'full_name': fullnameController.text,
+        'iit_id': iitIdController.text,
+        'birth_date': birthDate?.toIso8601String(),
+        'programme': selectedProgram,
+        'status': selectedStatus,
+        'profile_pic': avatarUrl,
+      });
+      print(response);
+      Navigator.pushNamed(context, '/profile');
     } catch (e) {
       print(e);
     }
@@ -111,7 +126,7 @@ class _CreateProfileState extends State<CreateProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Profile"),
+        title: Text("Create Profile ${authService.getCurrentUser()}"),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,

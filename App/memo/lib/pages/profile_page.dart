@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memo/services/auth_service.dart';
 
-
 void profilePage() {
   runApp(ProfilePage());
 }

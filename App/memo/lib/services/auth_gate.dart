@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,7 +25,7 @@ class authGate extends StatelessWidget {
         if (session != null) {
           return ProfilePage();
         } else {
-          return LoginPage();
+          return CreateProfile();
         }
       },
     );

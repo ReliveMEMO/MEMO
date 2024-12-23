@@ -3,6 +3,7 @@ import 'package:memo/components/authButton.dart';
 import 'package:memo/components/googleLog.dart';
 //import 'package:memo/components/textField.dart';
 import 'package:memo/services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void loginPage() {
   runApp(LoginPage());
@@ -40,7 +41,13 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       await authService.signInWithEmailPassword(email, password);
-      Navigator.pushNamed(context, '/profile');
+      final userExist = await checkUserExist(authService.getCurrentUserID());
+
+      if (userExist) {
+        Navigator.pushNamed(context, '/profile');
+      } else {
+        Navigator.pushNamed(context, '/create-profile');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -50,6 +57,19 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     }
+  }
+
+  Future<bool> checkUserExist(String? userId) async {
+    final response = await Supabase.instance.client
+        .from('User_Info')
+        .select()
+        .eq('id', userId!)
+        .maybeSingle();
+
+    if (response != null) {
+      return true;
+    }
+    return false;
   }
 
   // This widget is the root of your application.

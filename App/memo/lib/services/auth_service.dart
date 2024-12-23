@@ -17,8 +17,11 @@ class AuthService {
     String password,
     String userName,
   ) async {
-    return await _supabase.auth
-        .signUp(email: email, password: password, data: {'userName': userName});
+    return await _supabase.auth.signUp(
+      email: email,
+      password: password,
+      data: {'fullName': userName},
+    );
   }
 
   Future<void> signOut() async {
@@ -28,7 +31,8 @@ class AuthService {
   String? getCurrentUser() {
     final session = _supabase.auth.currentSession;
     final user = session?.user;
-    return user?.userMetadata?['userName'];
+    print(user);
+    return user?.userMetadata?['fullName'];
   }
 
   String? getCurrentUserID() {

@@ -30,9 +30,7 @@ class _SignupPageState extends State<SignupPage> {
       await authService.signUpWithEmailPassword(email, password, userName);
 
       if (mounted) {
-        await authService.signInWithEmailPassword(email, password).then((_) {
-          Navigator.pushNamed(context, '/create_profile');
-        });
+        Navigator.pushNamed(context, '/verify-acc');
       }
     } catch (e) {
       if (mounted) {

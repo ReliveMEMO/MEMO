@@ -3,6 +3,7 @@ import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/signup_page.dart';
+import 'package:memo/pages/verify_email_page.dart';
 import 'package:memo/services/auth_gate.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
         '/create-profile': (context) => CreateProfile(),
+        '/verify-acc': (context) => VerifyEmailPage(),
         //Testing the CI pipeline xoxo
       },
     );

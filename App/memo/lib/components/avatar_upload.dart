@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AvatarUpload extends StatefulWidget {
-  const AvatarUpload({super.key});
+  final Function(File?) onImageSelected;
+
+  const AvatarUpload({super.key, required this.onImageSelected});
 
   @override
   State<AvatarUpload> createState() => _AvatarUploadState();
@@ -20,26 +21,20 @@ class _AvatarUploadState extends State<AvatarUpload> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
+      final fileSize = await image.length();
+      if (fileSize > 10 * 1024 * 1024) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Image size must be less than 10MB")),
+        );
+        return;
+      }
       setState(() {
         _imageFile = File(image.path);
       });
+
+      // Pass the selected image back to the parent widget
+      widget.onImageSelected(_imageFile);
     }
-  }
-
-  Future uploadImage() async {
-    if (_imageFile == null) {
-      return;
-    }
-
-    final FileName = DateTime.now().millisecondsSinceEpoch.toString();
-    final path = 'uploads/$FileName';
-
-    await Supabase.instance.client.storage
-        .from('profile-pictures')
-        .upload(path, _imageFile!)
-        .then((value) => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Image uploaded successfully")),
-            ));
   }
 
   @override
@@ -53,8 +48,8 @@ class _AvatarUploadState extends State<AvatarUpload> {
             children: [
               ClipOval(
                 child: SizedBox(
-                  width: 200,
-                  height: 200,
+                  width: 150,
+                  height: 150,
                   child: _imageFile != null
                       ? Image.file(_imageFile!, fit: BoxFit.cover)
                       : Image.asset("assets/images/user.png",
@@ -73,8 +68,6 @@ class _AvatarUploadState extends State<AvatarUpload> {
             ],
           ),
           const SizedBox(height: 30),
-          ElevatedButton(
-              onPressed: uploadImage, child: const Text("Upload Image")),
         ],
       ),
     );

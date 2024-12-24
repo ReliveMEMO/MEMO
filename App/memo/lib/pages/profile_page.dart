@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memo/components/bottom_nav.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -94,6 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: CircularProgressIndicator(),
           ),
       ]),
+      bottomNavigationBar: const BottomNav(),
     );
   }
 }

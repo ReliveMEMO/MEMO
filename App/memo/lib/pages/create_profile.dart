@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
 import 'package:memo/components/dropDown.dart';
+// import 'package:memo/components/nav_bar.dart';
 import 'package:memo/components/textField.dart';
 import 'package:intl/intl.dart';
 import 'package:memo/services/auth_service.dart';
@@ -125,6 +126,7 @@ class _CreateProfileState extends State<CreateProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // bottomNavigationBar: NavBar(),
       appBar: AppBar(
         title: Text("Create Profile ${authService.getCurrentUser()}"),
       ),

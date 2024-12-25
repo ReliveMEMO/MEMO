@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 // import 'package:memo/components/nav_bar.dart';
 import 'package:memo/services/auth_service.dart';
@@ -73,11 +74,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 radius: 50,
                 child: ClipOval(
                   child: userDetails?['profile_pic'] != null
-                      ? Image.network(
-                          userDetails?['profile_pic'] as String,
+                      ? CachedNetworkImage(
+                          imageUrl: userDetails?['profile_pic'] as String,
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
                         )
                       : const Icon(Icons.person, size: 50),
                 ),

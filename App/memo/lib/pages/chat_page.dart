@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:memo/components/chat_tile.dart';
 import 'package:memo/services/auth_service.dart';
 
 class ChatPage extends StatefulWidget {
@@ -15,6 +16,13 @@ class _ChatPageState extends State<ChatPage> {
 
   final TextEditingController searchController = TextEditingController();
   String searchValue = '';
+
+  final chats = [
+    ['I', '4dec006b-d345-4c6f-b790-0560aa12ad35'],
+    ['G', 'b8ae07a3-20a5-41fd-aaf3-e532776a4d79'],
+    ['I', '4dec006b-d345-4c6f-b790-0560aa12ad35'],
+    ['G', 'b8ae07a3-20a5-41fd-aaf3-e532776a4d79'],
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +67,27 @@ class _ChatPageState extends State<ChatPage> {
             ),
           )
         ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
+                children: chats
+                    .map((chat) => Padding(
+                          padding: EdgeInsets.symmetric(vertical: 6.0),
+                          child: ChatTile(
+                            chatId: chat[1],
+                          ),
+                        ))
+                    .toList(),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

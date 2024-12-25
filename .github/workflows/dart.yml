@@ -1,0 +1,106 @@
+name: Dart
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+env:
+  ROOT_DIR: App/memo # Adjust to match your directory structure
+  TEST_BRANCH: DevTest
+  EXCLUDE_BRANCHES: main
+
+jobs:
+  # build:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - uses: dart-lang/setup-dart@v1
+  #       with:
+  #         sdk: "3.5.4"
+
+  #     - name: Set up Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: "3.24.4" # Use the desired Flutter version
+
+  #     - name: Install dependencies
+  #       run: dart pub get
+  #       working-directory: ${{ env.ROOT_DIR }}
+
+  #     # - name: Analyze project source
+  #     #   run: dart analyze
+  #     #   working-directory: ${{ env.ROOT_DIR }}
+
+  #     # - name: Run tests
+  #     #   run: dart test
+  #     #   working-directory: ${{ env.ROOT_DIR }}
+
+  auto-merge-to-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Attempt to merge PR branch into DevTest
+        run: |
+          git fetch origin
+          git checkout ${{ env.TEST_BRANCH }}
+          git merge origin/${{ github.event.pull_request.head.ref }} --no-ff -m "Auto-merge from ${{ github.event.pull_request.head.ref }}"
+          git push origin ${{ env.TEST_BRANCH }}
+        working-directory: ${{ env.ROOT_DIR }}
+        continue-on-error: true
+
+  auto-merge-to-other:
+    runs-on: ubuntu-latest
+    needs: auto-merge-to-test
+
+    permissions:
+      contents: write # Required for accessing branches and performing merges
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Script with Debug Logs
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const excludedBranches = ["${{ env.EXCLUDE_BRANCHES }}"];
+            const branches = await github.rest.repos.listBranches({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const targetBranches = branches.data
+              .map(branch => branch.name)
+              .filter(branch => branch !== "${{ env.TEST_BRANCH }}" && !excludedBranches.includes(branch));
+
+            console.log('Branches to merge into:', targetBranches);
+
+            for (const branch of targetBranches) {
+              try {
+                console.log(`Attempting to merge ${"${{ env.TEST_BRANCH }}"} into ${branch}...`);
+                const mergeResponse = await github.rest.repos.merge({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  base: branch,
+                  head: "${{ env.TEST_BRANCH }}",
+                  commit_message: `Auto-merge from ${{ env.TEST_BRANCH }}`,
+                });
+                console.log(`Successfully merged into ${branch}:`, mergeResponse);
+              } catch (error) {
+                console.error(`Failed to merge into ${branch}:`, error.message);
+              }
+            }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:memo/components/authButton.dart';
 import 'package:memo/components/googleLog.dart';
-import 'package:memo/components/textField.dart';
+//import 'package:memo/components/textField.dart';
 import 'package:memo/services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void loginPage() {
   runApp(LoginPage());
@@ -21,28 +22,32 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final AuthService authService = AuthService();
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  //final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? emailError;
   String? passwordError;
-
-
 
   void login() async {
     final email = usernameController.text;
     final password = passwordController.text;
 
-     setState(() {
+    setState(() {
       emailError = email.isEmpty ? 'Email is required' : null;
       passwordError = password.isEmpty ? 'Password is required' : null;
     });
 
-     if (emailError != null || passwordError != null) {
+    if (emailError != null || passwordError != null) {
       return; // Stop login attempt if there's an error
     }
 
     try {
       await authService.signInWithEmailPassword(email, password);
-      Navigator.pushNamed(context, '/profile');
+      final userExist = await checkUserExist(authService.getCurrentUserID());
+
+      if (userExist) {
+        Navigator.pushNamed(context, '/profile');
+      } else {
+        Navigator.pushNamed(context, '/create-profile');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -52,6 +57,19 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     }
+  }
+
+  Future<bool> checkUserExist(String? userId) async {
+    final response = await Supabase.instance.client
+        .from('User_Info')
+        .select()
+        .eq('id', userId!)
+        .maybeSingle();
+
+    if (response != null) {
+      return true;
+    }
+    return false;
   }
 
   // This widget is the root of your application.
@@ -74,113 +92,94 @@ class _LoginPageState extends State<LoginPage> {
 
             //Username textfield
             Padding(
-            padding:const EdgeInsets.symmetric(horizontal: 25, vertical: 10 ),
-            child: TextFormField(
-              controller: usernameController,
-              decoration: InputDecoration(
-                hintText: "Email",
-                errorText: emailError,
-                errorStyle: const TextStyle(color: Colors.red),
-                hintStyle: const TextStyle(
-                 
-                 fontSize: 16,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w300,
-               ),
-             
-
-                    fillColor: const Color.fromARGB(255, 248, 240, 255),
-                    filled: true,
-                    
-                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: emailError == null
-                            ? Colors.transparent
-                            : Colors.red, // Red border if error
-                      ),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              child: TextFormField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  hintText: "Email",
+                  errorText: emailError,
+                  errorStyle: const TextStyle(color: Colors.red),
+                  hintStyle: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w300,
+                  ),
+                  fillColor: const Color.fromARGB(255, 248, 240, 255),
+                  filled: true,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: emailError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border if error
                     ),
-                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: emailError == null
-                          ? Colors.transparent 
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: emailError == null
+                          ? Colors.transparent
                           : Colors.red, // Red border when error is present
-                      ),
                     ),
-
-       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(
-          color: emailError == null
-              ? Colors.transparent
-              : Colors.red, // Red border when error
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: emailError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border when error
+                    ),
+                  ),
                 ),
-               ),
               ),
             ),
-          ),
-
-
-              
-            
 
             //Password textfield
-             Padding(
-            padding:const EdgeInsets.symmetric(horizontal: 25, vertical: 10 ),
-            child: TextFormField(
-              controller: passwordController,
-              decoration: InputDecoration(
-                hintText: "Password",
-                errorText:passwordError,
-                errorStyle: const TextStyle(color: Colors.red),
-                hintStyle: const TextStyle(
-                 
-                 fontSize: 16,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w300,
-               ),
-             
-
-                    fillColor: const Color.fromARGB(255, 248, 240, 255),
-                    filled: true,
-                    
-                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: passwordError == null
-                            ? Colors.transparent
-                            : Colors.red, // Red border if error
-                      ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              child: TextFormField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                  hintText: "Password",
+                  errorText: passwordError,
+                  errorStyle: const TextStyle(color: Colors.red),
+                  hintStyle: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w300,
+                  ),
+                  fillColor: const Color.fromARGB(255, 248, 240, 255),
+                  filled: true,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: passwordError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border if error
                     ),
-                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: passwordError == null
-                          ? Colors.transparent 
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: passwordError == null
+                          ? Colors.transparent
                           : Colors.red, // Red border when error is present
-                      ),
                     ),
-
-       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(
-          color: passwordError == null
-              ? Colors.transparent
-              : Colors.red, // Red border when error
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: passwordError == null
+                          ? Colors.transparent
+                          : Colors.red, // Red border when error
+                    ),
+                  ),
                 ),
-               ),
               ),
             ),
-          ),
 
-
-            
             //Forgot password
-            
-            
-            
-            
+
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
               child: Row(

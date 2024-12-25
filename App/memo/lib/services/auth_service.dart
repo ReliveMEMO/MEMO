@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -17,8 +18,11 @@ class AuthService {
     String password,
     String userName,
   ) async {
-    return await _supabase.auth
-        .signUp(email: email, password: password, data: {'userName': userName});
+    return await _supabase.auth.signUp(
+      email: email,
+      password: password,
+      data: {'fullName': userName},
+    );
   }
 
   Future<void> signOut() async {
@@ -28,7 +32,14 @@ class AuthService {
   String? getCurrentUser() {
     final session = _supabase.auth.currentSession;
     final user = session?.user;
-    return user?.email;
+    print(user);
+    return user?.userMetadata?['fullName'];
+  }
+
+  String? getCurrentUserID() {
+    final session = _supabase.auth.currentSession;
+    final user = session?.user;
+    return user?.id;
   }
 
   Future<AuthResponse> signInWithGoogle() async {

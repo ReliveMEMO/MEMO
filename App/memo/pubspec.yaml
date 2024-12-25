@@ -40,6 +40,9 @@ dependencies:
   supabase_flutter: ^2.8.1
   path_provider: ^2.0.11
   image_picker: ^1.1.2
+  intl: ^0.20.1
+  hugeicons: ^0.0.7
+  solar_icons: ^0.0.5
 
 flutter_launcher_icons:
   android: true

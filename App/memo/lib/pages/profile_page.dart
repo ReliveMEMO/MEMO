@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// import 'package:memo/components/nav_bar.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -56,12 +57,12 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: logout,
-          )
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.logout),
+        //     onPressed: logout,
+        //   )
+        // ],
       ),
       body: Stack(children: [
         Center(
@@ -94,6 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: CircularProgressIndicator(),
           ),
       ]),
+      //bottomNavigationBar: NavBar(),
     );
   }
 }

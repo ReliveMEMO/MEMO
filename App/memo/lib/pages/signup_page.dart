@@ -61,7 +61,7 @@ class _SignupPageState extends State<SignupPage> {
 
             const SizedBox(height: 10),
 
-            const Googlelog(),
+            /*const*/ Googlelog(),
 
             const SizedBox(
               height: 20,

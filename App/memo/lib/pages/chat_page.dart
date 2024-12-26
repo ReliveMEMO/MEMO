@@ -19,9 +19,7 @@ class _ChatPageState extends State<ChatPage> {
 
   final chats = [
     ['I', '4dec006b-d345-4c6f-b790-0560aa12ad35'],
-    ['G', 'b8ae07a3-20a5-41fd-aaf3-e532776a4d79'],
     ['I', '4dec006b-d345-4c6f-b790-0560aa12ad35'],
-    ['G', 'b8ae07a3-20a5-41fd-aaf3-e532776a4d79'],
   ];
 
   @override

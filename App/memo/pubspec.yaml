@@ -43,6 +43,7 @@ dependencies:
   hugeicons: ^0.0.7
   solar_icons: ^0.0.5
   cached_network_image: ^3.4.1
+  encrypt: ^5.0.3
 
 flutter_launcher_icons:
   android: true

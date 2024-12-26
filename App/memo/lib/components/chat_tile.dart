@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/services/auth_service.dart';
+import 'package:memo/services/msg_encryption.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ChatTile extends StatefulWidget {
@@ -13,8 +14,9 @@ class ChatTile extends StatefulWidget {
 
 class _ChatTileState extends State<ChatTile> {
   final authService = AuthService();
+  final msgEncryption = MsgEncryption();
   final userName = 'Sandinu Pinnawala';
-  final recentMsg = 'Hello there!';
+  String? recentMsg = 'Hello there!';
   final time = '10:00 AM';
   final DP =
       'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/1734968788082';
@@ -55,6 +57,21 @@ class _ChatTileState extends State<ChatTile> {
     setState(() {
       recieverDetails = userResponse;
     });
+
+    final messageResponse = await Supabase.instance.client
+        .from('ind_message_table')
+        .select('message')
+        .eq('chat_id', cId)
+        .order('time_stamp', ascending: false)
+        .limit(1)
+        .single();
+
+    print(messageResponse);
+
+    setState(() {
+      recentMsg = msgEncryption.decrypt(messageResponse['message']);
+    });
+
     print(userResponse);
   }
 
@@ -67,7 +84,7 @@ class _ChatTileState extends State<ChatTile> {
       ),
       child: ListTile(
         title: Text(recieverDetails?['full_name'] ?? 'Unknown User'),
-        subtitle: Text(recentMsg),
+        subtitle: Text(recentMsg ?? 'No recent message'),
         leading: CircleAvatar(
           radius: 22,
           child: ClipOval(

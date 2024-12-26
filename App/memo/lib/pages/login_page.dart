@@ -251,7 +251,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
 
 
-            /*const*/ Googlelog(),
+            /*const*/ 
+            Googlelog(),
             //Signup link
 
             const SizedBox(

@@ -51,49 +51,67 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final userLoggedIn = authService.getCurrentUser();
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: logout,
-          )
-        ],
-      ),
-      body: Stack(children: [
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 50,
-                child: ClipOval(
-                  child: userDetails?['profile_pic'] != null
-                      ? Image.network(
-                          userDetails?['profile_pic'] as String,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        )
-                      : const Icon(Icons.person, size: 50),
+Widget build(BuildContext context) {
+  final userLoggedIn = authService.getCurrentUser();
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Profile'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: logout,
+        )
+      ],
+    ),
+    body: Stack(
+      children: [
+        Column(
+          children: [
+            const SizedBox(height: 50), // Adds some padding from the top
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(width: 68), // Padding from the left
+                CircleAvatar(
+                  radius: 58,
+                  child: ClipOval(
+                    child: userDetails?['profile_pic'] != null
+                        ? Image.network(
+                            userDetails?['profile_pic'] as String,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : const Icon(Icons.person, size: 50),
+                  ),
                 ),
-              ),
-              Text(
-                'Welcome $userLoggedIn',
-                style: const TextStyle(fontSize: 24, fontFamily: 'Poppins'),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+                const SizedBox(width: 20), 
+                Container(
+                  padding: const EdgeInsets.all(20), 
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey, width: 1.5), 
+                    borderRadius: BorderRadius.circular(10), 
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10), 
+                    child: Image.asset(
+                      "assets/images/IIT-Campus-Logo.png", 
+                      width: 50, 
+                      height: 50, 
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         if (isLoading)
-          Center(
+          const Center(
             child: CircularProgressIndicator(),
           ),
-      ]),
-    );
-  }
+      ],
+    ),
+  );
+}
 }

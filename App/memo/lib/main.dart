@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const authGate(),
       routes: {
-        '/login': (context) => LoginPage(),
+       // '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
         '/create-profile': (context) => CreateProfile(),

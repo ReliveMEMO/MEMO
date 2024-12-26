@@ -49,10 +49,8 @@ class _ProfilePageState extends State<ProfilePage> {
       isLoading = false;
     });
   }
-
-  @override
+ @override
 Widget build(BuildContext context) {
-  final userLoggedIn = authService.getCurrentUser();
   return Scaffold(
     appBar: AppBar(
       title: const Text('Profile'),
@@ -60,7 +58,7 @@ Widget build(BuildContext context) {
         IconButton(
           icon: const Icon(Icons.logout),
           onPressed: logout,
-        )
+        ),
       ],
     ),
     body: Stack(
@@ -69,38 +67,67 @@ Widget build(BuildContext context) {
           children: [
             const SizedBox(height: 50), // Adds some padding from the top
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(width: 68), // Padding from the left
                 CircleAvatar(
                   radius: 58,
                   child: ClipOval(
                     child: userDetails?['profile_pic'] != null
                         ? Image.network(
                             userDetails?['profile_pic'] as String,
-                            width: 100,
-                            height: 100,
+                            width: 116,
+                            height: 116,
                             fit: BoxFit.cover,
                           )
-                        : const Icon(Icons.person, size: 50),
+                        : const Icon(Icons.person, size: 58),
                   ),
                 ),
-                const SizedBox(width: 20), 
-                Container(
-                  padding: const EdgeInsets.all(20), 
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 1.5), 
-                    borderRadius: BorderRadius.circular(10), 
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10), 
-                    child: Image.asset(
-                      "assets/images/IIT-Campus-Logo.png", 
-                      width: 50, 
-                      height: 50, 
-                      fit: BoxFit.cover,
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 130,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey, width: 1.5),
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        ),
+                        child: Image.asset(
+                          "assets/images/IIT-Campus-Logo.png",
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 5),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 10,
+                      ),
+                      child: const Text(
+                        'LEVEL 05',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -114,4 +141,7 @@ Widget build(BuildContext context) {
     ),
   );
 }
+
 }
+
+

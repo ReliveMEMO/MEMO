@@ -1,6 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/providers/user_provider.dart';
 // import 'package:memo/components/nav_bar.dart';
 import 'package:memo/services/auth_service.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void profilePage() {
@@ -41,14 +44,21 @@ class _ProfilePageState extends State<ProfilePage> {
         .select()
         .eq('id', authService.getCurrentUserID()!)
         .maybeSingle();
+
+    if (!mounted) return;
+
     setState(() {
       userDetails = response;
     });
-
+    userDetails?['user_name'] = authService.getCurrentUser();
     print(response);
+
     setState(() {
       isLoading = false;
     });
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.userDetails = userDetails;
   }
 
   @override
@@ -73,11 +83,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 radius: 50,
                 child: ClipOval(
                   child: userDetails?['profile_pic'] != null
-                      ? Image.network(
-                          userDetails?['profile_pic'] as String,
+                      ? CachedNetworkImage(
+                          imageUrl: userDetails?['profile_pic'] as String,
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
                         )
                       : const Icon(Icons.person, size: 50),
                 ),

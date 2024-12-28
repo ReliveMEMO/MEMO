@@ -4,7 +4,9 @@ import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/signup_page.dart';
 import 'package:memo/pages/verify_email_page.dart';
+import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_gate.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -14,7 +16,12 @@ void main() async {
     url: "https://qbqwbeppyliavvfzryze.supabase.co",
   );
 
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => UserProvider()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 //final Supabase = Supabase.instance.clinet; //supabase
@@ -27,7 +34,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      color: Colors.white,
       home: const authGate(),
+      theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: const AppBarTheme(color: Colors.white)),
       routes: {
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),

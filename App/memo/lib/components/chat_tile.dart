@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ChatTile extends StatefulWidget {
@@ -17,7 +19,8 @@ class _ChatTileState extends State<ChatTile> {
   final msgEncryption = MsgEncryption();
   final userName = 'Sandinu Pinnawala';
   String? recentMsg = 'Hello there!';
-  final time = '10:00 AM';
+  String time = '10:00 AM';
+  DateTime? time_stamp;
   final DP =
       'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/1734968788082';
   bool isLoading = false;
@@ -54,25 +57,48 @@ class _ChatTileState extends State<ChatTile> {
         .select()
         .eq('id', recieverId)
         .maybeSingle();
+
+    if (!mounted) return;
+
     setState(() {
       recieverDetails = userResponse;
     });
 
     final messageResponse = await Supabase.instance.client
         .from('ind_message_table')
-        .select('message')
+        .select('message , time_stamp')
         .eq('chat_id', cId)
         .order('time_stamp', ascending: false)
         .limit(1)
         .single();
 
-    print(messageResponse);
+    if (!mounted) return;
 
     setState(() {
       recentMsg = msgEncryption.decrypt(messageResponse['message']);
+      time = formatTimeStamp(messageResponse['time_stamp']);
     });
 
     print(userResponse);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  String formatTimeStamp(String timeStamp) {
+    DateTime dateTime = DateTime.parse(timeStamp);
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime yesterday = today.subtract(Duration(days: 1));
+
+    if (dateTime.isAfter(today)) {
+      return DateFormat.jm().format(dateTime); // Time if it's today
+    } else if (dateTime.isAfter(yesterday)) {
+      return 'Yesterday'; // Yesterday
+    } else {
+      return DateFormat.MMMd().format(dateTime); // Date like Dec 24
+    }
   }
 
   @override
@@ -82,27 +108,40 @@ class _ChatTileState extends State<ChatTile> {
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(15),
       ),
-      child: ListTile(
-        title: Text(recieverDetails?['full_name'] ?? 'Unknown User'),
-        subtitle: Text(recentMsg ?? 'No recent message'),
-        leading: CircleAvatar(
-          radius: 22,
-          child: ClipOval(
-              child: recieverDetails?['profile_pic'] != null
-                  ? CachedNetworkImage(
-                      imageUrl: recieverDetails?['profile_pic'] as String,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      errorWidget: (context, url, error) => Icon(Icons.person),
-                    )
-                  : const Icon(Icons.person, size: 50)),
-        ),
-        trailing: Text(
-          time,
-          style: TextStyle(color: Colors.grey),
-        ),
-      ),
+      child: isLoading
+          ? Skeletonizer(
+              child: ListTile(
+              title: Container(
+                width: 100,
+                height: 20,
+                color: Colors.grey,
+                margin: EdgeInsets.symmetric(vertical: 4),
+              ),
+              subtitle: Container(width: 150, height: 20, color: Colors.grey),
+              leading: CircleAvatar(radius: 22, backgroundColor: Colors.grey),
+            ))
+          : ListTile(
+              title: Text(recieverDetails?['full_name'] ?? 'Unknown User'),
+              subtitle: Text(recentMsg ?? 'No recent message'),
+              leading: CircleAvatar(
+                radius: 22,
+                child: ClipOval(
+                    child: recieverDetails?['profile_pic'] != null
+                        ? CachedNetworkImage(
+                            imageUrl: recieverDetails?['profile_pic'] as String,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.person),
+                          )
+                        : const Icon(Icons.person, size: 50)),
+              ),
+              trailing: Text(
+                time,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
     );
   }
 }

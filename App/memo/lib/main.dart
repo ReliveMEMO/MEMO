@@ -4,7 +4,9 @@ import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/signup_page.dart';
 import 'package:memo/pages/verify_email_page.dart';
+import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_gate.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -14,7 +16,12 @@ void main() async {
     url: "https://qbqwbeppyliavvfzryze.supabase.co",
   );
 
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => UserProvider()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

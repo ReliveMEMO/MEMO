@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:memo/pages/chat_page.dart';
 import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:solar_icons/solar_icons.dart';
@@ -19,7 +20,7 @@ class _myPageState extends State<myPage> {
     CreateProfile(),
     ProfilePage(),
     ProfilePage(),
-    ProfilePage(),
+    ChatPage(),
   ];
 
   int currentIndex = 0;

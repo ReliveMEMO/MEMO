@@ -49,99 +49,113 @@ class _ProfilePageState extends State<ProfilePage> {
       isLoading = false;
     });
   }
- @override
+@override
 Widget build(BuildContext context) {
   return Scaffold(
+    backgroundColor: Colors.white, // Set the entire background to white
     appBar: AppBar(
-      title: const Text('Profile'),
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () {},
+      ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.logout),
-          onPressed: logout,
+          icon: Icon(Icons.settings, color: Colors.black),
+          onPressed: () {},
         ),
       ],
     ),
     body: Stack(
+      clipBehavior: Clip.none,
       children: [
-        Column(
-          children: [
-            const SizedBox(height: 50), // Adds some padding from the top
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 58,
-                  child: ClipOval(
-                    child: userDetails?['profile_pic'] != null
-                        ? Image.network(
-                            userDetails?['profile_pic'] as String,
-                            width: 116,
-                            height: 116,
-                            fit: BoxFit.cover,
-                          )
-                        : const Icon(Icons.person, size: 58),
-                  ),
+        Positioned(
+          top: 30,
+          left: 97,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Information Card
+              Container(
+                padding: EdgeInsets.all(12),
+                width: 220, // Adjust width for the content
+                constraints: BoxConstraints(
+                  minHeight: 95, // Minimum height for the container
                 ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                ),
+                child: Row(
                   children: [
-                    Container(
-                      width: 130,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey, width: 1.5),
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ),
-                        child: Image.asset(
-                          "assets/images/IIT-Campus-Logo.png",
-                          fit: BoxFit.contain,
-                        ),
+                    // University Logo
+                    CircleAvatar(
+                      radius: 20,
+                      
+                      child: Image.asset(
+                        'assets/images/IIT-Campus-Logo.png', 
+                        fit: BoxFit.contain,
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 5,
-                        horizontal: 10,
-                      ),
-                      child: const Text(
-                        'LEVEL 05',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                    SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 50),
+                        Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 45, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            "LEVEL 05",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // Profile Picture with Emoji Overlay
+              Positioned(
+                top: -20,
+                left: -40,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 73, // Adjust for the larger profile
+                      child: CircleAvatar(
+                        radius: 68,
+                        backgroundImage: AssetImage(''), // Replace with your profile image
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ],
-        ),
-        if (isLoading)
-          const Center(
-            child: CircularProgressIndicator(),
+              ),
+            ],
           ),
+        ),
       ],
     ),
   );
 }
-
 }
-
-

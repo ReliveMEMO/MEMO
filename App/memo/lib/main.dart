@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => ProfilePage(),
         '/create-profile': (context) => CreateProfile(),
         '/verify-acc': (context) => VerifyEmailPage(),
+        '/chat': (context) => convoPage(),
         //Testing the CI pipeline xoxo
       },
     );

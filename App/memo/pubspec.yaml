@@ -46,6 +46,7 @@ dependencies:
   encrypt: ^5.0.3
   skeletonizer: ^1.4.2
   provider: ^6.1.2
+  chatview: ^2.4.0
 
 flutter_launcher_icons:
   android: true

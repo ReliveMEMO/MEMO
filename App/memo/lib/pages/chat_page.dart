@@ -50,12 +50,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _refreshChats() async {
-    // Add your refresh logic here
-    await Future.delayed(Duration(seconds: 2)); // Simulate network request
     setState(() {
-      // Update your chat list or other state variables here
-      getChatDetails();
+      chats = []; // Clear the current chat list
     });
+
+    // Fetch the latest chat details and update the state
+    getChatDetails();
   }
 
   @override

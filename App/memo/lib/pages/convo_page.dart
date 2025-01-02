@@ -189,6 +189,11 @@ class _convoPageState extends State<convoPage> {
       });
 
       channel.sink.add(messagePayload);
+
+      // Update the last_accessed column in the database
+      await Supabase.instance.client.from('ind_chat_table').update({
+        'last_accessed': DateTime.now().toUtc().toIso8601String()
+      }).eq('chat_id', arguments['chatId']);
     } catch (e) {
       print("Error sending message: $e");
     }

@@ -188,7 +188,21 @@ class _convoPageState extends State<convoPage> {
         "message": encryptedMessage,
       });
 
+      final String chatId = arguments['chatId'];
+      print(chatId + " chatId");
+      final response = await Supabase.instance.client
+          .from('ind_chat_table')
+          .update({
+        'last_accessed': DateTime.now().toUtc().toIso8601String()
+      }).eq('chat_id', chatId);
+
       channel.sink.add(messagePayload);
+
+      if (response != null) {
+        print("Error updating last_accessed: ${response.error!.message}");
+      } else {
+        print("last_accessed updated successfully");
+      }
     } catch (e) {
       print("Error sending message: $e");
     }
@@ -271,8 +285,8 @@ class _convoPageState extends State<convoPage> {
                       final message = messages[index];
                       final isSender = message['sender_id'] ==
                           authService.getCurrentUserID();
-                      final messageTime = DateTime.parse(message[
-                          'time_stamp']); // Assuming 'timestamp' is in ISO 8601 format
+                      final messageTime = DateTime.parse(message['time_stamp'])
+                          .toLocal(); // Assuming 'timestamp' is in ISO 8601 format
                       final formattedTime = DateFormat('hh:mm a').format(
                           messageTime); // Using intl package for formatting
                       final formattedDate =

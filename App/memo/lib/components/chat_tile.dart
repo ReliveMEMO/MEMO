@@ -87,7 +87,8 @@ class _ChatTileState extends State<ChatTile> {
   }
 
   String formatTimeStamp(String timeStamp) {
-    DateTime dateTime = DateTime.parse(timeStamp);
+    DateTime dateTime =
+        DateTime.parse(timeStamp).toLocal(); // Convert to local time
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
     DateTime yesterday = today.subtract(Duration(days: 1));

@@ -14,8 +14,7 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> with RouteAware {
-  final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+class _ChatPageState extends State<ChatPage> {
   final authService = AuthService();
   final Color colorDark = const Color(0xFF7f31c6);
 
@@ -28,27 +27,6 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
   @override
   void initState() {
     super.initState();
-    getChatDetails();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Register this page as a route observer
-    routeObserver.subscribe(
-        this, ModalRoute.of(context)! as PageRoute<dynamic>);
-  }
-
-  @override
-  void dispose() {
-    // Unregister this page as a route observer
-    routeObserver.unsubscribe(this);
-    super.dispose();
-  }
-
-  @override
-  void didPopNext() {
-    // Called when the current route has been popped off, and the user returned to this route
     getChatDetails();
   }
 
@@ -68,12 +46,6 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
     setState(() {
       chats = response['chats'];
       isLoading = false;
-    });
-
-    chats.sort((a, b) {
-      DateTime aTime = DateTime.parse(a['last_message_time']);
-      DateTime bTime = DateTime.parse(b['last_message_time']);
-      return bTime.compareTo(aTime);
     });
   }
 

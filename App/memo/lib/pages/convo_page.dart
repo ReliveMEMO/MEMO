@@ -4,8 +4,10 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
+import 'package:memo/providers/chats_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -27,6 +29,7 @@ class _convoPageState extends State<convoPage> {
   double bottomInsets = 0;
 
   late WebSocketChannel channel;
+  late ChatProvider chatProvider;
 
   final TextEditingController textMessageController = TextEditingController();
   final ValueNotifier<IconData> iconNotifier = ValueNotifier(Icons.mic);
@@ -42,6 +45,7 @@ class _convoPageState extends State<convoPage> {
 
     // Establish WebSocket connection and register receiver
     _initializeWebSocket();
+    chatProvider = Provider.of<ChatProvider>(context, listen: false);
   }
 
   void _initializeWebSocket() {
@@ -189,6 +193,7 @@ class _convoPageState extends State<convoPage> {
       });
 
       channel.sink.add(messagePayload);
+      chatProvider.addChat(arguments['chatId']);
     } catch (e) {
       print("Error sending message: $e");
     }

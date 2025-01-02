@@ -3,6 +3,10 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/pages/chat_page.dart';
 import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/profile_page.dart';
+import 'package:memo/providers/chats_provider.dart';
+import 'package:memo/services/auth_service.dart';
+import 'package:provider/provider.dart';
+
 import 'package:solar_icons/solar_icons.dart';
 
 class myPage extends StatefulWidget {
@@ -32,6 +36,13 @@ class _myPageState extends State<myPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = AuthService();
+
+    late ChatProvider chatProvider;
+
+    chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    chatProvider.fetchChats(authService.getCurrentUserID()!);
+
     return Scaffold(
       body: pages[currentIndex],
       bottomNavigationBar: Container(

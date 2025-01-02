@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/chat_tile.dart';
+import 'package:memo/providers/chats_provider.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -24,10 +25,13 @@ class _ChatPageState extends State<ChatPage> {
 
   var chats = [];
 
+  late ChatProvider chatProvider;
+
   @override
   void initState() {
     super.initState();
     getChatDetails();
+    print(chatProvider.chats);
   }
 
   void getChatDetails() async {
@@ -35,16 +39,18 @@ class _ChatPageState extends State<ChatPage> {
       isLoading = true;
     });
 
-    final response = await Supabase.instance.client
-        .from('User_Info')
-        .select('chats')
-        .eq('id', authService.getCurrentUserID()!)
-        .single();
+    // final response = await Supabase.instance.client
+    //     .from('User_Info')
+    //     .select('chats')
+    //     .eq('id', authService.getCurrentUserID()!)
+    //     .single();
 
-    if (!mounted) return;
+    // if (!mounted) return;
+    chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    //await chatProvider.fetchChats(authService.getCurrentUserID()!);
 
     setState(() {
-      chats = response['chats'];
+      chats = chatProvider.chats;
       isLoading = false;
     });
   }
@@ -56,6 +62,13 @@ class _ChatPageState extends State<ChatPage> {
 
     // Fetch the latest chat details and update the state
     getChatDetails();
+    setState(() {});
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {});
   }
 
   @override
@@ -124,19 +137,25 @@ class _ChatPageState extends State<ChatPage> {
           child: Column(
             children: [
               Expanded(
-                child: ListView(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
-                  children: chats
-                      .map((chat) => Padding(
-                            padding: EdgeInsets.symmetric(vertical: 6.0),
-                            child: ChatTile(
-                              chatId: chat,
-                            ),
-                          ))
-                      .toList(),
+                child: Consumer<ChatProvider>(
+                  builder: (context, chatProvider, child) {
+                    final reversedChats = chatProvider.chats.reversed.toList();
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 5),
+                      itemCount: reversedChats.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          child: ChatTile(
+                            chatId: reversedChats[index],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
-              )
+              ),
             ],
           ),
         ),

@@ -22,9 +22,7 @@ class _ChatPageState extends State<ChatPage> {
   String searchValue = '';
   bool isLoading = false;
 
-  final SupabaseClient supabase = Supabase.instance.client;
-  late final Stream<List<Map<String, dynamic>>>
-      chatStream; // Updated to store chat details as map
+  var chats = [];
 
   @override
   void initState() {
@@ -37,35 +35,27 @@ class _ChatPageState extends State<ChatPage> {
       isLoading = true;
     });
 
-    chatStream = supabase
-        .from('ind_chat_table')
-        .stream(primaryKey: ['chat_id'])
-        .order('last_accessed', ascending: false)
-        .map((data) => data
-            .map((chat) => {
-                  'chat_id': chat['chat_id'],
-                  'last_accessed': chat['last_accessed']
-                })
-            .toList());
-
-    chatStream.listen((chats) {
-      // Handle the incoming chat data
-      print('New chat data: $chats');
-    });
+    final response = await Supabase.instance.client
+        .from('User_Info')
+        .select('chats')
+        .eq('id', authService.getCurrentUserID()!)
+        .single();
 
     if (!mounted) return;
 
     setState(() {
+      chats = response['chats'];
       isLoading = false;
     });
   }
 
   Future<void> _refreshChats() async {
     setState(() {
-      chatStream = Stream.empty();
+      chats = []; // Clear the current chat list
     });
 
     // Fetch the latest chat details and update the state
+    getChatDetails();
   }
 
   @override
@@ -131,26 +121,23 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10.0),
-          child: StreamBuilder<List<Map<String, dynamic>>>(
-            stream: chatStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('No chats available'));
-              } else {
-                final chats = snapshot.data!;
-                return ListView.builder(
-                  itemCount: chats.length,
-                  itemBuilder: (context, index) {
-                    final chat = chats[index];
-                    return ChatTile(chatId: chat['chat_id'] as String);
-                  },
-                );
-              }
-            },
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
+                  children: chats
+                      .map((chat) => Padding(
+                            padding: EdgeInsets.symmetric(vertical: 6.0),
+                            child: ChatTile(
+                              chatId: chat,
+                            ),
+                          ))
+                      .toList(),
+                ),
+              )
+            ],
           ),
         ),
       ),

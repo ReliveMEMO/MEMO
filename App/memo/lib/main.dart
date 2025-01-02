@@ -5,7 +5,6 @@ import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/signup_page.dart';
 import 'package:memo/pages/verify_email_page.dart';
-import 'package:memo/providers/chats_provider.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_gate.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +20,6 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
-      ChangeNotifierProvider(create: (_) => ChatProvider()),
     ],
     child: const MyApp(),
   ));

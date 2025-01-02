@@ -20,12 +20,15 @@ class _ChatTileState extends State<ChatTile> {
   final userName = 'Sandinu Pinnawala';
   String? recentMsg = 'Hello there!';
   String time = '10:00 AM';
+  bool isSeen = false;
   DateTime? time_stamp;
   final DP =
       'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/1734968788082';
   bool isLoading = false;
   String recieverId = '';
   PostgrestMap? recieverDetails;
+  final Color colorLight = const Color.fromARGB(255, 248, 240, 255);
+  final Color colorDark = const Color(0xFF7f31c6);
 
   late String cId;
 
@@ -66,7 +69,7 @@ class _ChatTileState extends State<ChatTile> {
 
     final messageResponse = await Supabase.instance.client
         .from('ind_message_table')
-        .select('message , time_stamp')
+        .select('message , time_stamp, is_seen')
         .eq('chat_id', cId)
         .order('time_stamp', ascending: false)
         .limit(1)
@@ -77,6 +80,7 @@ class _ChatTileState extends State<ChatTile> {
     setState(() {
       recentMsg = msgEncryption.decrypt(messageResponse['message']);
       time = formatTimeStamp(messageResponse['time_stamp']);
+      isSeen = messageResponse['is_seen'];
     });
 
     print(userResponse);
@@ -106,7 +110,7 @@ class _ChatTileState extends State<ChatTile> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: isSeen ? Colors.grey[100] : colorLight,
         borderRadius: BorderRadius.circular(15),
       ),
       child: isLoading
@@ -119,7 +123,8 @@ class _ChatTileState extends State<ChatTile> {
                 margin: EdgeInsets.symmetric(vertical: 4),
               ),
               subtitle: Container(width: 150, height: 20, color: Colors.grey),
-              leading: CircleAvatar(radius: 22, backgroundColor: Colors.grey),
+              leading:
+                  const CircleAvatar(radius: 22, backgroundColor: Colors.grey),
             ))
           : InkWell(
               onTap: () {
@@ -147,8 +152,8 @@ class _ChatTileState extends State<ChatTile> {
                           : const Icon(Icons.person, size: 50)),
                 ),
                 trailing: Text(
-                  time,
-                  style: TextStyle(color: Colors.grey),
+                  isSeen ? time : "$time ●",
+                  style: TextStyle(color: isSeen ? Colors.grey : colorDark),
                 ),
               ),
             ),

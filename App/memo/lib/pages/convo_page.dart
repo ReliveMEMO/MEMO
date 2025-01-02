@@ -77,6 +77,27 @@ class _convoPageState extends State<convoPage> {
     }
   }
 
+  Future<void> _markMessagesAsSeen() async {
+    final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
+    final String chatId = arguments['chatId'];
+
+    try {
+      final response = await Supabase.instance.client
+          .from('ind_message_table')
+          .update({'is_seen': true})
+          .eq('chat_id', arguments['chatId'])
+          .eq('is_seen', false);
+
+      if (response.error != null) {
+        print('Error updating messages: ${response.error!.message}');
+      } else {
+        print('Messages marked as seen');
+      }
+    } catch (e) {
+      print('Error marking messages as seen: $e');
+    }
+  }
+
   void _handleIncomingMessage(String message) {
     try {
       final data = jsonDecode(message);
@@ -131,6 +152,7 @@ class _convoPageState extends State<convoPage> {
       // Handle error
       _loading = false;
     }
+    _markMessagesAsSeen();
   }
 
   void _scrollListener() {

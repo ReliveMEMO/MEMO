@@ -27,6 +27,7 @@ class _convoPageState extends State<convoPage> {
   double bottomInsets = 0;
 
   late WebSocketChannel channel;
+  List<Map<String, dynamic>> chats = [];
 
   final TextEditingController textMessageController = TextEditingController();
   final ValueNotifier<IconData> iconNotifier = ValueNotifier(Icons.mic);
@@ -80,6 +81,7 @@ class _convoPageState extends State<convoPage> {
   void _handleIncomingMessage(String message) {
     try {
       final data = jsonDecode(message);
+      final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
 
       // Check if the incoming message type is a real-time message
       if (data['type'] == 'receiveMessage') {
@@ -93,6 +95,9 @@ class _convoPageState extends State<convoPage> {
         setState(() {
           messages.insert(0, newMessage); // Add the new message to the top
         });
+
+        _updateChatList(arguments['chatId']);
+
         print("New real-time message added: $newMessage");
       }
     } catch (e) {
@@ -189,9 +194,29 @@ class _convoPageState extends State<convoPage> {
       });
 
       channel.sink.add(messagePayload);
+
+      _updateChatList(arguments['chatId']);
     } catch (e) {
       print("Error sending message: $e");
     }
+  }
+
+  void _updateChatList(String chatId) async {
+    final response = await Supabase.instance.client
+        .from('User_Info')
+        .select('chats')
+        .eq('id', authService.getCurrentUserID()!)
+        .single();
+
+    if (!mounted) return;
+
+    setState(() {
+      chats = response['chats'];
+    });
+
+    // Sort chats by the most recent message timestamp
+    chats.sort(
+        (a, b) => b['last_message_time'].compareTo(a['last_message_time']));
   }
 
   @override

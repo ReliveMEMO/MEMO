@@ -48,7 +48,7 @@ class _convoPageState extends State<convoPage> {
     try {
       channel = WebSocketChannel.connect(
         Uri.parse(
-            'ws://192.168.1.4:3000'), // Replace with your WebSocket server URL
+            'ws://memo-backend-9b73024f3215.herokuapp.com'), // Replace with your WebSocket server URL
       );
 
       // Register the receiver

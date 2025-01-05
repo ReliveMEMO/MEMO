@@ -317,7 +317,8 @@ class _convoPageState extends State<convoPage> {
                       bool showDateHeader = true;
                       if (index < messages.length - 1) {
                         final nextMessageTime =
-                            DateTime.parse(messages[index + 1]['time_stamp']);
+                            DateTime.parse(messages[index + 1]['time_stamp'])
+                                .toLocal();
                         final nextFormattedDate =
                             DateFormat('dd MMM yyyy').format(nextMessageTime);
                         showDateHeader = formattedDate != nextFormattedDate;

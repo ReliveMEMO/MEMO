@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_profile.dart';
@@ -25,12 +26,34 @@ void main() async {
   await Firebase.initializeApp();
   await NotificationService.initializeFCM();
 
+  FirebaseMessaging.instance.getInitialMessage().then((message) {
+    if (message != null) {
+      // Handle notification tap
+      handleNotificationNavigation(message);
+    }
+  });
+
+  // Listen for notification taps when the app is in the background
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    // Handle notification tap
+    handleNotificationNavigation(message);
+  });
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
     ],
     child: const MyApp(),
   ));
+}
+
+void handleNotificationNavigation(RemoteMessage message) {
+  // Example: Navigate to the chat screen with the senderId from the payload
+  final senderId = message.data['senderId'];
+  if (senderId != null) {
+    routeObserver.navigator
+        ?.pushNamed('/chat', arguments: {'senderId': senderId});
+  }
 }
 
 class MyApp extends StatelessWidget {

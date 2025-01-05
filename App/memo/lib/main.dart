@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
@@ -8,6 +9,8 @@ import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_gate.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
   await Supabase.initialize(
@@ -34,6 +37,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       color: Colors.white,
       home: const authGate(),
+      navigatorObservers: [routeObserver],
       theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color: Colors.white)),
@@ -43,6 +47,7 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => ProfilePage(),
         '/create-profile': (context) => CreateProfile(),
         '/verify-acc': (context) => VerifyEmailPage(),
+        '/chat': (context) => convoPage(),
         //Testing the CI pipeline xoxo
       },
     );

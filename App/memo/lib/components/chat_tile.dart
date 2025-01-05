@@ -87,7 +87,8 @@ class _ChatTileState extends State<ChatTile> {
   }
 
   String formatTimeStamp(String timeStamp) {
-    DateTime dateTime = DateTime.parse(timeStamp);
+    DateTime dateTime =
+        DateTime.parse(timeStamp).toLocal(); // Convert to local time
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
     DateTime yesterday = today.subtract(Duration(days: 1));
@@ -120,26 +121,35 @@ class _ChatTileState extends State<ChatTile> {
               subtitle: Container(width: 150, height: 20, color: Colors.grey),
               leading: CircleAvatar(radius: 22, backgroundColor: Colors.grey),
             ))
-          : ListTile(
-              title: Text(recieverDetails?['full_name'] ?? 'Unknown User'),
-              subtitle: Text(recentMsg ?? 'No recent message'),
-              leading: CircleAvatar(
-                radius: 22,
-                child: ClipOval(
-                    child: recieverDetails?['profile_pic'] != null
-                        ? CachedNetworkImage(
-                            imageUrl: recieverDetails?['profile_pic'] as String,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.person),
-                          )
-                        : const Icon(Icons.person, size: 50)),
-              ),
-              trailing: Text(
-                time,
-                style: TextStyle(color: Colors.grey),
+          : InkWell(
+              onTap: () {
+                Navigator.pushNamed(context, '/chat', arguments: {
+                  'chatId': cId,
+                  'recieverDetails': recieverDetails,
+                });
+              },
+              child: ListTile(
+                title: Text(recieverDetails?['full_name'] ?? 'Unknown User'),
+                subtitle: Text(recentMsg ?? 'No recent message'),
+                leading: CircleAvatar(
+                  radius: 22,
+                  child: ClipOval(
+                      child: recieverDetails?['profile_pic'] != null
+                          ? CachedNetworkImage(
+                              imageUrl:
+                                  recieverDetails?['profile_pic'] as String,
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.person),
+                            )
+                          : const Icon(Icons.person, size: 50)),
+                ),
+                trailing: Text(
+                  time,
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
             ),
     );

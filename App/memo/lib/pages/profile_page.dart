@@ -144,7 +144,7 @@ Widget build(BuildContext context) {
                         ),
                       ),
                       // Profile Picture with Emoji Overlay
-                      Positioned(
+                     const Positioned(
                         top: -20,
                         left: -40,
                         child: Stack(
@@ -172,7 +172,7 @@ Widget build(BuildContext context) {
                   child: Column(
                     children: [
                       // Follower Stats
-                      Row(
+                   const   Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Column(
@@ -236,7 +236,7 @@ Widget build(BuildContext context) {
                       ),
                       SizedBox(height: 11),
                       // User's Name and Handle
-                      Column(
+                     const Column(
                         children: [
                           Text(
                             "user name",
@@ -293,7 +293,7 @@ Widget build(BuildContext context) {
                       ),
                       SizedBox(height: 5),
                       // TabBar for Bio and Timeline
-                      TabBar(
+                      const TabBar(
                         labelColor: Colors.purple,
                         unselectedLabelColor: Colors.grey,
                         indicatorColor: Colors.purple,
@@ -313,7 +313,7 @@ Widget build(BuildContext context) {
             child: TabBarView(
               children: [
                 // Timeline Section
-                Center(
+               const Center(
                   child: Text(
                     "User's Timeline goes here.",
                     style: TextStyle(fontSize: 20),
@@ -515,7 +515,7 @@ Widget build(BuildContext context) {
                           borderRadius: BorderRadius.circular(25),
                           border: Border.all(color: Colors.grey.withOpacity(0.4)),
                         ),
-                        child: Column(
+                       child: Column(
                           children: [
                             Text(
                               "blah blah blah blah\nblah blah blah blah",
@@ -602,7 +602,7 @@ Padding(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.emoji_events,
                     size: 40, 
                     color: Colors.purple,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memo/pages/create_profile.dart';
+import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/verify_email_page.dart';
@@ -24,7 +24,7 @@ class authGate extends StatelessWidget {
         final session = snapshot.data?.session;
 
         if (session != null) {
-          return ProfilePage();
+          return const myPage();
         } else {
           return LoginPage();
         }

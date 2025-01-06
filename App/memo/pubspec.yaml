@@ -40,6 +40,15 @@ dependencies:
   path_provider: ^2.0.11
   image_picker: ^1.1.2
   intl: ^0.20.1
+  hugeicons: ^0.0.7
+  solar_icons: ^0.0.5
+  cached_network_image: ^3.4.1
+  encrypt: ^5.0.3
+  skeletonizer: ^1.4.2
+  provider: ^6.1.2
+  chatview: ^2.4.0
+  emoji_picker_flutter: ^3.1.0
+  web_socket_channel: ^3.0.1
 
 flutter_launcher_icons:
   android: true

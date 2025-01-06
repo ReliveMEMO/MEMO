@@ -67,12 +67,12 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.logout),
-        //     onPressed: logout,
-        //   )
-        // ],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: logout,
+          )
+        ],
       ),
       body: Stack(children: [
         Center(

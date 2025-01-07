@@ -30,18 +30,27 @@ class _convoPageState extends State<convoPage> {
 
   final TextEditingController textMessageController = TextEditingController();
   final ValueNotifier<IconData> iconNotifier = ValueNotifier(Icons.mic);
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
 
     scrollController = ScrollController();
-    scrollController.addListener(_scrollListener);
+    _scrollController.addListener(_onScroll);
     _loadMessages();
     textMessageController.addListener(_updateIcon);
 
     // Establish WebSocket connection and register receiver
     _initializeWebSocket();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels <=
+            _scrollController.position.minScrollExtent + 100 &&
+        !_loading) {
+      _loadMessages();
+    }
   }
 
   void _initializeWebSocket() {
@@ -299,7 +308,7 @@ class _convoPageState extends State<convoPage> {
                 Expanded(
                   flex: bottomInsets > 0 ? 3 : 4,
                   child: ListView.builder(
-                    controller: scrollController,
+                    controller: _scrollController,
                     reverse:
                         true, // Updated to ensure recent messages at the bottom
                     itemCount: messages.length,
@@ -373,13 +382,43 @@ class _convoPageState extends State<convoPage> {
                                           const Icon(Icons.error),
                                     )
                                   else
-                                    Text(
-                                      message.containsKey('isEncrypted')
-                                          ? message['message']
-                                          : msgEncryption.decrypt(
-                                                  message['message']) ??
-                                              'Decryption failed',
-                                      style: const TextStyle(fontSize: 16),
+                                    Builder(
+                                      builder: (context) {
+                                        final decryptedMessage =
+                                            message.containsKey('isEncrypted')
+                                                ? message['message']
+                                                : msgEncryption.decrypt(
+                                                        message['message']) ??
+                                                    'Decryption failed';
+
+                                        // Check if the decrypted message is a single emoji
+                                        final isSingleEmoji = RegExp(
+                                                r'^[\u{1F1E6}-\u{1F1FF}' + // Regional indicator symbols (flags)
+                                                    r'\u{1F300}-\u{1F5FF}' + // Miscellaneous Symbols and Pictographs
+                                                    r'\u{1F600}-\u{1F64F}' + // Emoticons
+                                                    r'\u{1F680}-\u{1F6FF}' + // Transport and Map Symbols
+                                                    r'\u{1F700}-\u{1F77F}' + // Alchemical Symbols
+                                                    r'\u{1F780}-\u{1F7FF}' + // Geometric Shapes Extended
+                                                    r'\u{1F800}-\u{1F8FF}' + // Supplemental Arrows-C
+                                                    r'\u{1F900}-\u{1F9FF}' + // Supplemental Symbols and Pictographs
+                                                    r'\u{1FA00}-\u{1FA6F}' + // Chess Symbols
+                                                    r'\u{1FA70}-\u{1FAFF}' + // Symbols and Pictographs Extended-A
+                                                    r'\u{2600}-\u{26FF}' + // Miscellaneous Symbols
+                                                    r'\u{2700}-\u{27BF}' + // Dingbats
+                                                    r'\u{FE0F}' + // Variation Selector-16 (emoji variation)
+                                                    r']$',
+                                                unicode: true)
+                                            .hasMatch(decryptedMessage.trim());
+
+                                        return Text(
+                                          decryptedMessage,
+                                          style: TextStyle(
+                                            fontSize: isSingleEmoji
+                                                ? 48
+                                                : 16, // Larger font size for single emoji
+                                          ),
+                                        );
+                                      },
                                     ),
                                   const SizedBox(height: 5),
                                   Text(

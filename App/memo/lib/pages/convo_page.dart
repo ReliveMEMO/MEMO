@@ -87,23 +87,25 @@ class _convoPageState extends State<convoPage> {
   }
 
   Future<void> _markMessagesAsSeen() async {
-    final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-    final String chatId = arguments['chatId'];
+    if (mounted) {
+      final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
+      final String chatId = arguments['chatId'];
 
-    try {
-      final response = await Supabase.instance.client
-          .from('ind_message_table')
-          .update({'is_seen': true})
-          .eq('chat_id', arguments['chatId'])
-          .eq('is_seen', false);
+      try {
+        final response = await Supabase.instance.client
+            .from('ind_message_table')
+            .update({'is_seen': true})
+            .eq('chat_id', arguments['chatId'])
+            .eq('is_seen', false);
 
-      if (response.error != null) {
-        print('Error updating messages: ${response.error!.message}');
-      } else {
-        print('Messages marked as seen');
+        if (response.error != null) {
+          print('Error updating messages: ${response.error!.message}');
+        } else {
+          print('Messages marked as seen');
+        }
+      } catch (e) {
+        print('Error marking messages as seen: $e');
       }
-    } catch (e) {
-      print('Error marking messages as seen: $e');
     }
   }
 
@@ -136,30 +138,32 @@ class _convoPageState extends State<convoPage> {
     // Add your loading logic here
     await Future.delayed(Duration(seconds: 1));
 
-    final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-    final String chatId = arguments['chatId'];
+    if (mounted) {
+      final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
+      final String chatId = arguments['chatId'];
 
-    final response = await Supabase.instance.client
-        .from('ind_message_table')
-        .select('sender_id, message, time_stamp')
-        .eq('chat_id', chatId)
-        .order('time_stamp', ascending: false)
-        .range(
-            _currentBatch * _batchSize, (_currentBatch + 1) * _batchSize - 1);
+      final response = await Supabase.instance.client
+          .from('ind_message_table')
+          .select('sender_id, message, time_stamp')
+          .eq('chat_id', chatId)
+          .order('time_stamp', ascending: false)
+          .range(
+              _currentBatch * _batchSize, (_currentBatch + 1) * _batchSize - 1);
 
-    if (response != null) {
-      if (mounted) {
-        setState(() {
-          messages.addAll(response);
-          _currentBatch++;
+      if (response != null) {
+        if (mounted) {
+          setState(() {
+            messages.addAll(response);
+            _currentBatch++;
+            _loading = false;
+          });
+        } else {
           _loading = false;
-        });
+        }
       } else {
+        // Handle error
         _loading = false;
       }
-    } else {
-      // Handle error
-      _loading = false;
     }
     _markMessagesAsSeen();
   }

@@ -50,6 +50,9 @@ dependencies:
   chatview: ^2.4.0
   emoji_picker_flutter: ^3.1.0
   web_socket_channel: ^3.0.1
+  firebase_core: ^3.9.0
+  firebase_messaging: ^15.1.6
+  flutter_local_notifications: ^18.0.1
 
 flutter_launcher_icons:
   android: true

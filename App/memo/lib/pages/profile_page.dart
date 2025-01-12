@@ -31,7 +31,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void logout() async {
     await authService.signOut();
-    Navigator.pushNamed(context, '/login');
+    if (mounted) {
+      Navigator.pushNamed(context, '/login');
+    }
   }
 
   void getUser() async {

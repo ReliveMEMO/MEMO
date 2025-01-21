@@ -234,7 +234,26 @@ class _LoginPageState extends State<LoginPage> {
               height: 20,
             ),
 
-            const Googlelog(),
+            
+
+            // Google Sign-In button
+          Authbutton(
+            buttonText: "Sign in with Google",
+            onTap: () async {
+              try {
+                await authService.signInWithGoogle();
+                Navigator.pushNamed(context, '/profile');
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(e.toString())),
+                );
+              }
+            },
+          ),
+
+
+            /*const*/ 
+            Googlelog(),
             //Signup link
 
             const SizedBox(

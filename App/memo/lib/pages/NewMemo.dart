@@ -1,3 +1,4 @@
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -15,6 +16,7 @@ class _NewMemoState extends State<NewMemo> {
   final ImagePicker _picker = ImagePicker();
   String selectedTab = "Post";
   DateTime? selectedDate;
+  String? selectedEmoji;
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -136,7 +138,6 @@ class _NewMemoState extends State<NewMemo> {
                             color: selectedTab == "Post"
                                 ? Colors.white
                                 : Colors.grey.shade700,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -421,6 +422,45 @@ class _NewMemoState extends State<NewMemo> {
                   ),
                 ],
               ),
+            ],
+
+            // Milestone Section
+            if (selectedTab == "Milestone") ...[
+              Text(
+                "Heading",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              SizedBox(height: 8),
+              TextField(
+                controller: _headingController,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: "New Memo 12.11.2024",
+                  hintStyle: TextStyle(color: Colors.grey.shade500),
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                "Emoji",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              SizedBox(height: 8),
             ],
           ],
         ),

@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-class AddPicturePage extends StatefulWidget {
+class NewMemo extends StatefulWidget {
   @override
-  _AddPicturePageState createState() => _AddPicturePageState();
+  _NewMemoState createState() => _NewMemoState();
 }
 
-class _AddPicturePageState extends State<AddPicturePage> {
+class _NewMemoState extends State<NewMemo> {
   File? _selectedImage;
   final _captionController = TextEditingController();
   final _headingController = TextEditingController();
+  final _noteController = TextEditingController(); // For Note section
   final ImagePicker _picker = ImagePicker();
   String selectedTab = "Post";
   DateTime? selectedDate;
@@ -179,6 +180,7 @@ class _AddPicturePageState extends State<AddPicturePage> {
 
             SizedBox(height: 30),
 
+            // Post Section
             if (selectedTab == "Post") ...[
               Text(
                 "Heading",
@@ -321,6 +323,99 @@ class _AddPicturePageState extends State<AddPicturePage> {
                     ),
                     child: Text(
                       "Location",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            // Note Section
+            if (selectedTab == "Note") ...[
+              Text(
+                "Heading",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              SizedBox(height: 8),
+              TextField(
+                controller: _headingController,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: "New Memo 12.11.2024",
+                  hintStyle: TextStyle(color: Colors.grey.shade500),
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                "Note",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              SizedBox(height: 8),
+              TextField(
+                controller: _noteController,
+                maxLines: 8,
+                decoration: InputDecoration(
+                  hintText: "Write your note here...",
+                  hintStyle: TextStyle(color: Colors.grey.shade500),
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: EdgeInsets.all(20),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Action for tagging friends
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      "Tag Friends",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _selectDate(context); // Open date picker
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      "Date",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

@@ -15,7 +15,7 @@ import 'package:memo/services/notification.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'pages/add_picture_page.dart';
+import 'pages/NewMemo.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       color: Colors.white,
-      home: const authGate(),
+      home: NewMemo(),
       navigatorObservers: [routeObserver],
       theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
         '/verify-acc': (context) => VerifyEmailPage(),
         '/chat': (context) => convoPage(),
         '/my-page': (context) => myPage(),
-        '/add-picture': (context) => AddPicturePage(),
+        '/add-picture': (context) => NewMemo(),
         //Testing the CI pipeline xoxo
       },
     );

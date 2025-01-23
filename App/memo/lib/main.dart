@@ -74,6 +74,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       color: Colors.white,
+      home: const authGate(),
       navigatorObservers: [routeObserver],
       theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,

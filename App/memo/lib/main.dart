@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       color: Colors.white,
-      home: NewMemo(),
+      home: const authGate(),
       navigatorObservers: [routeObserver],
       theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
         '/verify-acc': (context) => VerifyEmailPage(),
         '/chat': (context) => convoPage(),
         '/my-page': (context) => myPage(),
-        '/add-picture': (context) => NewMemo(),
+        '/new-memo': (context) => NewMemo(),
         //Testing the CI pipeline xoxo
       },
     );

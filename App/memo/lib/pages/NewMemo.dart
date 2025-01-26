@@ -1,4 +1,3 @@
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -13,10 +12,12 @@ class _NewMemoState extends State<NewMemo> {
   final _captionController = TextEditingController();
   final _headingController = TextEditingController();
   final _noteController = TextEditingController(); // For Note section
+  final FocusNode _milestoneFocusNode = FocusNode();
+  final TextEditingController _milestoneTextController =
+      TextEditingController();
   final ImagePicker _picker = ImagePicker();
   String selectedTab = "Post";
   DateTime? selectedDate;
-  String? selectedEmoji;
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -264,7 +265,7 @@ class _NewMemoState extends State<NewMemo> {
                 controller: _captionController,
                 textAlign: TextAlign.start,
                 decoration: InputDecoration(
-                  hintText: "Enter Caption",
+                  hintText: "Enter Caption...",
                   hintStyle: TextStyle(color: Colors.grey.shade500),
                   filled: true,
                   fillColor: Colors.grey.shade200,
@@ -308,7 +309,9 @@ class _NewMemoState extends State<NewMemo> {
                       ),
                     ),
                     child: Text(
-                      "Date",
+                      selectedDate != null
+                          ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}" // Display formatted date
+                          : "Date", // Default text
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -416,7 +419,9 @@ class _NewMemoState extends State<NewMemo> {
                       ),
                     ),
                     child: Text(
-                      "Date",
+                      selectedDate != null
+                          ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}" // Display formatted date
+                          : "Date", // Default text
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -461,6 +466,141 @@ class _NewMemoState extends State<NewMemo> {
                 ),
               ),
               SizedBox(height: 8),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // TextField for emoji input
+                  TextField(
+                      focusNode: _milestoneFocusNode,
+                      controller: _milestoneTextController,
+                      textAlign: TextAlign.center,
+                      textAlignVertical: TextAlignVertical
+                          .center, // Center the cursor vertically
+                      style: TextStyle(fontSize: 60), // Large text for emoji
+                      onChanged: (value) {
+                        setState(
+                            () {}); // Update the UI dynamically when emoji is entered
+                      },
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.grey.shade300,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 30,
+                          horizontal: 20,
+                        ),
+                      )),
+                  // Plus icon overlay (conditionally hidden)
+                  if (_milestoneTextController.text.isEmpty &&
+                      !_milestoneFocusNode.hasFocus)
+                    GestureDetector(
+                      onTap: () {
+                        // Show keyboard when plus icon is clicked
+                        FocusScope.of(context)
+                            .requestFocus(_milestoneFocusNode);
+                      },
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF7D17BA), // Purple background
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.add, // Plus icon
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: Text(
+                  "Caption",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              TextField(
+                controller: _captionController,
+                textAlign: TextAlign.start,
+                decoration: InputDecoration(
+                  hintText: "Enter Caption...",
+                  hintStyle: TextStyle(color: Colors.grey.shade500),
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 60,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Action for tagging friends
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      "Tag Friends",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _selectDate(context); // Open date picker
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      selectedDate != null
+                          ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}" // Display formatted date
+                          : "Date", // Default text
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Action for location
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      "Location",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ],
         ),

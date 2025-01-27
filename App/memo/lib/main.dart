@@ -16,6 +16,8 @@ import 'package:memo/services/notification.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'pages/NewMemo.dart';
+
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
@@ -88,6 +90,7 @@ class MyApp extends StatelessWidget {
         '/verify-acc': (context) => VerifyEmailPage(),
         '/chat': (context) => convoPage(),
         '/my-page': (context) => myPage(),
+        '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
         //Testing the CI pipeline xoxo
       },

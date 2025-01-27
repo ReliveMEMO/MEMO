@@ -30,13 +30,14 @@ class _convoPageState extends State<convoPage> {
 
   final TextEditingController textMessageController = TextEditingController();
   final ValueNotifier<IconData> iconNotifier = ValueNotifier(Icons.mic);
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
 
     scrollController = ScrollController();
-    scrollController.addListener(_scrollListener);
+    _scrollController.addListener(_onScroll);
     _loadMessages();
     textMessageController.addListener(_updateIcon);
 
@@ -44,11 +45,19 @@ class _convoPageState extends State<convoPage> {
     _initializeWebSocket();
   }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels <=
+            _scrollController.position.minScrollExtent + 100 &&
+        !_loading) {
+      _loadMessages();
+    }
+  }
+
   void _initializeWebSocket() {
     try {
       channel = WebSocketChannel.connect(
         Uri.parse(
-            'ws://192.168.1.4:3000'), // Replace with your WebSocket server URL
+            'ws://memo-backend-9b73024f3215.herokuapp.com'), // Replace with your WebSocket server URL
       );
 
       // Register the receiver
@@ -74,6 +83,29 @@ class _convoPageState extends State<convoPage> {
       });
     } catch (e, stackTrace) {
       print("WebSocket initialization error: $e\n$stackTrace");
+    }
+  }
+
+  Future<void> _markMessagesAsSeen() async {
+    if (mounted) {
+      final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
+      final String chatId = arguments['chatId'];
+
+      try {
+        final response = await Supabase.instance.client
+            .from('ind_message_table')
+            .update({'is_seen': true})
+            .eq('chat_id', arguments['chatId'])
+            .eq('is_seen', false);
+
+        if (response.error != null) {
+          print('Error updating messages: ${response.error!.message}');
+        } else {
+          print('Messages marked as seen');
+        }
+      } catch (e) {
+        print('Error marking messages as seen: $e');
+      }
     }
   }
 
@@ -106,31 +138,34 @@ class _convoPageState extends State<convoPage> {
     // Add your loading logic here
     await Future.delayed(Duration(seconds: 1));
 
-    final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-    final String chatId = arguments['chatId'];
+    if (mounted) {
+      final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
+      final String chatId = arguments['chatId'];
 
-    final response = await Supabase.instance.client
-        .from('ind_message_table')
-        .select('sender_id, message, time_stamp')
-        .eq('chat_id', chatId)
-        .order('time_stamp', ascending: false)
-        .range(
-            _currentBatch * _batchSize, (_currentBatch + 1) * _batchSize - 1);
+      final response = await Supabase.instance.client
+          .from('ind_message_table')
+          .select('sender_id, message, time_stamp')
+          .eq('chat_id', chatId)
+          .order('time_stamp', ascending: false)
+          .range(
+              _currentBatch * _batchSize, (_currentBatch + 1) * _batchSize - 1);
 
-    if (response != null) {
-      if (mounted) {
-        setState(() {
-          messages.addAll(response);
-          _currentBatch++;
+      if (response != null) {
+        if (mounted) {
+          setState(() {
+            messages.addAll(response);
+            _currentBatch++;
+            _loading = false;
+          });
+        } else {
           _loading = false;
-        });
+        }
       } else {
+        // Handle error
         _loading = false;
       }
-    } else {
-      // Handle error
-      _loading = false;
     }
+    _markMessagesAsSeen();
   }
 
   void _scrollListener() {
@@ -277,7 +312,7 @@ class _convoPageState extends State<convoPage> {
                 Expanded(
                   flex: bottomInsets > 0 ? 3 : 4,
                   child: ListView.builder(
-                    controller: scrollController,
+                    controller: _scrollController,
                     reverse:
                         true, // Updated to ensure recent messages at the bottom
                     itemCount: messages.length,
@@ -295,7 +330,8 @@ class _convoPageState extends State<convoPage> {
                       bool showDateHeader = true;
                       if (index < messages.length - 1) {
                         final nextMessageTime =
-                            DateTime.parse(messages[index + 1]['time_stamp']);
+                            DateTime.parse(messages[index + 1]['time_stamp'])
+                                .toLocal();
                         final nextFormattedDate =
                             DateFormat('dd MMM yyyy').format(nextMessageTime);
                         showDateHeader = formattedDate != nextFormattedDate;
@@ -350,13 +386,43 @@ class _convoPageState extends State<convoPage> {
                                           const Icon(Icons.error),
                                     )
                                   else
-                                    Text(
-                                      message.containsKey('isEncrypted')
-                                          ? message['message']
-                                          : msgEncryption.decrypt(
-                                                  message['message']) ??
-                                              'Decryption failed',
-                                      style: const TextStyle(fontSize: 16),
+                                    Builder(
+                                      builder: (context) {
+                                        final decryptedMessage =
+                                            message.containsKey('isEncrypted')
+                                                ? message['message']
+                                                : msgEncryption.decrypt(
+                                                        message['message']) ??
+                                                    'Decryption failed';
+
+                                        // Check if the decrypted message is a single emoji
+                                        final isSingleEmoji = RegExp(
+                                                r'^[\u{1F1E6}-\u{1F1FF}' + // Regional indicator symbols (flags)
+                                                    r'\u{1F300}-\u{1F5FF}' + // Miscellaneous Symbols and Pictographs
+                                                    r'\u{1F600}-\u{1F64F}' + // Emoticons
+                                                    r'\u{1F680}-\u{1F6FF}' + // Transport and Map Symbols
+                                                    r'\u{1F700}-\u{1F77F}' + // Alchemical Symbols
+                                                    r'\u{1F780}-\u{1F7FF}' + // Geometric Shapes Extended
+                                                    r'\u{1F800}-\u{1F8FF}' + // Supplemental Arrows-C
+                                                    r'\u{1F900}-\u{1F9FF}' + // Supplemental Symbols and Pictographs
+                                                    r'\u{1FA00}-\u{1FA6F}' + // Chess Symbols
+                                                    r'\u{1FA70}-\u{1FAFF}' + // Symbols and Pictographs Extended-A
+                                                    r'\u{2600}-\u{26FF}' + // Miscellaneous Symbols
+                                                    r'\u{2700}-\u{27BF}' + // Dingbats
+                                                    r'\u{FE0F}' + // Variation Selector-16 (emoji variation)
+                                                    r']$',
+                                                unicode: true)
+                                            .hasMatch(decryptedMessage.trim());
+
+                                        return Text(
+                                          decryptedMessage,
+                                          style: TextStyle(
+                                            fontSize: isSingleEmoji
+                                                ? 48
+                                                : 16, // Larger font size for single emoji
+                                          ),
+                                        );
+                                      },
                                     ),
                                   const SizedBox(height: 5),
                                   Text(

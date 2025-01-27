@@ -27,7 +27,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void logout() async {
     await authService.signOut();
-    Navigator.pushNamed(context, '/login');
+    if (mounted) {
+      Navigator.pushNamed(context, '/login');
+    }
   }
 
   void getUser() async {
@@ -370,6 +372,7 @@ Widget build(BuildContext context) {
                     ],
                   ),
                   SizedBox(height: 30),
+
 
                   // Grad Year, Age, GPA Section
                   Row(

@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/chat_tile.dart';
+import 'package:memo/components/user_tile.dart';
 import 'package:memo/main.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
+import 'package:memo/services/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -25,10 +27,15 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
 
   var chats = [];
 
+  var searchResults = [];
+  bool isSearching = false;
+  final searchService = SearchService();
+
   @override
   void initState() {
     super.initState();
     getChatDetails();
+    searchController.addListener(_onSearchChanged);
   }
 
   @override
@@ -78,6 +85,39 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
 
     // Fetch the latest chat details and update the state
     getChatDetails();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      searchValue = searchController.text;
+      if (searchValue.isEmpty) {
+        isSearching = false;
+        searchResults = [];
+      } else {
+        isSearching = true;
+        _searchUsers(searchValue);
+      }
+    });
+  }
+
+  Future<void> _searchUsers(String query) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final results = await searchService.searchUsers(query);
+      setState(() {
+        searchResults = results;
+        isLoading = false;
+      });
+      print(results);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error Searching users: $e');
+    }
   }
 
   @override
@@ -137,32 +177,46 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
           )
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _refreshChats,
-        color: colorDark,
-        backgroundColor: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
-                  children: chats
-                      .map((chat) => Padding(
-                            padding: EdgeInsets.symmetric(vertical: 6.0),
-                            child: ChatTile(
-                              chatId: chat,
-                            ),
-                          ))
-                      .toList(),
+      body: isSearching
+          ? isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  itemCount: searchResults.length,
+                  itemBuilder: (context, index) {
+                    final user = searchResults[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 4),
+                      child: UserTile(userId: user['id']),
+                    );
+                  },
+                )
+          : RefreshIndicator(
+              onRefresh: _refreshChats,
+              color: colorDark,
+              backgroundColor: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 5),
+                        children: chats
+                            .map((chat) => Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 6.0),
+                                  child: ChatTile(
+                                    chatId: chat,
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
     );
   }
 }

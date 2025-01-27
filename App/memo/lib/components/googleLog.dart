@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:memo/services/auth_service.dart'; //aded
 
 class Googlelog extends StatelessWidget {
-  const Googlelog({super.key});
+  final AuthService authService = AuthService(); //added
+  /*const*/ Googlelog({super.key});
+
+  void _handleGoogleLogin(BuildContext context) async {
+    try {
+      await authService.signInWithGoogle();
+      Navigator.pushNamed(
+          context, '/profile'); // Navigate to profile on success
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

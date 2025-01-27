@@ -56,6 +56,9 @@ void main() async {
   ));
 }
 
+
+//final Supabase = Supabase.instance.clinet; //supabase
+
 void handleNotificationNavigation(RemoteMessage message) {
   // Example: Navigate to the chat screen with the senderId from the payload
   final senderId = message.data['senderId'];
@@ -64,6 +67,7 @@ void handleNotificationNavigation(RemoteMessage message) {
         ?.pushNamed('/chat', arguments: {'senderId': senderId});
   }
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

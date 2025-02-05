@@ -1,13 +1,24 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_profile.dart';
+import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/login_page.dart';
+import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/signup_page.dart';
 import 'package:memo/pages/verify_email_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_gate.dart';
+import 'package:memo/services/auth_service.dart';
+import 'package:memo/services/notification.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'pages/NewMemo.dart';
+
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
   await Supabase.initialize(
@@ -16,12 +27,45 @@ void main() async {
     url: "https://qbqwbeppyliavvfzryze.supabase.co",
   );
 
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  final authService = AuthService();
+
+  if (authService.getCurrentUserID() != null) {
+    await NotificationService.initializeFCM(authService.getCurrentUserID());
+
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        // Handle notification tap
+        handleNotificationNavigation(message);
+      }
+    });
+  }
+
+  // Listen for notification taps when the app is in the background
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    // Handle notification tap
+    handleNotificationNavigation(message);
+  });
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
     ],
     child: const MyApp(),
   ));
+}
+
+//final Supabase = Supabase.instance.clinet; //supabase
+
+void handleNotificationNavigation(RemoteMessage message) {
+  // Example: Navigate to the chat screen with the senderId from the payload
+  final senderId = message.data['senderId'];
+  if (senderId != null) {
+    routeObserver.navigator
+        ?.pushNamed('/chat', arguments: {'senderId': senderId});
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -34,6 +78,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       color: Colors.white,
       home: const authGate(),
+      navigatorObservers: [routeObserver],
       theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color: Colors.white)),
@@ -43,6 +88,10 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => ProfilePage(),
         '/create-profile': (context) => CreateProfile(),
         '/verify-acc': (context) => VerifyEmailPage(),
+        '/chat': (context) => convoPage(),
+        '/my-page': (context) => myPage(),
+        '/new-memo': (context) => NewMemo(),
+        '/create-timeline': (context) => CreateTimeline(),
         //Testing the CI pipeline xoxo
       },
     );

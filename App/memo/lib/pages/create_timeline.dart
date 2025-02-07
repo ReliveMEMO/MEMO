@@ -4,6 +4,7 @@ import "package:flutter/material.dart";
 import "package:hugeicons/hugeicons.dart";
 import "package:image_picker/image_picker.dart";
 import "package:solar_icons/solar_icons.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
 
 class CreateTimeline extends StatefulWidget {
   const CreateTimeline({super.key});
@@ -17,6 +18,7 @@ class _CreateTimelineState extends State<CreateTimeline> {
   final TextEditingController timelineDescriptionController =
       TextEditingController();
   File? _image;
+  String? avatarUrl;
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -28,6 +30,27 @@ class _CreateTimelineState extends State<CreateTimeline> {
         _image = File(pickedImage.path);
       });
     }
+  }
+
+  Future<void> uploadImage() async {
+    if (_image == null) {
+      avatarUrl =
+          'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/default.jpg';
+      return;
+    }
+
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final path = 'uploads/$fileName';
+
+    await Supabase.instance.client.storage
+        .from('timeline_covers')
+        .upload(path, _image!);
+
+    final url = await Supabase.instance.client.storage
+        .from('timeline_covers')
+        .getPublicUrl(path);
+
+    avatarUrl = url;
   }
 
   @override
@@ -169,7 +192,7 @@ class _CreateTimelineState extends State<CreateTimeline> {
                               color: Colors.white, size: 17),
                           const SizedBox(width: 5),
                           Text(
-                            'Create Profile',
+                            'Add Collaborators',
                             style: TextStyle(color: Colors.white, fontSize: 17),
                           ),
                         ],

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/components/achievements_section.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -605,15 +606,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                       child: Stack(
                                         clipBehavior: Clip.none,
                                         children: [
+                                          // Achievements Title
                                           Positioned(
                                             top: -15,
-                                            left:
-                                                120, // Adjust to center the heading
+                                            left: 120,
                                             child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 8),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8),
                                               color: Colors.white,
-                                              child: Text(
+                                              child: const Text(
                                                 "Achievements",
                                                 style: TextStyle(
                                                   fontSize: 12,
@@ -623,67 +625,40 @@ class _ProfilePageState extends State<ProfilePage> {
                                               ),
                                             ),
                                           ),
+
                                           // Achievements Section Container
-                                          Container(
-                                            width: 340,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 20, vertical: 20),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                              border: Border.all(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.4)),
-                                            ),
-                                            child: GridView.count(
-                                              crossAxisCount: 3, // 3 columns
-                                              shrinkWrap: true,
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              childAspectRatio: 0.9,
-                                              mainAxisSpacing: 20,
-                                              crossAxisSpacing: 20,
-                                              children: List.generate(
-                                                6,
-                                                (index) => Container(
-                                                  padding: EdgeInsets.all(12),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                    border: Border.all(
+                                          LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              return Container(
+                                                width: 340,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 20),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(25),
+                                                  border: Border.all(
                                                       color: Colors.grey
-                                                          .withOpacity(0.4),
-                                                    ),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      const Icon(
-                                                        Icons.emoji_events,
-                                                        size: 40,
-                                                        color: Colors.purple,
-                                                      ),
-                                                      SizedBox(height: 12),
-                                                      Text(
-                                                        "Achievement ${index + 1}",
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                            fontSize: 8,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                          .withOpacity(0.4)),
                                                 ),
-                                              ),
-                                            ),
+                                                child: Column(
+                                                  children: [
+                                                    // Achievements GridView
+                                                    AchievementsSection(
+                                                      achievements: [
+                                                        // Achievement(
+                                                        //   emoji: "🏆",
+                                                        //   description: "SE",
+                                                        //   position: "1st",
+                                                        // ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ],
                                       ),

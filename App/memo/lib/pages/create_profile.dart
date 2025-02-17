@@ -76,7 +76,7 @@ class _CreateProfileState extends State<CreateProfile> {
         'profile_pic': avatarUrl,
       });
       print(response);
-      Navigator.pushNamed(context, '/profile');
+      Navigator.pushNamed(context, '/my-page');
     } catch (e) {
       print(e);
     }

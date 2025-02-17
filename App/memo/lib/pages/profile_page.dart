@@ -89,14 +89,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Positioned(
                     top: 30,
-                    left: 97,
+                    left: 105,
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         // Information Card
                         Container(
                           padding: EdgeInsets.all(12),
-                          width: 220,
+                          width: 230,
                           constraints: BoxConstraints(
                             minHeight: 95, // Minimum height for the container
                           ),
@@ -113,31 +113,22 @@ class _ProfilePageState extends State<ProfilePage> {
                             border:
                                 Border.all(color: Colors.grey.withOpacity(0.2)),
                           ),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               // University Logo
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundImage: AssetImage(
-                                    'assets/images/IIT-Campus-Logo.png'),
+                              Image.asset(
+                                'assets/images/iit.png',
+                                width: 120,
                               ),
                               SizedBox(width: 8),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height: 10),
-                                  Text(
-                                    "",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
                                   Container(
                                     alignment: Alignment.center,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 45, vertical: 1),
+                                    padding: EdgeInsets.only(
+                                        left: 80, top: 1, bottom: 1, right: 10),
                                     decoration: BoxDecoration(
                                       color: Colors.blue,
                                       borderRadius: BorderRadius.circular(6),
@@ -159,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         // Profile Picture with Emoji Overlay
                         Positioned(
                           top: -20,
-                          left: -40,
+                          left: -30,
                           child: Stack(
                             clipBehavior: Clip.none,
                             alignment: Alignment.center,

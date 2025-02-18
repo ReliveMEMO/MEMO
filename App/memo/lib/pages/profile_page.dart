@@ -297,11 +297,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: TabBarView(
                   children: [
                     // Timeline Section
-                    const Center(
-                      child: Text(
-                        "User's Timeline goes here.",
-                        style: TextStyle(fontSize: 20),
-                      ),
+                    const Scaffold(
+                      body: SafeArea(child: Text('hi')),
                     ),
                     // Bio Section
                     Scaffold(

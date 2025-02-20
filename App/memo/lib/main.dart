@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_profile.dart';
+import 'package:memo/pages/event_page.dart';//added
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/profile_page.dart';
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color: Colors.white)),
       routes: {
+        '/event': (context) => EventPage(),//added
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
@@ -93,6 +95,7 @@ class MyApp extends StatelessWidget {
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
         //Testing the CI pipeline xoxo
+
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/components/follow_section.dart';
+import 'package:memo/components/timeline_card.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -81,578 +82,573 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: DefaultTabController(
         length: 2,
-        child: Column(
-          children: [
-            Expanded(
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned(
-                    top: 30,
-                    left: 105,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Information Card
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          width: 230,
-                          constraints: BoxConstraints(
-                            minHeight: 95, // Minimum height for the container
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
-                                blurRadius: 6,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                            border:
-                                Border.all(color: Colors.grey.withOpacity(0.2)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              // University Logo
-                              Image.asset(
-                                'assets/images/iit.png',
-                                width: 120,
-                              ),
-                              SizedBox(width: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    alignment: Alignment.center,
-                                    padding: EdgeInsets.only(
-                                        left: 80, top: 1, bottom: 1, right: 10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      "LEVEL 05",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
+        child: SingleChildScrollView(
+          // Wrap the entire content in SingleChildScrollView
+          child: Column(
+            children: [
+              Container(
+                // Wrap Stack in a Container with a defined height
+                height: 300,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned(
+                      top: 30,
+                      left: 105,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          // Information Card
+                          Container(
+                            padding: EdgeInsets.all(12),
+                            width: 230,
+                            constraints: BoxConstraints(
+                              minHeight: 95, // Minimum height for the container
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                              border: Border.all(
+                                  color: Colors.grey.withOpacity(0.2)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                // University Logo
+                                Image.asset(
+                                  'assets/images/iit.png',
+                                  width: 120,
+                                ),
+                                SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.center,
+                                      padding: EdgeInsets.only(
+                                          left: 80,
+                                          top: 1,
+                                          bottom: 1,
+                                          right: 10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(6),
                                       ),
+                                      child: Text(
+                                        "LEVEL 05",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Profile Picture with Emoji Overlay
+                          Positioned(
+                            top: -20,
+                            left: -30,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.center,
+                              children: [
+                                CircleAvatar(
+                                  radius: 65,
+                                  child: ClipOval(
+                                    child: userDetails?['profile_pic'] != null
+                                        ? CachedNetworkImage(
+                                            imageUrl:
+                                                userDetails?['profile_pic']
+                                                    as String,
+                                            width: 120,
+                                            height: 120,
+                                            fit: BoxFit.cover,
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Icon(Icons.error),
+                                            placeholder: (context, url) =>
+                                                CircularProgressIndicator(),
+                                          )
+                                        : const Icon(Icons.person, size: 50),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      top: 163,
+                      left: 50,
+                      right: 50,
+                      child: Column(
+                        children: [
+                          // Follower Stats
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                    "100",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Followers",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    "100",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Following",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Timelines",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                        ),
-                        // Profile Picture with Emoji Overlay
-                        Positioned(
-                          top: -20,
-                          left: -30,
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.center,
+                          SizedBox(height: 11),
+                          // User's Name and Handle
+                          Column(
                             children: [
-                              CircleAvatar(
-                                radius: 65,
-                                child: ClipOval(
-                                  child: userDetails?['profile_pic'] != null
-                                      ? CachedNetworkImage(
-                                          imageUrl: userDetails?['profile_pic']
-                                              as String,
-                                          width: 120,
-                                          height: 120,
-                                          fit: BoxFit.cover,
-                                          errorWidget: (context, url, error) =>
-                                              Icon(Icons.error),
-                                          placeholder: (context, url) =>
-                                              CircularProgressIndicator(),
-                                        )
-                                      : const Icon(Icons.person, size: 50),
+                              Text(
+                                userDetails?['full_name'] ?? 'Unknown User',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              SizedBox(height: 0),
+                              Text(
+                                userLoggedIn != null
+                                    ? '@$userLoggedIn'
+                                    : 'Unknown User',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 15),
+                          // Following Button and Icon
+                          FollowSections(
+                              userId: authService.getCurrentUserID()),
+                          SizedBox(height: 5),
+                          // TabBar for Bio and Timelines
+                          const TabBar(
+                            labelColor: Colors.purple,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: Colors.purple,
+                            tabs: [
+                              Tab(text: "Timeline"),
+                              Tab(text: "Bio"),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    top: 163,
-                    left: 50,
-                    right: 50,
-                    child: Column(
-                      children: [
-                        // Follower Stats
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  "100",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "Followers",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  "100",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "Following",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  "0",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "Timelines",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 11),
-                        // User's Name and Handle
-                        Column(
-                          children: [
-                            Text(
-                              userDetails?['full_name'] ?? 'Unknown User',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                            SizedBox(height: 0),
-                            Text(
-                              userLoggedIn != null
-                                  ? '@$userLoggedIn'
-                                  : 'Unknown User',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 15),
-                        // Following Button and Icon
-                        FollowSections(userId: authService.getCurrentUserID()),
-                        SizedBox(height: 5),
-                        // TabBar for Bio and Timelines
-                        const TabBar(
-                          labelColor: Colors.purple,
-                          unselectedLabelColor: Colors.grey,
-                          indicatorColor: Colors.purple,
-                          tabs: [
-                            Tab(text: "Timeline"),
-                            Tab(text: "Bio"),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 30.0),
-                child: TabBarView(
-                  children: [
-                    // Timeline Section
-                    const Scaffold(
-                      body: SafeArea(child: Text('hi')),
-                    ),
-                    // Bio Section
-                    Scaffold(
-                      body: SafeArea(
-                        child: Container(
-                          color: Colors.white,
-                          child: SingleChildScrollView(
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 100.0, horizontal: 20),
+                child: SizedBox(
+                  height: MediaQuery.of(context)
+                      .size
+                      .height, // Set height to screen height
+                  child: TabBarView(
+                    children: [
+                      // Timeline Section
+                      GridView.count(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        shrinkWrap: true,
+                        physics:
+                            NeverScrollableScrollPhysics(), // Disable scrolling for GridView
+                        children: [
+                          TimelineCard(timelineId: ''),
+                          TimelineCard(timelineId: ''),
+                          TimelineCard(timelineId: ''),
+                        ],
+                      ),
+                      // Bio Section
+                      Column(
+                        children: [
+                          SizedBox(height: 20),
+                          Center(
                             child: Column(
                               children: [
-                                SizedBox(height: 40),
-                                Center(
-                                  child: Column(
-                                    children: [
-                                      // Major Section
-                                      Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 50, vertical: 12),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              border: Border.all(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.4)),
-                                            ),
+                                // Major Section
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 50, vertical: 12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                            color:
+                                                Colors.grey.withOpacity(0.4)),
+                                      ),
+                                      child: Text(
+                                        "BEng. Software Engineering",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: -12,
+                                      left: 130,
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        color: Colors.white,
+                                        child: Text(
+                                          "Major",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 30),
+                                // Grad Year, Age, GPA Section
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    // Grad Year
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        Container(
+                                          width: 90,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                                color: Colors.grey
+                                                    .withOpacity(0.4)),
+                                          ),
+                                          child: Center(
                                             child: Text(
-                                              "BEng. Software Engineering",
+                                              "2027",
                                               style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black,
                                               ),
                                             ),
                                           ),
-                                          Positioned(
-                                            top: -12,
-                                            left: 130,
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 8),
-                                              color: Colors.white,
-                                              child: Text(
-                                                "Major",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 30),
-
-                                      // Grad Year, Age, GPA Section
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          // Grad Year
-                                          Stack(
-                                            clipBehavior: Clip.none,
-                                            children: [
-                                              Container(
-                                                width: 90,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 16,
-                                                    vertical: 12),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  border: Border.all(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.4)),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    "2027",
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                top: -12,
-                                                left: 15,
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 8),
-                                                  color: Colors.white,
-                                                  child: Text(
-                                                    "Grad Year",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.grey,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          // Age
-                                          Stack(
-                                            clipBehavior: Clip.none,
-                                            children: [
-                                              Container(
-                                                width: 90,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 16,
-                                                    vertical: 12),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  border: Border.all(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.4)),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    "21",
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                top: -12,
-                                                left: 25,
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 8),
-                                                  color: Colors.white,
-                                                  child: Text(
-                                                    "Age",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.grey,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          // GPA
-                                          Stack(
-                                            clipBehavior: Clip.none,
-                                            children: [
-                                              Container(
-                                                width: 90,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 16,
-                                                    vertical: 12),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  border: Border.all(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.4)),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    "3.0",
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                top: -12,
-                                                left: 30,
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 8),
-                                                  color: Colors.white,
-                                                  child: Text(
-                                                    "GPA",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.grey,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-
-                                      SizedBox(height: 30),
-
-                                      // About Section
-                                      Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Container(
-                                            width: 320,
+                                        ),
+                                        Positioned(
+                                          top: -12,
+                                          left: 15,
+                                          child: Container(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: 20, vertical: 20),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                              border: Border.all(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.4)),
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  "blah blah blah blah\nblah blah blah blah",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ],
+                                                horizontal: 8),
+                                            color: Colors.white,
+                                            child: Text(
+                                              "Grad Year",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
                                           ),
-                                          Positioned(
-                                            top: -12,
-                                            left: 130,
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 8),
-                                              color: Colors.white,
-                                              child: Text(
-                                                "About",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Age
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        Container(
+                                          width: 90,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                                color: Colors.grey
+                                                    .withOpacity(0.4)),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              "21",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
                                               ),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: -12,
+                                          left: 25,
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            color: Colors.white,
+                                            child: Text(
+                                              "Age",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // GPA
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        Container(
+                                          width: 90,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                                color: Colors.grey
+                                                    .withOpacity(0.4)),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              "3.0",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: -12,
+                                          left: 30,
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            color: Colors.white,
+                                            child: Text(
+                                              "GPA",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 30),
+                                // About Section
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Container(
+                                      width: 320,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 20),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(25),
+                                        border: Border.all(
+                                            color:
+                                                Colors.grey.withOpacity(0.4)),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "blah blah blah blah\nblah blah blah blah",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black,
                                             ),
                                           ),
                                         ],
                                       ),
-
-                                      SizedBox(height: 30),
-
-                                      // Achievements Section
-                                      Padding(
+                                    ),
+                                    Positioned(
+                                      top: -12,
+                                      left: 130,
+                                      child: Container(
                                         padding:
-                                            const EdgeInsets.only(bottom: 20),
-                                        child: Stack(
-                                          clipBehavior: Clip.none,
-                                          children: [
-                                            Positioned(
-                                              top: -15,
-                                              left:
-                                                  120, // Adjust to center the heading
-                                              child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 8),
-                                                color: Colors.white,
-                                                child: Text(
-                                                  "Achievements",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        color: Colors.white,
+                                        child: Text(
+                                          "About",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 30),
+                                // Achievements Section
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Positioned(
+                                        top: -15,
+                                        left:
+                                            120, // Adjust to center the heading
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          color: Colors.white,
+                                          child: Text(
+                                            "Achievements",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.w500,
                                             ),
-                                            // Achievements Section Container
-                                            Container(
-                                              width: 340,
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 20, vertical: 20),
+                                          ),
+                                        ),
+                                      ),
+                                      // Achievements Section Container
+                                      Container(
+                                        width: 340,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 20),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          border: Border.all(
+                                              color:
+                                                  Colors.grey.withOpacity(0.4)),
+                                        ),
+                                        child: GridView.count(
+                                          crossAxisCount: 3, // 3 columns
+                                          shrinkWrap: true,
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          childAspectRatio: 0.9,
+                                          mainAxisSpacing: 20,
+                                          crossAxisSpacing: 20,
+                                          children: List.generate(
+                                            6,
+                                            (index) => Container(
+                                              padding: EdgeInsets.all(12),
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius:
-                                                    BorderRadius.circular(25),
+                                                    BorderRadius.circular(15),
                                                 border: Border.all(
-                                                    color: Colors.grey
-                                                        .withOpacity(0.4)),
-                                              ),
-                                              child: GridView.count(
-                                                crossAxisCount: 3, // 3 columns
-                                                shrinkWrap: true,
-                                                physics:
-                                                    NeverScrollableScrollPhysics(),
-                                                childAspectRatio: 0.9,
-                                                mainAxisSpacing: 20,
-                                                crossAxisSpacing: 20,
-                                                children: List.generate(
-                                                  6,
-                                                  (index) => Container(
-                                                    padding: EdgeInsets.all(12),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15),
-                                                      border: Border.all(
-                                                        color: Colors.grey
-                                                            .withOpacity(0.4),
-                                                      ),
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        const Icon(
-                                                          Icons.emoji_events,
-                                                          size: 40,
-                                                          color: Colors.purple,
-                                                        ),
-                                                        SizedBox(height: 12),
-                                                        Text(
-                                                          "Achievement ${index + 1}",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                              fontSize: 8,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                                  color: Colors.grey
+                                                      .withOpacity(0.4),
                                                 ),
                                               ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  const Icon(
+                                                    Icons.emoji_events,
+                                                    size: 40,
+                                                    color: Colors.purple,
+                                                  ),
+                                                  SizedBox(height: 12),
+                                                  Text(
+                                                    "Achievement ${index + 1}",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontSize: 8,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -661,14 +657,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    )
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

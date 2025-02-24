@@ -5,7 +5,7 @@ import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:solar_icons/solar_icons.dart';
-
+import 'package:memo/pages/search_page.dart';
 class myPage extends StatefulWidget {
   const myPage({super.key});
 
@@ -18,7 +18,7 @@ class _myPageState extends State<myPage> {
 
   List pages = [
     ProfilePage(),
-    CreateProfile(),
+    SearchPage(),
     ProfilePage(),
     CreateTimeline(),
     ChatPage(),

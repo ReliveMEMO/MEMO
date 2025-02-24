@@ -70,7 +70,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search'),
+        title: Text(''),
         centerTitle: true,
       ),
       body: Column(
@@ -81,19 +81,19 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 20.0),
+                child: Image.asset(
+                  'assets/images/TextLogo.png',
+                  width: 70,
+                  height: 70,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 20.0),
                 child: CircleAvatar(
                   radius: 30,
                   backgroundImage: userDetails?['profile_pic'] != null
                       ? CachedNetworkImageProvider(userDetails?['profile_pic'])
                       : AssetImage('assets/images/default_profile.png'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 20.0),
-                child: Image.asset(
-                  'assets/images/TextLogo.png',
-                  width: 50,
-                  height: 50,
                 ),
               ),
             ],

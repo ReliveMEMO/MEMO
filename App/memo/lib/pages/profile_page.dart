@@ -54,7 +54,6 @@ class _ProfilePageState extends State<ProfilePage> {
       userDetails = response;
     });
     userDetails?['user_name'] = authService.getCurrentUser();
-    print(response);
 
     setState(() {
       isLoading = false;
@@ -320,9 +319,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         physics:
                             NeverScrollableScrollPhysics(), // Disable scrolling for GridView
                         children: [
-                          TimelineCard(timelineId: ''),
-                          TimelineCard(timelineId: ''),
-                          TimelineCard(timelineId: ''),
+                          TimelineCard(
+                              timelineId:
+                                  '39ceb52e-4620-4059-a145-bae2944ed58b'),
+                          TimelineCard(
+                              timelineId:
+                                  'f45bf6fd-2ac0-4c49-a1dc-da651b27dbaa'),
+                          //TimelineCard(timelineId: ''),
                         ],
                       ),
                       // Bio Section

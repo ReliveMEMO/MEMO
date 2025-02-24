@@ -78,7 +78,6 @@ class _CreateTimelineState extends State<CreateTimeline> {
 
       final response =
           await Supabase.instance.client.from('Timeline_Table').insert({
-        'id': userId,
         'timeline_name': timelineNameController.text,
         'timeLine_Description': timelineDescriptionController.text,
         'timeline_Cover': avatarUrl,

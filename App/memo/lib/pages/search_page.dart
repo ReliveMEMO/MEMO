@@ -10,12 +10,12 @@ import 'package:memo/services/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ChatPage extends StatefulWidget {
+class SearchPage extends StatefulWidget {
   @override
-  _ChatPageState createState() => _ChatPageState();
+  _SearchPageState createState() => _SearchPageState();
 }
 
-class _ChatPageState extends State<ChatPage> with RouteAware {
+class _SearchPageState extends State<SearchPage> with RouteAware {
   final TextEditingController searchController = TextEditingController();
   String searchValue = '';
   bool isLoading = false;

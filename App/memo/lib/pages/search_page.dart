@@ -65,48 +65,82 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final userDetails = userProvider.userDetails;
+
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          decoration: BoxDecoration(
-            color: Colors.black12,
-            borderRadius: BorderRadius.circular(100),
-          ),
-          margin: const EdgeInsets.only(right: 15),
-          child: TextField(
-            controller: searchController,
-            decoration: const InputDecoration(
-              hintText: 'Search chat',
-              prefixIcon: Icon(
-                HugeIcons.strokeRoundedSearch01,
-                color: Colors.grey,
-                size: 20,
-              ),
-              border: InputBorder.none,
-              hintStyle: TextStyle(color: Colors.grey, fontSize: 18),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-            ),
-            style: const TextStyle(color: Colors.black),
-          ),
-        ),
+        title: Text('Search'),
         centerTitle: true,
       ),
-      body: isSearching
-          ? isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  itemCount: searchResults.length,
-                  itemBuilder: (context, index) {
-                    final user = searchResults[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 4),
-                      child: UserTile(userId: user['id']),
-                    );
-                  },
-                )
-          : const Center(child: Text('Start searching...')),
+      body: Column(
+        children: [
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundImage: userDetails?['profile_pic'] != null
+                      ? CachedNetworkImageProvider(userDetails?['profile_pic'])
+                      : AssetImage('assets/images/default_profile.png'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 20.0),
+                child: Image.asset(
+                  'assets/images/TextLogo.png',
+                  width: 50,
+                  height: 50,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.black12,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              controller: searchController,
+              decoration: const InputDecoration(
+                hintText: 'Search',
+                prefixIcon: Icon(
+                  HugeIcons.strokeRoundedSearch01,
+                  color: Colors.grey,
+                  size: 20,
+                ),
+                border: InputBorder.none,
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 18),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              ),
+              style: const TextStyle(color: Colors.black),
+            ),
+          ),
+          Expanded(
+            child: isSearching
+                ? isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                        itemCount: searchResults.length,
+                        itemBuilder: (context, index) {
+                          final user = searchResults[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 4),
+                            child: UserTile(userId: user['id']),
+                          );
+                        },
+                      )
+                : const Center(child: Text('Start searching...')),
+          ),
+        ],
+      ),
     );
   }
 }

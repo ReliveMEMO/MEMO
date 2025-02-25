@@ -19,11 +19,8 @@ class _myPageState extends State<myPage> {
   List pages = [
     ProfilePage(),
     CreateProfile(),
+    EventPage(),
     //ProfilePage(),
-    EventPage(eventImage: "...",
-        eventDate: "...",
-        eventTime: "...",
-        eventDescription: "...",),
     ChatPage(),
   ];
 

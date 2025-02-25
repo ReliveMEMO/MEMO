@@ -70,12 +70,12 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        // AppBar title has been removed
         centerTitle: true,
       ),
       body: Column(
         children: [
-          SizedBox(height: 20),
+          SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -137,7 +137,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                           );
                         },
                       )
-                : const Center(child: Text('Start searching...')),
+                : const Center(child: Text('')),
           ),
         ],
       ),

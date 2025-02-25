@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/event_page.dart';//added
+import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/profile_page.dart';
@@ -57,7 +58,6 @@ void main() async {
   ));
 }
 
-
 //final Supabase = Supabase.instance.clinet; //supabase
 
 void handleNotificationNavigation(RemoteMessage message) {
@@ -68,7 +68,6 @@ void handleNotificationNavigation(RemoteMessage message) {
         ?.pushNamed('/chat', arguments: {'senderId': senderId});
   }
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -94,6 +93,7 @@ class MyApp extends StatelessWidget {
         '/chat': (context) => convoPage(),
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
+        '/create-timeline': (context) => CreateTimeline(),
         //Testing the CI pipeline xoxo
 
       },

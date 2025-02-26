@@ -13,7 +13,8 @@ void profilePage() {
 }
 
 class ProfilePage extends StatefulWidget {
-  ProfilePage({super.key});
+  final String? userId;
+  ProfilePage({Key? key, this.userId}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -47,7 +48,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final response = await Supabase.instance.client
         .from('User_Info')
         .select()
-        .eq('id', authService.getCurrentUserID()!)
+        .eq(
+            'id',
+            widget.userId != null
+                ? widget.userId!
+                : authService.getCurrentUserID()!)
         .maybeSingle();
 
     if (!mounted) return;
@@ -57,17 +62,28 @@ class _ProfilePageState extends State<ProfilePage> {
     });
     userDetails?['user_name'] = authService.getCurrentUser();
 
-    final timelines = await Supabase.instance.client
-        .from('Timeline_Table')
-        .select('id')
-        .or('admin.eq.${authService.getCurrentUserID()},collaborators.cs.{${authService.getCurrentUserID()}}')
-        .order('lastUpdate', ascending: false);
-    ;
+    PostgrestList? timelines;
+
+    if (widget.userId == null) {
+      timelines = await Supabase.instance.client
+          .from('Timeline_Table')
+          .select('id')
+          .or('admin.eq.${authService.getCurrentUserID()},collaborators.cs.{${authService.getCurrentUserID()}}')
+          .order('lastUpdate', ascending: false);
+      ;
+    } else {
+      timelines = await Supabase.instance.client
+          .from('Timeline_Table')
+          .select('id')
+          .or('admin.eq.${widget.userId},collaborators.cs.{${widget.userId}}')
+          .order('lastUpdate', ascending: false);
+      ;
+    }
 
     if (!mounted) return;
 
     setState(() {
-      timelineIds = timelines.map((e) => e['id'] as String).toList();
+      timelineIds = timelines?.map((e) => e['id'] as String).toList() ?? [];
     });
 
     setState(() {
@@ -82,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final userLoggedIn = authService.getCurrentUser();
+    final userLoggedIn = userDetails?['display_name'];
 
     return Scaffold(
       backgroundColor: Colors.white, // Set the entire background to white
@@ -299,7 +315,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           SizedBox(height: 15),
                           // Following Button and Icon
                           FollowSections(
-                              userId: authService.getCurrentUserID()),
+                              userId: widget.userId != null
+                                  ? widget.userId
+                                  : authService.getCurrentUserID()),
                           SizedBox(height: 5),
                           // TabBar for Bio and Timelines
                           const TabBar(

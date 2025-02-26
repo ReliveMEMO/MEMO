@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/pages/timeLine_page.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -87,71 +88,82 @@ class _TimelineCardState extends State<TimelineCard> {
     List<String> avatarPaths =
         (timeLines?['collaborators'] as List<dynamic>?)?.cast<String>() ?? [];
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 1,
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: isLoading
-                ? Skeletonizer(
-                    child: Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ))
-                : CachedNetworkImage(imageUrl: imagePath),
-          ),
-          Positioned(
-            top: 8,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: avatars.map((path) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1),
-                    ),
-                    child: CircleAvatar(
-                      radius: 12,
-                      backgroundImage: CachedNetworkImageProvider(path),
-                    ),
-                  ),
-                );
-              }).toList(),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => TimelinePage(
+                    timelineId: widget.timelineId,
+                  )),
+        );
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        elevation: 1,
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: isLoading
+                  ? Skeletonizer(
+                      child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ))
+                  : CachedNetworkImage(imageUrl: imagePath),
             ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(15)),
+            Positioned(
+              top: 8,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: avatars.map((path) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
+                      child: CircleAvatar(
+                        radius: 12,
+                        backgroundImage: CachedNetworkImageProvider(path),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Center(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius:
+                      const BorderRadius.vertical(bottom: Radius.circular(15)),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Center(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

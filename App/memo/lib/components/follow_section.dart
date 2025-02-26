@@ -47,7 +47,17 @@ class _FollowSectionsState extends State<FollowSections> {
                 ),
               ],
             )
-          : null,
+          : ElevatedButton(
+              onPressed: () {},
+              child: Text(
+                'Follow',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ButtonStyle(
+                  elevation: WidgetStateProperty.all(0),
+                  backgroundColor: WidgetStateProperty.all(Colors.purple),
+                  fixedSize: MaterialStateProperty.all(Size(170, 40))),
+            ),
     );
   }
 }

@@ -312,7 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 15),
+                          SizedBox(height: 10),
                           // Following Button and Icon
                           FollowSections(
                               userId: widget.userId != null

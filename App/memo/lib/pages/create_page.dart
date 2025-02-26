@@ -34,7 +34,19 @@ class _CreatePageState extends State<CreatePage> {
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: [],
+          children: [
+            TextFieldComponent(
+              hintText: "Page Name",
+              obscureText: false,
+              controller: pageNameController,
+              errorText: pageNameErrorText,
+              clearErrorText: () {
+                setState(() {
+                  pageNameErrorText = null;
+                });
+              },
+            ),
+          ],
         ),
       ),
     );

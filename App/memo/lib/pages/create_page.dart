@@ -27,6 +27,38 @@ class _CreatePageState extends State<CreatePage> {
   String? yearErrorText;
   String? aboutUsErrorText;
 
+  void _validateFields() {
+    setState(() {
+      pageNameController.text.isEmpty
+          ? pageNameErrorText = 'Please enter the page name'
+          : pageNameErrorText = null;
+      yearController.text.isEmpty
+          ? yearErrorText = 'Please enter the year (e.g. 2024/25)'
+          : yearErrorText = null;
+      aboutUsController.text.isEmpty
+          ? aboutUsErrorText = 'Please provide a short description'
+          : aboutUsErrorText = null;
+    });
+  }
+
+  void createPage() {
+    _validateFields();
+    if (pageNameErrorText == null &&
+        yearErrorText == null &&
+        aboutUsErrorText == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Page Created Successfully!')),
+      );
+      // Clear fields after successful submission
+      pageNameController.clear();
+      yearController.clear();
+      aboutUsController.clear();
+      setState(() {
+        _imageFile = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -23,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final authService = AuthService();
   String? selectedProgram;
   PostgrestMap? userDetails;
+  List<String> timelineIds = [];
   bool isLoading = true;
 
   @override
@@ -56,12 +57,27 @@ class _ProfilePageState extends State<ProfilePage> {
     });
     userDetails?['user_name'] = authService.getCurrentUser();
 
+    final timelines = await Supabase.instance.client
+        .from('Timeline_Table')
+        .select('id')
+        .or('admin.eq.${authService.getCurrentUserID()},collaborators.cs.{${authService.getCurrentUserID()}}')
+        .order('lastUpdate', ascending: false);
+    ;
+
+    if (!mounted) return;
+
+    setState(() {
+      timelineIds = timelines.map((e) => e['id'] as String).toList();
+    });
+
     setState(() {
       isLoading = false;
     });
 
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.userDetails = userDetails;
+    if (userDetails?['id'] == authService.getCurrentUserID()) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.userDetails = userDetails;
+    }
   }
 
   @override
@@ -320,13 +336,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           physics:
                               NeverScrollableScrollPhysics(), // Disable scrolling for GridView
                           children: [
-                            TimelineCard(
-                                timelineId:
-                                    '39ceb52e-4620-4059-a145-bae2944ed58b'),
-                            TimelineCard(
-                                timelineId:
-                                    'f45bf6fd-2ac0-4c49-a1dc-da651b27dbaa'),
-                            //TimelineCard(timelineId: ''),
+                            ...timelineIds.map((id) {
+                              return TimelineCard(timelineId: id);
+                            }).toList()
                           ],
                         ),
                         // Bio Section

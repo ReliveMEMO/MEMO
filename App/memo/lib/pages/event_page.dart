@@ -52,19 +52,36 @@ class _EventPageState extends State<EventPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
 
             // Event Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                "image.jpg",
-                width: MediaQuery.of(context).size.width * 0.7, 
-                height: 300,
-                fit: BoxFit.cover,
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFC7C5C5), 
+                borderRadius: BorderRadius.circular(12), 
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1), 
+                    blurRadius: 8, 
+                    spreadRadius: 2, 
+                    offset: const Offset(0, 4), 
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(8), // Padding inside the box
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12), 
+                child: Image.network(
+                  "image.jpg",
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: 350,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
+            
+          
 
             // Event Date & Time
             Row(

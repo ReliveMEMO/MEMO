@@ -134,6 +134,34 @@ class _CreatePageState extends State<CreatePage> {
                 ],
               ),
             ),
+            // Create Page Button
+            GestureDetector(
+              onTap: createPage,
+              child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  decoration: BoxDecoration(
+                    color: colorDark,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+                  child: const Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Create Page',
+                          style: TextStyle(color: Colors.white, fontSize: 17),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Icon(Icons.arrow_forward_ios_rounded,
+                            color: Colors.white, size: 17)
+                      ],
+                    ),
+                  )),
+            ),
           ],
         ),
       ),

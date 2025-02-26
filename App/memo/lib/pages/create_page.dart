@@ -114,10 +114,12 @@ class _CreatePageState extends State<CreatePage> {
                     child: TextField(
                       controller: aboutUsController,
                       maxLines: 5,
+                      style: TextStyle(color: colorDark),
                       decoration: InputDecoration(
                         hintText: "About Us",
+                        hintStyle: TextStyle(color: const Color(0xFF7f31c6)),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(15),
+                        contentPadding: const EdgeInsets.all(10),
                       ),
                     ),
                   ),

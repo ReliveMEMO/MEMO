@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'pages/NewMemo.dart';
+import 'pages/create_page.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -88,6 +89,7 @@ class MyApp extends StatelessWidget {
         '/chat': (context) => convoPage(),
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
+        '/create-page': (context) => CreatePage(),
         //Testing the CI pipeline xoxo
       },
     );

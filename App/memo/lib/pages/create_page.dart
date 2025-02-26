@@ -35,6 +35,14 @@ class _CreatePageState extends State<CreatePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            // Avatar Upload Component
+            AvatarUpload(
+              onImageSelected: (File? imageFile) {
+                setState(() {
+                  _imageFile = imageFile;
+                });
+              },
+            ),
             // Page Name Field
             TextFieldComponent(
               hintText: "Page Name",

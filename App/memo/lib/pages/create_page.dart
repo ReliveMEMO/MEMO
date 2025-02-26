@@ -35,6 +35,7 @@ class _CreatePageState extends State<CreatePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            // Page Name Field
             TextFieldComponent(
               hintText: "Page Name",
               obscureText: false,
@@ -43,6 +44,18 @@ class _CreatePageState extends State<CreatePage> {
               clearErrorText: () {
                 setState(() {
                   pageNameErrorText = null;
+                });
+              },
+            ),
+            // Year Field
+            TextFieldComponent(
+              hintText: "Year (e.g. 2024/25)",
+              obscureText: false,
+              controller: yearController,
+              errorText: yearErrorText,
+              clearErrorText: () {
+                setState(() {
+                  yearErrorText = null;
                 });
               },
             ),

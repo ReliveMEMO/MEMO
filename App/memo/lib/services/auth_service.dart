@@ -5,7 +5,7 @@ import 'package:memo/services/notification.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class AuthService { 
+class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   Future<AuthResponse> signInWithEmailPassword(
@@ -57,11 +57,9 @@ class AuthService {
   }
 
   Future<AuthResponse> signInWithGoogle() async {
-     // Web Client ID that registered with Google Cloud.
+    // Web Client ID that registered with Google Cloud.
     const webClientId =
         '1047457511880-jeorj6kvv0ddfneplopr4km951tsbhh3.apps.googleusercontent.com';
-
-    
 
     final GoogleSignIn googleSignIn = GoogleSignIn(
       //clientId: iosClientId,
@@ -84,5 +82,35 @@ class AuthService {
       idToken: idToken,
       accessToken: accessToken,
     );
+  }
+
+  Future<String?> getDisplayPicture(String userId) async {
+    final response = await _supabase
+        .from('User_Info')
+        .select('profile_pic')
+        .eq('id', userId)
+        .maybeSingle();
+
+    if (response == null || response['avatar_url'] == null) {
+      print('Error fetching display picture');
+      return null;
+    }
+
+    return response['avatar_url'] as String?;
+  }
+
+  Future<String?> getDisplayName(String userId) async {
+    final response = await _supabase
+        .from('User_Info')
+        .select('full_name')
+        .eq('id', userId)
+        .maybeSingle();
+
+    if (response == null || response['full_name'] == null) {
+      print('Error fetching display name');
+      return null;
+    }
+
+    return response['full_name'] as String?;
   }
 }

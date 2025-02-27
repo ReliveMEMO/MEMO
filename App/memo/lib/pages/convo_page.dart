@@ -8,6 +8,8 @@ import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:memo/services/webrtc_service.dart'; // Import the WebRTCService
+import 'call_pagee.dart'; // Import the CallScreen widget
 
 class convoPage extends StatefulWidget {
   const convoPage({super.key});
@@ -20,6 +22,7 @@ class _convoPageState extends State<convoPage> {
   final authService = AuthService();
   final msgEncryption = MsgEncryption();
   var scrollController;
+  final webrtcService = WebRTCService(); // Define the webrtcService variable
   final List<Map<String, dynamic>> messages = [];
   final int _batchSize = 20;
   bool _loading = false;
@@ -57,7 +60,7 @@ class _convoPageState extends State<convoPage> {
     try {
       channel = WebSocketChannel.connect(
         Uri.parse(
-            'ws://memo-backend-9b73024f3215.herokuapp.com'), // Replace with your WebSocket server URL
+            'ws://memo-backend-9b73024f3215.herokuapp.com/messaging'), // Replace with your WebSocket server URL
       );
 
       // Register the receiver
@@ -290,8 +293,17 @@ class _convoPageState extends State<convoPage> {
         actions: [
           IconButton(
             icon: Icon(HugeIcons.strokeRoundedCall02),
-            onPressed: () {
-              // Add your onPressed logic here
+            onPressed: () async {
+              // Initiate the call and navigate to CallScreen
+              await webrtcService.createOffer(recieverDetails['id']);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CallScreen(
+                    webrtcService: webrtcService,
+                  ),
+                ),
+              );
             },
           ),
         ],

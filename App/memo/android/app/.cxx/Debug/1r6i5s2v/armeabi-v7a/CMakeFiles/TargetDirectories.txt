@@ -1,0 +1,2 @@
+C:/Users/Malsha Jayasinghe/Documents/GitHub/Memo/MEMO/App/memo/android/app/.cxx/Debug/1r6i5s2v/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Malsha Jayasinghe/Documents/GitHub/Memo/MEMO/App/memo/android/app/.cxx/Debug/1r6i5s2v/armeabi-v7a/CMakeFiles/rebuild_cache.dir

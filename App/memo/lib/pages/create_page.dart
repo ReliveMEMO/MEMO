@@ -174,42 +174,18 @@ class _CreatePageState extends State<CreatePage> {
                 });
               },
             ),
-            // About Us Field
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 25),
-                    decoration: BoxDecoration(
-                      color: colorLight,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: TextField(
-                      controller: aboutUsController,
-                      maxLines: 5,
-                      style: TextStyle(color: colorDark),
-                      decoration: InputDecoration(
-                        hintText: "About Us",
-                        hintStyle: TextStyle(color: const Color(0xFF7f31c6)),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(10),
-                      ),
-                    ),
-                  ),
-                  if (aboutUsErrorText != null)
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.symmetric(horizontal: 35),
-                      child: Text(
-                        aboutUsErrorText!,
-                        style: const TextStyle(color: Colors.red, fontSize: 12),
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                ],
-              ),
+            // About Us Field using TextFieldComponent
+            TextFieldComponent(
+              hintText: "About Us",
+              obscureText: false,
+              controller: aboutUsController,
+              errorText: aboutUsErrorText,
+              clearErrorText: () {
+                setState(() {
+                  aboutUsErrorText = null;
+                });
+              },
+              maxLines: 7, // Multiline Support
             ),
             // Create Page Button
             GestureDetector(

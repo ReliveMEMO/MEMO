@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
 import 'package:memo/components/textField.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:memo/services/auth_service.dart';
+
+final authService = AuthService();
 
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
@@ -21,8 +25,37 @@ class _CreatePageState extends State<CreatePage> {
   final Color colorLight = const Color.fromARGB(255, 248, 240, 255);
   final Color colorDark = const Color(0xFF7f31c6);
 
+  Future<void> uploadImage() async {
+    if (_imageFile == null) {
+      return;
+    }
+
+    try {
+      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final path = 'page-images/$fileName';
+
+      // Upload Image to Supabase Storage
+      await Supabase.instance.client.storage
+          .from('page-images')
+          .upload(path, _imageFile!);
+
+      // Get Public URL of the Uploaded Image
+      final url = Supabase.instance.client.storage
+          .from('page-images')
+          .getPublicUrl(path);
+
+      avatarUrl = url;
+    } catch (e) {
+      print('Image Upload Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to upload image. Please try again.')),
+      );
+    }
+  }
+
   // Image and Error Text Variables
   File? _imageFile;
+  String? avatarUrl;
   String? pageNameErrorText;
   String? yearErrorText;
   String? aboutUsErrorText;
@@ -41,21 +74,63 @@ class _CreatePageState extends State<CreatePage> {
     });
   }
 
-  void createPage() {
+  Future<void> createPage() async {
+    // Get Current User ID
+    final userId = authService.getCurrentUserID();
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please login to create a page')),
+      );
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
+
+    // Validate Fields
     _validateFields();
     if (pageNameErrorText == null &&
         yearErrorText == null &&
         aboutUsErrorText == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Page Created Successfully!')),
-      );
-      // Clear fields after successful submission
-      pageNameController.clear();
-      yearController.clear();
-      aboutUsController.clear();
-      setState(() {
-        _imageFile = null;
-      });
+      try {
+        // Upload Image (if selected)
+        await uploadImage();
+
+        // Insert Page Data into Supabase
+        final response = await Supabase.instance.client.from('Pages').insert({
+          'user_id': userId,
+          'page_name': pageNameController.text,
+          'year': yearController.text,
+          'about_us': aboutUsController.text,
+          'image_url': avatarUrl,
+          'created_at': DateTime.now().toIso8601String(),
+        });
+
+        if (response.error == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Page Created Successfully!')),
+          );
+
+          // Clear Fields after Successful Submission
+          pageNameController.clear();
+          yearController.clear();
+          aboutUsController.clear();
+          setState(() {
+            _imageFile = null;
+          });
+
+          // Navigate to Profile or Home Screen
+          Navigator.pushNamed(context, '/profile');
+        } else {
+          print('Error: ${response.error!.message}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${response.error!.message}')),
+          );
+        }
+      } catch (e) {
+        print('Exception: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred. Please try again.')),
+        );
+      }
     }
   }
 

@@ -15,7 +15,7 @@ class TextFieldComponent extends StatelessWidget {
       required this.obscureText,
       required this.controller,
       this.errorText,
-      this.clearErrorText, Color? backgroundColor});
+      this.clearErrorText, Color? backgroundColor, required double borderRadius});
 
   @override
   Widget build(BuildContext context) {

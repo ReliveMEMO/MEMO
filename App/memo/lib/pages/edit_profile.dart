@@ -26,7 +26,11 @@ class _EditProfileState extends State<EditProfile> {
   final Color colorDark = const Color(0xFF7f31c6);
   String? avatarUrl;
   File? _imageFile;
-  
+  String? fullnameErrorText;
+  String? dateErrorText;
+  String? programmeErrorText;
+  String? statusErrorText;
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -37,6 +41,7 @@ class _EditProfileState extends State<EditProfile> {
     if (picked != null && picked != birthDate) {
       setState(() {
         birthDate = picked;
+        dateErrorText = null;
       });
     }
   }
@@ -46,136 +51,244 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Edit Profile"),
+        title: Text("Edit Profile"),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.grey.shade300,
-                    child: _imageFile == null
-                        ? const Icon(Icons.person, size: 50, color: Colors.grey)
-                        : null,
-                    backgroundImage:
-                        _imageFile != null ? FileImage(_imageFile!) : null,
+              child: AvatarUpload(
+                onImageSelected: (File? imageFile) {
+                  setState(() {
+                    _imageFile = imageFile;
+                  });
+                },
+              ),
+            ),
+            const SizedBox(height: 15),
+            buildHeading("BirthDate"),
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () => _selectDate(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 125, vertical: 12),
+                  margin: const EdgeInsets.only(right: 15), // Adjust margin to move right
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: dateErrorText != null ? Colors.red : Colors.transparent,
+                    ),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: const CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Colors.purple,
-                        child: Icon(Icons.add, color: Colors.white, size: 15),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextFieldComponent(
-              hintText: "Full Name",
-              obscureText: false,
-              controller: fullnameController,
-              backgroundColor: Colors.grey.shade300,
-            ),
-            GestureDetector(
-              onTap: () => _selectDate(context),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      birthDate == null
-                          ? 'Select Birthdate'
-                          : DateFormat('dd.MM.yyyy').format(birthDate!),
-                      style: const TextStyle(color: Colors.black54),
-                    ),
-                    const Icon(Icons.calendar_today, color: Colors.black54),
-                  ],
+                  child: Text(
+                    birthDate == null
+                        ? 'Select Birthdate'
+                        : DateFormat('dd.MM.yyyy').format(birthDate!),
+                    style: TextStyle(color: Colors.black87),
+                  ),
                 ),
               ),
             ),
+            if (dateErrorText != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 5, left: 10),
+                child: Text(
+                  dateErrorText!,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
             const SizedBox(height: 10),
-            DropdownComponent(
-              hintText: 'Programme',
-              items: const ['Software Engineering', 'Computer Science', 'AI and Data Science', 'Business Information Systems'],
-              onChanged: (value) => setState(() => selectedProgram = value),
-              selectedValue: selectedProgram,
-            ),
-            DropdownComponent(
-              hintText: 'Student Status',
-              items: const ['Level 3', 'Level 4', 'Level 5', 'Level 6', 'Alumni'],
-              onChanged: (value) => setState(() => selectedStatus = value),
-              selectedValue: selectedStatus,
-            ),
-            TextFieldComponent(
-              hintText: "About",
-              obscureText: false,
-              controller: aboutController,
-              backgroundColor: Colors.grey.shade300,
+            buildInputField("Full Name", "Sandinu Pinnawala"),
+            buildDropdownField("Programme", "Software Engineering", ["Software Engineering", "Computer Science"], (String? newValue) {
+              setState(() {
+                selectedProgram = newValue;
+              });
+            }),
+            buildDropdownField("Student Status", "Level 5", ["Level 5", "Level 6"], (String? newValue) {
+              setState(() {
+                selectedStatus = newValue;
+              });
+            }),
+            buildTextArea("About", "Blah Blah Blah"),
+            const SizedBox(height: 20),
+            Text(
+              "Achievements",
+              style: TextStyle(color: Colors.grey, fontSize: 16),
             ),
             const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.grey.shade100,
-              ),
-              child: Column(
-                children: [
-                  const Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      _buildAchievementCard("IEEE Xtreme", "champions", Icons.whatshot),
-                      _buildAchievementCard("RCL'23", "participation", Icons.emoji_people),
-                      _buildAchievementCard("WebSpire", "volunteer", Icons.web),
-                      _buildAchievementCard("IEEE Xtreme", "champions", Icons.whatshot),
-                      _buildAchievementCard("RCL'23", "participation", Icons.emoji_people),
-                      _buildAchievementCard("Add Achievement", "", Icons.add, addNew: true),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            buildAchievementsGrid(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAchievementCard(String title, String subtitle, IconData icon, {bool addNew = false}) {
-    return Container(
-      width: 100,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 2)],
-      ),
+
+
+Widget buildInputField(String label, String value, {double height = 25}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: Colors.grey)),
+        const SizedBox(height: 5),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: SizedBox(
+            height: height, 
+            child: TextField(
+              decoration: InputDecoration(
+                border: InputBorder.none,
+              ),
+              controller: TextEditingController(text: value),
+              readOnly: true,
+              maxLines: null, 
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+
+  
+
+Widget buildDropdownField(String label, String value, List<String> options, void Function(String?) onChanged, {double height = 50}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: Colors.grey)),
+        const SizedBox(height: 5),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: SizedBox(
+            height: height, // Set desired height
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: value,
+                onChanged: onChanged,
+                items: options.map((String option) {
+                  return DropdownMenuItem(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                icon: Icon(Icons.arrow_drop_down),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+
+  Widget buildTextArea(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: addNew ? Colors.black54 : Colors.orange, size: 30),
+          Text(label, style: TextStyle(color: Colors.grey)),
           const SizedBox(height: 5),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-          if (subtitle.isNotEmpty) Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10)),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: TextField(
+              maxLines: 3,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+              ),
+              controller: TextEditingController(text: value),
+              readOnly: true,
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget buildAchievementsGrid() {
+    List<Map<String, String>> achievements = [
+      {"icon": "🔥", "text": "IEEE Xtreme\nchampions"},
+      {"icon": "😊", "text": "RCL'23\nparticipation"},
+      {"icon": "🕸", "text": "WebSpire\nvolunteer"},
+      {"icon": "🔥", "text": "IEEE Xtreme\nchampions"},
+      {"icon": "😊", "text": "RCL'23\nparticipation"},
+      {"icon": "➕", "text": "add\nachievement"},
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: achievements.length,
+      itemBuilder: (context, index) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 5,
+                spreadRadius: 1,
+              )
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                achievements[index]['icon']!,
+                style: TextStyle(fontSize: 24),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                achievements[index]['text']!,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildHeading(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5, left: 5),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black54),
       ),
     );
   }

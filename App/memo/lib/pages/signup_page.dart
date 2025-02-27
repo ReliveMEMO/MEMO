@@ -121,11 +121,13 @@ class _SignupPageState extends State<SignupPage> {
               hintText: "Email",
               obscureText: false,
               controller: emailController,
+              borderRadius: 10,
             ),
             TextFieldComponent(
               hintText: "Username",
               obscureText: false,
               controller: usernameController,
+              borderRadius: 10,
             ),
 
             //Password textfield
@@ -133,6 +135,7 @@ class _SignupPageState extends State<SignupPage> {
               hintText: "Password",
               obscureText: true,
               controller: passwordController,
+              borderRadius: 10,
             ),
 
             //Login button

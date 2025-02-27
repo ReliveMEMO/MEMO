@@ -144,6 +144,7 @@ class _CreateProfileState extends State<CreateProfile> {
             hintText: "Full Name",
             obscureText: false,
             controller: fullnameController,
+            borderRadius: 10,
             errorText: fullnameErrorText,
             clearErrorText: () {
               setState(() {
@@ -156,6 +157,7 @@ class _CreateProfileState extends State<CreateProfile> {
             obscureText: false,
             controller: iitIdController,
             errorText: iitIdErrorText,
+            borderRadius: 10,
             clearErrorText: () {
               setState(() {
                 iitIdErrorText = null;

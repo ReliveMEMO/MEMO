@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
 import 'package:memo/components/textField.dart';
+import 'package:memo/pages/my_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:memo/services/auth_service.dart';
 
@@ -37,7 +38,7 @@ class _CreatePageState extends State<CreatePage> {
   // Year Picker Function - Custom Year Selector
   Future<void> _selectYear(BuildContext context) async {
     int selectedYear = DateTime.now().year;
-    int startYear = 1900;
+    int startYear = 1950;
     int endYear = 2025;
 
     await showDialog(
@@ -189,7 +190,7 @@ class _CreatePageState extends State<CreatePage> {
           // });
 
           // Navigate to Profile or Home Screen
-          Navigator.pushNamed(context, '/profile');
+          Navigator.pushNamed(context, '/my-page');
         } else {
           print('Error: ${response.error!.message}');
           ScaffoldMessenger.of(context).showSnackBar(

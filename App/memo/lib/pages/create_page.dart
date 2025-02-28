@@ -8,6 +8,13 @@ import 'package:memo/services/auth_service.dart';
 
 final authService = AuthService();
 
+// Image and Error Text Variables
+File? _imageFile;
+String? avatarUrl;
+String? pageNameErrorText;
+String? yearErrorText;
+String? aboutUsErrorText;
+
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
 
@@ -53,13 +60,6 @@ class _CreatePageState extends State<CreatePage> {
     }
   }
 
-  // Image and Error Text Variables
-  File? _imageFile;
-  String? avatarUrl;
-  String? pageNameErrorText;
-  String? yearErrorText;
-  String? aboutUsErrorText;
-
   void _validateFields() {
     setState(() {
       pageNameController.text.isEmpty
@@ -77,13 +77,6 @@ class _CreatePageState extends State<CreatePage> {
   Future<void> createPage() async {
     // Get Current User ID
     final userId = authService.getCurrentUserID();
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please login to create a page')),
-      );
-      Navigator.pushReplacementNamed(context, '/login');
-      return;
-    }
 
     // Validate Fields
     _validateFields();
@@ -95,8 +88,9 @@ class _CreatePageState extends State<CreatePage> {
         await uploadImage();
 
         // Insert Page Data into Supabase
-        final response = await Supabase.instance.client.from('Pages').insert({
-          'user_id': userId,
+        final response =
+            await Supabase.instance.client.from('page_table').insert({
+          'admin': authService.getCurrentUserID(),
           'page_name': pageNameController.text,
           'year': yearController.text,
           'about_us': aboutUsController.text,
@@ -104,18 +98,18 @@ class _CreatePageState extends State<CreatePage> {
           'created_at': DateTime.now().toIso8601String(),
         });
 
-        if (response.error == null) {
+        if (response == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Page Created Successfully!')),
           );
 
           // Clear Fields after Successful Submission
-          pageNameController.clear();
-          yearController.clear();
-          aboutUsController.clear();
-          setState(() {
-            _imageFile = null;
-          });
+          // pageNameController.clear();
+          // yearController.clear();
+          // aboutUsController.clear();
+          // setState(() {
+          //   _imageFile = null;
+          // });
 
           // Navigate to Profile or Home Screen
           Navigator.pushNamed(context, '/profile');

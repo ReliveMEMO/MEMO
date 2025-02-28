@@ -295,13 +295,20 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
       "@sir.techghost2 liked your memo",
       "@sir.techghost2 tagged you in a memo",
       "@sir.techghost2 is now following you!",
+      "@sir.techghost2 is now following you!",
+      "@sir.techghost2 liked your memo",
+      "@sir.techghost2 tagged you in a memo",
+      "@sir.techghost2 is now following you!",
+      "@sir.techghost2 liked your memo",
+      "@sir.techghost2 tagged you in a memo",
+      "@sir.techghost2 is now following you!",
     ];
 
     return ScrollbarTheme(
       data: ScrollbarThemeData(
         thumbColor: MaterialStateProperty.all(Colors.purple),  // Set the thumb color to purple
         radius: Radius.circular(10),  // Set the corners to be rounded
-        thickness: MaterialStateProperty.all(8),  // Keeping default thickness (no change)
+       // thickness: MaterialStateProperty.all(8),  // Keeping default thickness (no change)
       ),
       child: Scrollbar(
         child: ListView.builder(

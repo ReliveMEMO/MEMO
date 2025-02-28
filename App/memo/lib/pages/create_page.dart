@@ -32,6 +32,83 @@ class _CreatePageState extends State<CreatePage> {
   final Color colorLight = const Color.fromARGB(255, 248, 240, 255);
   final Color colorDark = const Color(0xFF7f31c6);
 
+  final authService = AuthService();
+
+  // Year Picker Function - Custom Year Selector
+  Future<void> _selectYear(BuildContext context) async {
+    int selectedYear = DateTime.now().year;
+    int startYear = 1900;
+    int endYear = 2025;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Select Year',
+            style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+          ),
+          backgroundColor: const Color.fromARGB(255, 246, 244, 247),
+          content: Container(
+            width: double.maxFinite,
+            height: 300,
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, // 3 columns for grid
+                mainAxisSpacing: 20,
+                crossAxisSpacing: 20,
+                childAspectRatio: 2,
+              ),
+              itemCount: endYear - startYear + 1,
+              itemBuilder: (BuildContext context, int index) {
+                int year = startYear + index;
+                bool isSelected = year.toString() == yearController.text;
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      yearController.text = year.toString();
+                      yearErrorText = null;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color.fromARGB(255, 131, 67, 195)
+                          : const Color.fromARGB(0, 255, 255, 255),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      year.toString(),
+                      style: TextStyle(
+                        color: isSelected
+                            ? colorLight
+                            : const Color.fromARGB(255, 0, 0, 0),
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel',
+                  style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0))),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> uploadImage() async {
     if (_imageFile == null) {
       return;
@@ -66,7 +143,7 @@ class _CreatePageState extends State<CreatePage> {
           ? pageNameErrorText = 'Please enter the page name'
           : pageNameErrorText = null;
       yearController.text.isEmpty
-          ? yearErrorText = 'Please enter the year (e.g. 2024/25)'
+          ? yearErrorText = 'Please select a year'
           : yearErrorText = null;
       aboutUsController.text.isEmpty
           ? aboutUsErrorText = 'Please provide a short description'
@@ -156,18 +233,52 @@ class _CreatePageState extends State<CreatePage> {
                 });
               },
             ),
-            // Year Field
-            TextFieldComponent(
-              hintText: "Year (e.g. 2024/25)",
-              obscureText: false,
-              controller: yearController,
-              errorText: yearErrorText,
-              clearErrorText: () {
-                setState(() {
-                  yearErrorText = null;
-                });
-              },
+
+            // Year Picker Field
+            GestureDetector(
+              onTap: () => _selectYear(context),
+              child: Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: colorLight,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color:
+                        yearErrorText != null ? Colors.red : Colors.transparent,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      yearController.text.isEmpty
+                          ? 'Started Year (e.g. 2024)'
+                          : 'Year: ${yearController.text}',
+                      style: TextStyle(
+                        color: yearController.text.isEmpty
+                            ? const Color.fromARGB(255, 167, 107, 219)
+                            : Colors.black,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Icon(Icons.calendar_today, color: colorDark),
+                  ],
+                ),
+              ),
             ),
+            if (yearErrorText != null)
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.symmetric(horizontal: 35),
+                child: Text(
+                  yearErrorText!,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+
             // About Us Field using TextFieldComponent
             TextFieldComponent(
               hintText: "About Us",

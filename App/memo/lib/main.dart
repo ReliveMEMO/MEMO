@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_profile.dart';
+import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/profile_page.dart';
@@ -58,6 +59,8 @@ void main() async {
   ));
 }
 
+//final Supabase = Supabase.instance.clinet; //supabase
+
 void handleNotificationNavigation(RemoteMessage message) {
   // Example: Navigate to the chat screen with the senderId from the payload
   final senderId = message.data['senderId'];
@@ -90,6 +93,7 @@ class MyApp extends StatelessWidget {
         '/chat': (context) => convoPage(),
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
+        '/create-timeline': (context) => CreateTimeline(),
         '/create-page': (context) => CreatePage(),
         //Testing the CI pipeline xoxo
       },

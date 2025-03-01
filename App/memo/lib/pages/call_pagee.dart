@@ -26,8 +26,6 @@ class _CallScreenState extends State<CallScreen> {
   String? displayName;
   RTCPeerConnection? _peerConnection;
   MediaStream? _localStream;
-  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   WebSocketChannel? callingChannel;
   String _callingStatus = 'Idle'; // 'Idle', 'Calling', 'Ringing', 'In Call'
   bool _inCalling = false;
@@ -38,15 +36,9 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void initState() {
     super.initState();
-    _initRenderers();
     final String userId = AuthService().getCurrentUserID()!;
     _initializeCallingWebSocket(userId); // Pass userId instead of calleeId
     _getDisplayName();
-  }
-
-  Future<void> _initRenderers() async {
-    await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
   }
 
   Future<void> _getDisplayName() async {
@@ -61,7 +53,6 @@ class _CallScreenState extends State<CallScreen> {
     try {
       await _createPeerConnection();
       await _getUserMedia();
-      _listenForRemoteStreams();
     } catch (e) {
       print("Error initializing WebRTC: $e");
     }
@@ -82,13 +73,6 @@ class _CallScreenState extends State<CallScreen> {
       _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
         _sendIceCandidate(candidate);
       };
-
-      _peerConnection?.onTrack = (RTCTrackEvent event) {
-        if (event.track.kind == 'video') {
-          _remoteRenderer.srcObject = event.streams[0];
-          setState(() {});
-        }
-      };
     } catch (e) {
       print("Error creating peer connection: $e");
     }
@@ -98,20 +82,11 @@ class _CallScreenState extends State<CallScreen> {
     try {
       final mediaConstraints = <String, dynamic>{
         'audio': true,
-        'video': {
-          'mandatory': {
-            'minWidth': '640',
-            'minHeight': '480',
-            'minFrameRate': '30',
-          },
-          'facingMode': 'user',
-          'optional': [],
-        }
+        'video': false, // Disable video
       };
 
       _localStream =
           await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      _localRenderer.srcObject = _localStream;
 
       _localStream?.getTracks().forEach((track) {
         _peerConnection?.addTrack(track, _localStream!);
@@ -123,15 +98,6 @@ class _CallScreenState extends State<CallScreen> {
     } catch (e) {
       print('Error getting user media: $e');
     }
-  }
-
-  void _listenForRemoteStreams() {
-    _peerConnection?.onTrack = (RTCTrackEvent event) {
-      if (event.track.kind == 'video') {
-        _remoteRenderer.srcObject = event.streams[0];
-        setState(() {});
-      }
-    };
   }
 
   void _initializeCallingWebSocket(String userId) {
@@ -150,6 +116,7 @@ class _CallScreenState extends State<CallScreen> {
       });
 
       callingChannel?.stream.listen((message) {
+        print("Received WebSocket message: $message"); // Log incoming messages
         _handleCallingMessage(message);
       }, onError: (error) {
         print("WebSocket error: $error");
@@ -406,8 +373,6 @@ class _CallScreenState extends State<CallScreen> {
   void dispose() {
     try {
       _timer?.cancel();
-      _localRenderer.dispose();
-      _remoteRenderer.dispose();
       callingChannel?.sink.close();
       _peerConnection?.close();
       _localStream?.dispose();
@@ -459,13 +424,6 @@ class _CallScreenState extends State<CallScreen> {
                         : AssetImage('assets/images/user.png') as ImageProvider,
                   ),
                 ),
-                if (_inCalling)
-                  SizedBox(
-                    width: 120,
-                    height: 160,
-                    child: RTCVideoView(_localRenderer),
-                  ),
-                if (_inCalling) Expanded(child: RTCVideoView(_remoteRenderer)),
               ],
             ),
             Padding(

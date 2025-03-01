@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_launcher_icons: ^0.14.2
   flutter_native_splash: ^2.4.3
-  google_sign_in: ^5.4.0 #sing  in button
+  google_sign_in: ^6.2.2 #sing  in button
   supabase_flutter: ^2.8.1
   path_provider: ^2.0.11
   image_picker: ^1.1.2
@@ -74,7 +74,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

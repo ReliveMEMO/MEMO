@@ -75,7 +75,7 @@ class _CallScreenState extends State<CallScreen> {
                     child: CircleAvatar(
                       radius: 45,
                       backgroundImage: AssetImage(
-                          'assets/avatar.png'), // Change to your image
+                          'assets/images/user.png'), // Change to your image
                     ),
                   ),
                 ],

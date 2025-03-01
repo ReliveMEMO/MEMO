@@ -16,9 +16,6 @@ import 'package:memo/services/notification.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:memo/services/webrtc_service.dart'; // Import the WebRTCService
-//import 'package:memo/services/webrtc_service.dart';
-//import 'package:memo/pages/call_page.dart';
-import 'package:memo/pages/call_pagee.dart';
 
 import 'pages/NewMemo.dart';
 
@@ -57,11 +54,9 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
     ],
-    child: const MyApp(),
+    child: MyApp(),
   ));
 }
-
-//final Supabase = Supabase.instance.clinet; //supabase
 
 void handleNotificationNavigation(RemoteMessage message) {
   // Example: Navigate to the chat screen with the senderId from the payload
@@ -73,9 +68,12 @@ void handleNotificationNavigation(RemoteMessage message) {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final WebRTCService webrtcService = WebRTCService();
 
-  // This widget is the root of your application.
+  MyApp({super.key}) {
+    webrtcService.initSocket('user_id'); // Initialize with the user's ID
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -96,7 +94,6 @@ class MyApp extends StatelessWidget {
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
-        //Testing the CI pipeline xoxo
       },
     );
   }

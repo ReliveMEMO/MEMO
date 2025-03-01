@@ -3,9 +3,9 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:memo/services/auth_service.dart';
 
 class WebRTCService {
-  late RTCPeerConnection _peerConnection;
-  late IO.Socket _socket;
-  late String _userId;
+  RTCPeerConnection? _peerConnection;
+  IO.Socket? _socket;
+  String? _userId;
   MediaStream? _localStream;
 
   // Define the onIncomingCall callback
@@ -17,31 +17,49 @@ class WebRTCService {
   String? calleeId; // Add a property to store the callee's ID
   bool isCaller = false; // Add a property to store the caller status
 
-  void initSocket(String userId) {
-    _userId = userId;
-    _socket = IO.io('ws://localhost:YOUR_PORT/calling', <String, dynamic>{
-      'transports': ['websocket'],
+  WebRTCService() {
+    _socket = IO.io(
+        'wss://memo-backend-9b73024f3215.herokuapp.com/calling',
+        <String, dynamic>{
+          'transports': ['websocket'],
+        });
+
+    _socket!.on('connect', (_) {
+      if (_userId != null) {
+        _socket!.emit('register', {'type': 'register', 'userId': _userId});
+      }
     });
 
-    _socket.on('connect', (_) {
-      _socket.emit('register', {'type': 'register', 'userId': _userId});
+    _socket!.on('connect_error', (error) {
+      print('WebSocket connection error: $error');
     });
 
-    _socket.on('incomingCall', (data) {
+    _socket!.on('disconnect', (_) {
+      print('WebSocket connection closed.');
+    });
+
+    _socket!.on('incomingCall', (data) {
       _handleIncomingCall(data);
     });
 
-    _socket.on('callAnswered', (data) {
+    _socket!.on('callAnswered', (data) {
       _handleCallAnswered(data);
     });
 
-    _socket.on('iceCandidate', (data) {
+    _socket!.on('iceCandidate', (data) {
       _handleIceCandidate(data);
     });
 
-    _socket.on('hangup', (_) {
+    _socket!.on('hangup', (_) {
       _handleHangup();
     });
+  }
+
+  void initSocket(String userId) {
+    _userId = userId;
+    if (_socket != null && _socket!.connected) {
+      _socket!.emit('register', {'type': 'register', 'userId': _userId});
+    }
   }
 
   Future<void> getUserMedia() async {
@@ -66,12 +84,12 @@ class WebRTCService {
     });
 
     if (_localStream != null) {
-      _peerConnection.addStream(_localStream!);
+      _peerConnection!.addStream(_localStream!);
     }
 
-    _peerConnection.onIceCandidate = (candidate) {
+    _peerConnection!.onIceCandidate = (candidate) {
       if (candidate != null) {
-        _socket.emit('iceCandidate',
+        _socket!.emit('iceCandidate',
             {'type': 'iceCandidate', 'candidate': candidate.toMap()});
       }
     };
@@ -79,10 +97,10 @@ class WebRTCService {
     // Get callee's profile picture
     calleeProfilePic = await AuthService().getDisplayPicture(calleeId);
 
-    RTCSessionDescription offer = await _peerConnection.createOffer();
-    await _peerConnection.setLocalDescription(offer);
+    RTCSessionDescription offer = await _peerConnection!.createOffer();
+    await _peerConnection!.setLocalDescription(offer);
 
-    _socket.emit('call', {
+    _socket!.emit('call', {
       'type': 'call',
       'callerId': _userId, // Send caller ID
       'calleeId': calleeId, // Send callee ID
@@ -101,12 +119,12 @@ class WebRTCService {
     });
 
     if (_localStream != null) {
-      _peerConnection.addStream(_localStream!);
+      _peerConnection!.addStream(_localStream!);
     }
 
-    _peerConnection.onIceCandidate = (candidate) {
+    _peerConnection!.onIceCandidate = (candidate) {
       if (candidate != null) {
-        _socket.emit('iceCandidate',
+        _socket!.emit('iceCandidate',
             {'type': 'iceCandidate', 'candidate': candidate.toMap()});
       }
     };
@@ -116,12 +134,12 @@ class WebRTCService {
 
     RTCSessionDescription offer =
         RTCSessionDescription(data['offer']['sdp'], data['offer']['type']);
-    await _peerConnection.setRemoteDescription(offer);
+    await _peerConnection!.setRemoteDescription(offer);
 
-    RTCSessionDescription answer = await _peerConnection.createAnswer();
-    await _peerConnection.setLocalDescription(answer);
+    RTCSessionDescription answer = await _peerConnection!.createAnswer();
+    await _peerConnection!.setLocalDescription(answer);
 
-    _socket.emit('answer', {'type': 'answer', 'answer': answer.toMap()});
+    _socket!.emit('answer', {'type': 'answer', 'answer': answer.toMap()});
 
     // Notify UI about incoming call
     onIncomingCall?.call(callerId, callerProfilePic);
@@ -130,24 +148,24 @@ class WebRTCService {
   void _handleCallAnswered(Map<String, dynamic> data) async {
     RTCSessionDescription answer =
         RTCSessionDescription(data['answer']['sdp'], data['answer']['type']);
-    await _peerConnection.setRemoteDescription(answer);
+    await _peerConnection!.setRemoteDescription(answer);
   }
 
   void _handleIceCandidate(Map<String, dynamic> data) async {
     RTCIceCandidate candidate = RTCIceCandidate(data['candidate']['candidate'],
         data['candidate']['sdpMid'], data['candidate']['sdpMLineIndex']);
-    await _peerConnection.addCandidate(candidate);
+    await _peerConnection!.addCandidate(candidate);
   }
 
   void _handleHangup() {
-    _peerConnection.close();
-    _peerConnection.dispose();
+    _peerConnection?.close();
+    _peerConnection?.dispose();
     _localStream?.dispose();
     _localStream = null;
   }
 
   void hangup() {
-    _socket.emit('hangup', {'type': 'hangup'});
+    _socket!.emit('hangup', {'type': 'hangup'});
     _handleHangup();
   }
 

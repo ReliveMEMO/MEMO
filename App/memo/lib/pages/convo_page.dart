@@ -8,11 +8,11 @@ import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:memo/services/webrtc_service.dart'; // Import the WebRTCService
-import 'call_pagee.dart'; // Import the CallScreen widget
+
+import 'call_pagee.dart'; // Import CallScreen
 
 class convoPage extends StatefulWidget {
-  const convoPage({super.key});
+  const convoPage({Key? key}) : super(key: key);
 
   @override
   State<convoPage> createState() => _convoPageState();
@@ -22,14 +22,13 @@ class _convoPageState extends State<convoPage> {
   final authService = AuthService();
   final msgEncryption = MsgEncryption();
   var scrollController;
-  final webrtcService = WebRTCService(); // Define the webrtcService variable
   final List<Map<String, dynamic>> messages = [];
   final int _batchSize = 20;
   bool _loading = false;
   int _currentBatch = 0;
   double bottomInsets = 0;
 
-  late WebSocketChannel channel;
+  late WebSocketChannel messagingChannel; // WebSocket for messaging
 
   final TextEditingController textMessageController = TextEditingController();
   final ValueNotifier<IconData> iconNotifier = ValueNotifier(Icons.mic);
@@ -44,8 +43,8 @@ class _convoPageState extends State<convoPage> {
     _loadMessages();
     textMessageController.addListener(_updateIcon);
 
-    // Establish WebSocket connection and register receiver
-    _initializeWebSocket();
+    // Establish WebSocket connection for messaging
+    _initializeMessagingWebSocket();
   }
 
   void _onScroll() {
@@ -56,11 +55,11 @@ class _convoPageState extends State<convoPage> {
     }
   }
 
-  void _initializeWebSocket() {
+  void _initializeMessagingWebSocket() {
     try {
-      channel = WebSocketChannel.connect(
+      messagingChannel = WebSocketChannel.connect(
         Uri.parse(
-            'ws://memo-backend-9b73024f3215.herokuapp.com/messaging'), // Replace with your WebSocket server URL
+            'wss://memo-backend-9b73024f3215.herokuapp.com/messaging'), // Use the messaging WebSocket server URL
       );
 
       // Register the receiver
@@ -72,12 +71,12 @@ class _convoPageState extends State<convoPage> {
           "userId": "$receiverId",
         });
 
-        channel.sink.add(registerMessage);
+        messagingChannel.sink.add(registerMessage);
         print("Receiver registered with ID: $receiverId");
       });
 
       // Listen for messages
-      channel.stream.listen((message) {
+      messagingChannel.stream.listen((message) {
         _handleIncomingMessage(message);
       }, onError: (error) {
         print("WebSocket error: $error");
@@ -234,7 +233,7 @@ class _convoPageState extends State<convoPage> {
         'last_accessed': DateTime.now().toUtc().toIso8601String()
       }).eq('chat_id', chatId);
 
-      channel.sink.add(messagePayload);
+      messagingChannel.sink.add(messagePayload);
 
       if (response != null) {
         print("Error updating last_accessed: ${response.error!.message}");
@@ -252,7 +251,7 @@ class _convoPageState extends State<convoPage> {
     scrollController.dispose();
 
     // Close WebSocket connection
-    channel.sink.close();
+    messagingChannel.sink.close();
 
     super.dispose();
   }
@@ -260,8 +259,9 @@ class _convoPageState extends State<convoPage> {
   @override
   Widget build(BuildContext context) {
     final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-    final String chatId = arguments['chatId'];
     final recieverDetails = arguments['recieverDetails'];
+    final String calleeId = recieverDetails['id'];
+    final String calleeProfilePic = recieverDetails['profile_pic'] as String;
 
     // Detect keyboard height
     bottomInsets = MediaQuery.of(context).viewInsets.bottom;
@@ -293,14 +293,13 @@ class _convoPageState extends State<convoPage> {
         actions: [
           IconButton(
             icon: Icon(HugeIcons.strokeRoundedCall02),
-            onPressed: () async {
-              // Initiate the call and navigate to CallScreen
-              await webrtcService.createOffer(recieverDetails['id']);
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => CallScreen(
-                    webrtcService: webrtcService,
+                    calleeId: calleeId,
+                    calleeProfilePic: calleeProfilePic,
                   ),
                 ),
               );

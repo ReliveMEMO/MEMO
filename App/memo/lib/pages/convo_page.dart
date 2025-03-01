@@ -149,8 +149,8 @@ class _convoPageState extends State<convoPage> {
           .select('sender_id, message, time_stamp')
           .eq('chat_id', chatId)
           .order('time_stamp', ascending: false)
-          .range(
-              _currentBatch * _batchSize, (_currentBatch + 1) * _batchSize - 1);
+          .range(_currentBatch * _batchSize,
+              (_currentBatch + 1) * _currentBatch - 1);
 
       if (response != null) {
         if (mounted) {

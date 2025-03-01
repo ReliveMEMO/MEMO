@@ -41,7 +41,6 @@ class _CallScreenState extends State<CallScreen> {
     _initRenderers();
     final String userId = AuthService().getCurrentUserID()!;
     _initializeCallingWebSocket(userId); // Pass userId instead of calleeId
-    //_initializeWebRTC(); // Don't initialize WebRTC here for callee
     _getDisplayName();
   }
 
@@ -59,49 +58,57 @@ class _CallScreenState extends State<CallScreen> {
   }
 
   Future<void> _initializeWebRTC() async {
-    await _createPeerConnection();
-    await _getUserMedia();
-    _listenForRemoteStreams();
+    try {
+      await _createPeerConnection();
+      await _getUserMedia();
+      _listenForRemoteStreams();
+    } catch (e) {
+      print("Error initializing WebRTC: $e");
+    }
   }
 
   Future<void> _createPeerConnection() async {
-    final config = <String, dynamic>{
-      'iceServers': [
-        {
-          'urls': ['stun:stun.l.google.com:19302']
-        },
-      ]
-    };
+    try {
+      final config = <String, dynamic>{
+        'iceServers': [
+          {
+            'urls': ['stun:stun.l.google.com:19302']
+          },
+        ]
+      };
 
-    _peerConnection = await createPeerConnection(config);
+      _peerConnection = await createPeerConnection(config);
 
-    _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
-      _sendIceCandidate(candidate);
-    };
+      _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
+        _sendIceCandidate(candidate);
+      };
 
-    _peerConnection?.onTrack = (RTCTrackEvent event) {
-      if (event.track.kind == 'video') {
-        _remoteRenderer.srcObject = event.streams[0];
-        setState(() {});
-      }
-    };
+      _peerConnection?.onTrack = (RTCTrackEvent event) {
+        if (event.track.kind == 'video') {
+          _remoteRenderer.srcObject = event.streams[0];
+          setState(() {});
+        }
+      };
+    } catch (e) {
+      print("Error creating peer connection: $e");
+    }
   }
 
   Future<void> _getUserMedia() async {
-    final mediaConstraints = <String, dynamic>{
-      'audio': true,
-      'video': {
-        'mandatory': {
-          'minWidth': '640',
-          'minHeight': '480',
-          'minFrameRate': '30',
-        },
-        'facingMode': 'user',
-        'optional': [],
-      }
-    };
-
     try {
+      final mediaConstraints = <String, dynamic>{
+        'audio': true,
+        'video': {
+          'mandatory': {
+            'minWidth': '640',
+            'minHeight': '480',
+            'minFrameRate': '30',
+          },
+          'facingMode': 'user',
+          'optional': [],
+        }
+      };
+
       _localStream =
           await navigator.mediaDevices.getUserMedia(mediaConstraints);
       _localRenderer.srcObject = _localStream;
@@ -111,8 +118,7 @@ class _CallScreenState extends State<CallScreen> {
       });
 
       if (!_isIncomingCall) {
-        _initiateCall(widget
-            .calleeId); // Start the calling process immediately if it's an outgoing call
+        _initiateCall(widget.calleeId);
       }
     } catch (e) {
       print('Error getting user media: $e');
@@ -156,20 +162,29 @@ class _CallScreenState extends State<CallScreen> {
   }
 
   void _handleCallingMessage(dynamic message) {
-    final data = jsonDecode(message);
-    switch (data['type']) {
-      case 'incomingCall':
-        _handleIncomingCall(data['callerId'], data['offer']);
-        break;
-      case 'callAnswered':
-        _handleCallAnswered(data['answer']);
-        break;
-      case 'iceCandidate':
-        _addIceCandidate(data['candidate']);
-        break;
-      case 'hangup':
-        _hangup();
-        break;
+    try {
+      final data = jsonDecode(message);
+      print("Received message: $data"); // Log the message
+
+      switch (data['type']) {
+        case 'incomingCall':
+          _handleIncomingCall(data['callerId'], data['offer']);
+          break;
+        case 'callAnswered':
+          _handleCallAnswered(data['answer']);
+          break;
+        case 'iceCandidate':
+          _addIceCandidate(data['candidate']);
+          break;
+        case 'hangup':
+          _hangup();
+          break;
+        default:
+          print("Unknown message type: ${data['type']}");
+          break;
+      }
+    } catch (e) {
+      print("Error handling calling message: $e");
     }
   }
 
@@ -295,52 +310,71 @@ class _CallScreenState extends State<CallScreen> {
 
   // Send call offer
   void _sendCallOffer(RTCSessionDescription offer) {
-    final String? callerId = AuthService().getCurrentUserID();
-    final message = jsonEncode({
-      'type': 'call',
-      'callerId': callerId,
-      'calleeId': widget.calleeId,
-      'offer': offer.sdp,
-    });
-    callingChannel?.sink.add(message);
+    try {
+      final String? callerId = AuthService().getCurrentUserID();
+      final message = jsonEncode({
+        'type': 'call',
+        'callerId': callerId,
+        'calleeId': widget.calleeId,
+        'offer': offer.sdp,
+      });
+      callingChannel?.sink.add(message);
+      print("Sending call offer: $message"); // Log the message
+    } catch (e) {
+      print("Error sending call offer: $e");
+    }
   }
 
   // Send call answer
   void _sendCallAnswer(RTCSessionDescription answer) {
-    final message = jsonEncode({
-      'type': 'answer',
-      'answer': answer.sdp,
-    });
-    callingChannel?.sink.add(message);
+    try {
+      final message = jsonEncode({
+        'type': 'answer',
+        'answer': answer.sdp,
+      });
+      callingChannel?.sink.add(message);
+      print("Sending call answer: $message"); // Log the message
+    } catch (e) {
+      print("Error sending call answer: $e");
+    }
   }
 
   // Send ICE candidate
   void _sendIceCandidate(RTCIceCandidate candidate) {
-    final message = jsonEncode({
-      'type': 'iceCandidate',
-      'candidate': candidate.toMap(),
-    });
-    callingChannel?.sink.add(message);
+    try {
+      final message = jsonEncode({
+        'type': 'iceCandidate',
+        'candidate': candidate.toMap(),
+      });
+      callingChannel?.sink.add(message);
+      print("Sending ICE candidate: $message"); // Log the message
+    } catch (e) {
+      print("Error sending ICE candidate: $e");
+    }
   }
 
   // Hangup call
   void _hangup() {
-    _stopTimer();
-    setState(() {
-      _inCalling = false;
-      _callingStatus = 'Idle';
-    });
-    _peerConnection?.close();
-    _localStream?.dispose();
-    _peerConnection = null;
-    _localStream = null;
+    try {
+      _stopTimer();
+      setState(() {
+        _inCalling = false;
+        _callingStatus = 'Idle';
+      });
+      _peerConnection?.close();
+      _localStream?.dispose();
+      _peerConnection = null;
+      _localStream = null;
 
-    if (callingChannel != null) {
-      callingChannel?.sink.add(jsonEncode({'type': 'hangup'}));
-      callingChannel?.sink.close();
-      callingChannel = null;
+      if (callingChannel != null) {
+        callingChannel?.sink.add(jsonEncode({'type': 'hangup'}));
+        callingChannel?.sink.close();
+        callingChannel = null;
+      }
+      Navigator.pop(context); // Navigate back to the previous page
+    } catch (e) {
+      print("Error during hangup: $e");
     }
-    Navigator.pop(context); // Navigate back to the previous page
   }
 
   // Start the timer
@@ -370,13 +404,17 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _localRenderer.dispose();
-    _remoteRenderer.dispose();
-    callingChannel?.sink.close();
-    _peerConnection?.close();
-    _localStream?.dispose();
-    super.dispose();
+    try {
+      _timer?.cancel();
+      _localRenderer.dispose();
+      _remoteRenderer.dispose();
+      callingChannel?.sink.close();
+      _peerConnection?.close();
+      _localStream?.dispose();
+      super.dispose();
+    } catch (e) {
+      print("Error during dispose: $e");
+    }
   }
 
   @override

@@ -8,7 +8,7 @@ class WebSocketManager {
   void connect(String userId) {
     _userId = userId;
     _channel = WebSocketChannel.connect(
-      Uri.parse('ws://localhost:YOUR_PORT/calling'),
+      Uri.parse('ws://memo-backend-9b73024f3215.herokuapp.com/calling'),
     );
     _channel!.stream.listen(_handleMessage);
     _registerUser();

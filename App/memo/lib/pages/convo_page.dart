@@ -40,11 +40,16 @@ class _convoPageState extends State<convoPage> {
 
     scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    _loadMessages();
     textMessageController.addListener(_updateIcon);
 
     // Establish WebSocket connection for messaging
     _initializeMessagingWebSocket();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadMessages();
   }
 
   void _onScroll() {
@@ -137,8 +142,6 @@ class _convoPageState extends State<convoPage> {
   Future<void> _loadMessages() async {
     if (_loading) return;
     _loading = true;
-    // Add your loading logic here
-    await Future.delayed(Duration(seconds: 1));
 
     if (mounted) {
       final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
@@ -149,21 +152,22 @@ class _convoPageState extends State<convoPage> {
           .select('sender_id, message, time_stamp')
           .eq('chat_id', chatId)
           .order('time_stamp', ascending: false)
-          .range(_currentBatch * _batchSize,
-              (_currentBatch + 1) * _currentBatch - 1);
+          .range(
+              _currentBatch * _batchSize, (_currentBatch + 1) * _batchSize - 1);
 
-      if (response != null) {
-        if (mounted) {
-          setState(() {
-            messages.addAll(response);
-            _currentBatch++;
-            _loading = false;
-          });
-        } else {
+      if (response != null && response.isNotEmpty) {
+        setState(() {
+          messages.addAll(response
+              .map((msg) => {
+                    'sender_id': msg['sender_id'],
+                    'message': msg['message'],
+                    'time_stamp': msg['time_stamp'],
+                  })
+              .toList());
+          _currentBatch++;
           _loading = false;
-        }
+        });
       } else {
-        // Handle error
         _loading = false;
       }
     }
@@ -235,7 +239,7 @@ class _convoPageState extends State<convoPage> {
 
       messagingChannel.sink.add(messagePayload);
 
-      if (response != null) {
+      if (response.error != null) {
         print("Error updating last_accessed: ${response.error!.message}");
       } else {
         print("last_accessed updated successfully");

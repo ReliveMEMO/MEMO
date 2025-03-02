@@ -248,7 +248,7 @@ class _NewMemoState extends State<NewMemo> {
                   controller: _headingController,
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
-                    hintText: "New Memo 12.11.2024",
+                    hintText: "New Memo",
                     hintStyle: TextStyle(color: Colors.grey.shade500),
                     filled: true,
                     fillColor: Colors.grey.shade200,

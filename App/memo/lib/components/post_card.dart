@@ -83,11 +83,21 @@ class _PostCardState extends State<PostCard> {
                           size: 19,
                         ),
                   SizedBox(width: 5),
-                  Text("${widget.post.likes}"),
+                  Text(
+                    "${widget.post.likes}",
+                    style: TextStyle(color: Colors.black45),
+                  ),
                   SizedBox(width: 15),
-                  Icon(HugeIcons.strokeRoundedComment01, size: 18),
+                  Icon(
+                    HugeIcons.strokeRoundedComment01,
+                    size: 18,
+                    color: Colors.grey,
+                  ),
                   SizedBox(width: 5),
-                  Text("${widget.post.comments}"),
+                  Text(
+                    "${widget.post.comments}",
+                    style: TextStyle(color: Colors.black45),
+                  ),
                   SizedBox(
                     width: 110,
                   ),

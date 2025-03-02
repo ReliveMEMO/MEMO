@@ -98,6 +98,7 @@ class _TimelinePageState extends State<TimelinePage> {
                 date: posts[index].date,
                 index: index,
                 isLast: index == posts.length - 1,
+                isFirst: index == 0,
               );
             }),
           )
@@ -111,8 +112,13 @@ class TimelineDot extends StatelessWidget {
   final String date;
   final int index;
   final bool isLast;
+  final bool isFirst;
 
-  TimelineDot({required this.date, required this.index, this.isLast = false});
+  TimelineDot(
+      {required this.date,
+      required this.index,
+      this.isLast = false,
+      this.isFirst = false});
 
   @override
   Widget build(BuildContext context) {
@@ -125,14 +131,19 @@ class TimelineDot extends StatelessWidget {
           40, // Adjust the height as needed to control the space between dots
       child: Column(
         children: [
-          Expanded(
-            child: Container(
-              width: 2,
-              color: Colors.grey,
+          if (isFirst)
+            Container(
+              height: 5,
             ),
-          ),
-          const CircleAvatar(
-            radius: 10,
+          if (!isFirst)
+            Expanded(
+              child: Container(
+                width: 2,
+                color: Colors.grey,
+              ),
+            ),
+          CircleAvatar(
+            radius: isFirst ? 13 : 10,
             backgroundColor: Colors.purple,
           ),
           if (!isLast)

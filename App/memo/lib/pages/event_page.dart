@@ -10,7 +10,8 @@ class EventPage extends StatefulWidget {
 
 class _EventPageState extends State<EventPage> {
   bool isAttending = false; // Track attendance
-
+  int attendeeCount = 12; // Initial attendee count
+   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +30,7 @@ class _EventPageState extends State<EventPage> {
           children: [
             // Event Name & Club Name
             const Text(
-              "Last AirBender Fiesta ft Sandinu",
+              "Sky Light",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -91,7 +92,7 @@ class _EventPageState extends State<EventPage> {
 
             // Event Description Box
             Container(
-              width: 300,
+              width: MediaQuery.of(context).size.width * 0.7,
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: const Color(0xFFEEEEEE),
@@ -109,10 +110,11 @@ class _EventPageState extends State<EventPage> {
               onTap: () {
                 setState(() {
                   isAttending = !isAttending;
+                  isAttending ? attendeeCount++ : attendeeCount--;
                 });
               },
               child: Container(
-                width: 300,
+                width: MediaQuery.of(context).size.width * 0.7,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: isAttending
@@ -134,7 +136,7 @@ class _EventPageState extends State<EventPage> {
 
             //Attendees Section
 
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CircleAvatar(
@@ -158,9 +160,10 @@ class _EventPageState extends State<EventPage> {
                   backgroundImage: CachedNetworkImageProvider(
                       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SGvshARHJ5GYSH_Kig8-cYNw5rO3nWn7mA&s'), // club logo
                 ),
-                //Image.asset("assets/attending_icon.png", width: 20), // Replace with actual asset
+                
                 const SizedBox(width: 5),
-                const Text("Attending", style: TextStyle(color: Colors.grey)),
+                Text("$attendeeCount Attending",
+                 style: TextStyle(color: Colors.grey, fontSize: 14)),
               ],
             ),
           ],
@@ -184,3 +187,4 @@ class _EventPageState extends State<EventPage> {
     );
   }
 }
+

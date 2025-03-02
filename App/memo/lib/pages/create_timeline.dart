@@ -24,6 +24,7 @@ class _CreateTimelineState extends State<CreateTimeline> {
   File? _image;
   String? avatarUrl;
   String? timelineNameError;
+  String? timelineId;
   List<String> collaborators = [];
 
   Future<void> _pickImage() async {

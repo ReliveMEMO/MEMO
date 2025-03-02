@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:memo/components/timeLine_search.dart';
+
 class NewMemo extends StatefulWidget {
   @override
   _NewMemoState createState() => _NewMemoState();
@@ -18,6 +20,8 @@ class _NewMemoState extends State<NewMemo> {
   final ImagePicker _picker = ImagePicker();
   String selectedTab = "Post";
   DateTime? selectedDate;
+  Map<String, dynamic>? timelineId;
+  String timeLineName = "Timeline Name";
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -40,6 +44,20 @@ class _NewMemoState extends State<NewMemo> {
         selectedDate = pickedDate;
       });
     }
+  }
+
+  void showTimeLinePopUp() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return TimelineSearch(timeLineSelected: (timeLineSelected) {
+            setState(() {
+              timelineId = timeLineSelected;
+              timeLineName = timeLineSelected!['timeline_name'];
+            });
+            print(timelineId);
+          });
+        });
   }
 
   @override
@@ -96,21 +114,24 @@ class _NewMemoState extends State<NewMemo> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFEADCF5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                  Container(
+                    width: 150, // Set the fixed width here
+                    child: ElevatedButton(
+                      onPressed: showTimeLinePopUp,
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFEADCF5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          elevation: 0),
+                      child: Text(
+                        timeLineName,
+                        style: TextStyle(
+                          color: Color(0xFF7D17BA),
+                          fontWeight: FontWeight.w500,
                         ),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                        elevation: 0),
-                    child: const Text(
-                      "Timeline Name",
-                      style: TextStyle(
-                        color: Color(0xFF7D17BA),
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

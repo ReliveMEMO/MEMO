@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
 import 'package:memo/components/dropDown.dart';
@@ -12,283 +11,194 @@ class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
 
   @override
-  State<EditProfile> createState() => _EditProfileState();
+  _EditProfileState createState() => _EditProfileState();
 }
 
 class _EditProfileState extends State<EditProfile> {
-  final authService = AuthService();
-  String? selectedProgram;
-  String? selectedStatus;
-  final TextEditingController fullnameController = TextEditingController();
-  final TextEditingController aboutController = TextEditingController();
-  DateTime? birthDate;
-  final Color colorLight = const Color(0xFFBDBDBD);
-  final Color colorDark = const Color(0xFF7f31c6);
-  String? avatarUrl;
-  File? _imageFile;
-  String? fullnameErrorText;
-  String? dateErrorText;
-  String? programmeErrorText;
-  String? statusErrorText;
+  TextEditingController fullNameController = TextEditingController(text: "Sandinu Pinnawala");
+  TextEditingController birthDateController = TextEditingController(text: "04.08.2003");
+  TextEditingController aboutController = TextEditingController(text: "Blah Blah Blah");
+
+  final List<Map<String, dynamic>> achievements = [
+    {"icon": Icons.local_fire_department, "title": "IEEE Xtreme", "subtitle": "champions"},
+    {"icon": Icons.emoji_emotions, "title": "RCL'23", "subtitle": "participation"},
+    {"icon": Icons.language, "title": "WebSpire", "subtitle": "volunteer"},
+    {"icon": Icons.local_fire_department, "title": "IEEE Xtreme", "subtitle": "champions"},
+    {"icon": Icons.emoji_emotions, "title": "RCL'23", "subtitle": "participation"},
+    {"icon": Icons.add, "title": "Add Achievement", "subtitle": ""},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Edit Profile'),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage('assets/Vector.png'),
+              ),
+              CustomTextField(label: "Full Name", controller: fullNameController),
+              DatePickerTextField(label: "BirthDate", controller: birthDateController),
+              CustomDropdown(
+                label: "Programme",
+                value: "Software Engineering",
+                items: ["Software Engineering", "IT", "CS"],
+              ),
+              CustomDropdown(
+                label: "Student Status",
+                value: "Level 5",
+                items: ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Alumni"],
+              ),
+              CustomTextField(label: "About", controller: aboutController, maxLines: 3),
+              SizedBox(height: 20),
+              Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              SizedBox(height: 10),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1,
+                ),
+                itemCount: achievements.length,
+                itemBuilder: (context, index) {
+                  return AchievementCard(
+                    icon: achievements[index]["icon"],
+                    title: achievements[index]["title"],
+                    subtitle: achievements[index]["subtitle"],
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomTextField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final int maxLines;
+
+  const CustomTextField({required this.label, required this.controller, this.maxLines = 1});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: Colors.grey, fontSize: 14)),
+        SizedBox(height: 5),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            filled: true,
+            fillColor: Colors.grey.shade200,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+          ),
+        ),
+        SizedBox(height: 15),
+      ],
+    );
+  }
+}
+
+class DatePickerTextField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+
+  const DatePickerTextField({required this.label, required this.controller});
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: birthDate ?? DateTime.now(),
+      initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (picked != null && picked != birthDate) {
-      setState(() {
-        birthDate = picked;
-        dateErrorText = null;
-      });
+    if (picked != null) {
+      controller.text = "${picked.day}.${picked.month}.${picked.year}";
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("Edit Profile"),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: AvatarUpload(
-                onImageSelected: (File? imageFile) {
-                  setState(() {
-                    _imageFile = imageFile;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(height: 15),
-            buildHeading("BirthDate"),
-            Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () => _selectDate(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 125, vertical: 12),
-                  margin: const EdgeInsets.only(right: 15), // Adjust margin to move right
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: dateErrorText != null ? Colors.red : Colors.transparent,
-                    ),
-                  ),
-                  child: Text(
-                    birthDate == null
-                        ? 'Select Birthdate'
-                        : DateFormat('dd.MM.yyyy').format(birthDate!),
-                    style: TextStyle(color: Colors.black87),
-                  ),
-                ),
-              ),
-            ),
-            if (dateErrorText != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 5, left: 10),
-                child: Text(
-                  dateErrorText!,
-                  style: const TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
-            const SizedBox(height: 10),
-            buildInputField("Full Name", "Sandinu Pinnawala"),
-            buildDropdownField("Programme", "Software Engineering", ["Software Engineering", "Computer Science"], (String? newValue) {
-              setState(() {
-                selectedProgram = newValue;
-              });
-            }),
-            buildDropdownField("Student Status", "Level 5", ["Level 5", "Level 6"], (String? newValue) {
-              setState(() {
-                selectedStatus = newValue;
-              });
-            }),
-            buildTextArea("About", "Blah Blah Blah"),
-            const SizedBox(height: 20),
-            Text(
-              "Achievements",
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            buildAchievementsGrid(),
-          ],
-        ),
+    return GestureDetector(
+      onTap: () => _selectDate(context),
+      child: AbsorbPointer(
+        child: CustomTextField(label: label, controller: controller),
       ),
     );
   }
-
-
-
-Widget buildInputField(String label, String value, {double height = 25}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(color: Colors.grey)),
-        const SizedBox(height: 5),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: SizedBox(
-            height: height, 
-            child: TextField(
-              decoration: InputDecoration(
-                border: InputBorder.none,
-              ),
-              controller: TextEditingController(text: value),
-              readOnly: true,
-              maxLines: null, 
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
 }
 
+class CustomDropdown extends StatelessWidget {
+  final String label;
+  final String value;
+  final List<String> items;
 
-  
+  const CustomDropdown({required this.label, required this.value, required this.items});
 
-Widget buildDropdownField(String label, String value, List<String> options, void Function(String?) onChanged, {double height = 50}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Column(
+  @override
+  Widget build(BuildContext context) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.grey)),
-        const SizedBox(height: 5),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: SizedBox(
-            height: height, // Set desired height
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: value,
-                onChanged: onChanged,
-                items: options.map((String option) {
-                  return DropdownMenuItem(
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList(),
-                icon: Icon(Icons.arrow_drop_down),
-              ),
-            ),
+        Text(label, style: TextStyle(color: Colors.grey, fontSize: 14)),
+        SizedBox(height: 5),
+        DropdownButtonFormField<String>(
+          value: value,
+          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+          onChanged: (val) {},
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey.shade200,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           ),
         ),
+        SizedBox(height: 15),
       ],
-    ),
-  );
+    );
+  }
 }
 
+class AchievementCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
 
-  Widget buildTextArea(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+  const AchievementCard({required this.icon, required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 5)],
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey)),
-          const SizedBox(height: 5),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: TextField(
-              maxLines: 3,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-              ),
-              controller: TextEditingController(text: value),
-              readOnly: true,
-            ),
-          ),
+          Icon(icon, size: 30, color: Colors.orange),
+          SizedBox(height: 5),
+          Text(title, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          if (subtitle.isNotEmpty)
+            Text(subtitle, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 10)),
         ],
-      ),
-    );
-  }
-
-  Widget buildAchievementsGrid() {
-    List<Map<String, String>> achievements = [
-      {"icon": "🔥", "text": "IEEE Xtreme\nchampions"},
-      {"icon": "😊", "text": "RCL'23\nparticipation"},
-      {"icon": "🕸", "text": "WebSpire\nvolunteer"},
-      {"icon": "🔥", "text": "IEEE Xtreme\nchampions"},
-      {"icon": "😊", "text": "RCL'23\nparticipation"},
-      {"icon": "➕", "text": "add\nachievement"},
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 1,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
-      itemCount: achievements.length,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 5,
-                spreadRadius: 1,
-              )
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                achievements[index]['icon']!,
-                style: TextStyle(fontSize: 24),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                achievements[index]['text']!,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget buildHeading(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 5, left: 5),
-      child: Text(
-        text,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black54),
       ),
     );
   }

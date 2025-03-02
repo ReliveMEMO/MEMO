@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:memo/components/chat_tile.dart';
+
 import 'package:memo/components/user_tile.dart';
-import 'package:memo/main.dart';
+
 import 'package:memo/providers/user_provider.dart';
-import 'package:memo/services/auth_service.dart';
+
 import 'package:memo/services/search_service.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
 
 class SearchPage extends StatefulWidget {
   @override
@@ -69,13 +69,10 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     final userDetails = userProvider.userDetails;
 
     return Scaffold(
-      appBar: AppBar(
-        // AppBar title has been removed
-        centerTitle: true,
-      ),
+      
       body: Column(
         children: [
-          SizedBox(height: 8),
+          SizedBox(height: 40),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

@@ -82,6 +82,7 @@ class _convoPageState extends State<convoPage> {
 
       // Listen for messages
       messagingChannel.stream.listen((message) {
+        print("Received WebSocket message: $message"); // Log incoming messages
         _handleIncomingMessage(message);
       }, onError: (error) {
         print("WebSocket error: $error");
@@ -119,6 +120,7 @@ class _convoPageState extends State<convoPage> {
   void _handleIncomingMessage(String message) {
     try {
       final data = jsonDecode(message);
+      print("Handling incoming message: $data"); // Log the incoming message
 
       // Check if the incoming message type is a real-time message
       if (data['type'] == 'receiveMessage') {
@@ -238,6 +240,7 @@ class _convoPageState extends State<convoPage> {
       }).eq('chat_id', chatId);
 
       messagingChannel.sink.add(messagePayload);
+      print("Sent message payload: $messagePayload"); // Log the sent message
 
       if (response.error != null) {
         print("Error updating last_accessed: ${response.error!.message}");
@@ -296,19 +299,10 @@ class _convoPageState extends State<convoPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(HugeIcons.strokeRoundedCall02),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CallScreen(
-                    calleeId: calleeId,
-                    calleeProfilePic: calleeProfilePic,
-                  ),
-                ),
-              );
-            },
-          ),
+              icon: Icon(HugeIcons.strokeRoundedCall02),
+              onPressed: () {
+                //onpress logic here
+              }),
         ],
       ),
       body: Stack(

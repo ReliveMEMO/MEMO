@@ -15,7 +15,6 @@ import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/notification.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:memo/services/webrtc_service.dart'; // Import the WebRTCService
 
 import 'pages/NewMemo.dart';
 
@@ -68,12 +67,6 @@ void handleNotificationNavigation(RemoteMessage message) {
 }
 
 class MyApp extends StatelessWidget {
-  final WebRTCService webrtcService = WebRTCService();
-
-  MyApp({super.key}) {
-    webrtcService.initSocket('user_id'); // Initialize with the user's ID
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memo/components/collab_popup.dart';
 import 'dart:convert';
 
 import 'package:memo/components/post_card.dart';
@@ -30,6 +31,23 @@ class _TimelinePageState extends State<TimelinePage> {
       "comments": 5,
       "imageUrl": "https://i.pinimg.com/originals/35/77/cc/3577cc8ffbaa0797b446942ef44df9cc.jpg"
     }
+    ,
+    {
+      "date": "22nd Oct 2024",
+      "title": "Heading",
+      "content": "Lorem ipsum blah blah Lorem ipsum blah blah",
+      "likes": 50000,
+      "comments": 5,
+      "imageUrl": "https://i.pinimg.com/originals/35/77/cc/3577cc8ffbaa0797b446942ef44df9cc.jpg"
+    },
+    {
+      "date": "22nd Oct 2024",
+      "title": "Heading",
+      "content": "Lorem ipsum blah blah Lorem ipsum blah blah",
+      "likes": 50000,
+      "comments": 5,
+      "imageUrl": "https://i.pinimg.com/originals/35/77/cc/3577cc8ffbaa0797b446942ef44df9cc.jpg"
+    }
   ]
   ''';
 
@@ -43,7 +61,22 @@ class _TimelinePageState extends State<TimelinePage> {
     posts.sort((a, b) => b.date.compareTo(a.date));
 
     return Scaffold(
-      appBar: AppBar(title: Text("Timeline")),
+      appBar: AppBar(
+        title: Text("Timeline"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person_add),
+            onPressed: () {
+              // Call the showCustomPopup function when the icon is pressed
+              showCustomPopup(context);
+            },
+          )
+        ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
       body: Row(
         children: [
           Expanded(
@@ -61,7 +94,11 @@ class _TimelinePageState extends State<TimelinePage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: List.generate(posts.length, (index) {
-              return TimelineDot(date: posts[index].date, index: index);
+              return TimelineDot(
+                date: posts[index].date,
+                index: index,
+                isLast: index == posts.length - 1,
+              );
             }),
           )
         ],
@@ -73,19 +110,38 @@ class _TimelinePageState extends State<TimelinePage> {
 class TimelineDot extends StatelessWidget {
   final String date;
   final int index;
+  final bool isLast;
 
-  TimelineDot({required this.date, required this.index});
+  TimelineDot({required this.date, required this.index, this.isLast = false});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+      padding: EdgeInsets.only(
+        right: 10,
+        left: 5,
+      ),
+      height:
+          40, // Adjust the height as needed to control the space between dots
       child: Column(
         children: [
-          CircleAvatar(
+          Expanded(
+            child: Container(
+              width: 2,
+              color: Colors.grey,
+            ),
+          ),
+          const CircleAvatar(
             radius: 10,
             backgroundColor: Colors.purple,
           ),
+          if (!isLast)
+            Expanded(
+              child: Container(
+                width: 2,
+                color: Colors.grey,
+              ),
+            ),
         ],
       ),
     );

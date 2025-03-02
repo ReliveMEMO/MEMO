@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:solar_icons/solar_icons.dart';
 
 class PostCard extends StatefulWidget {
   const PostCard({
@@ -15,11 +17,14 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
+  bool liked = true;
+
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
       elevation: 2,
+      color: Colors.grey[100],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
         child: Column(
@@ -60,20 +65,37 @@ class _PostCardState extends State<PostCard> {
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey[300]!),
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.thumb_up, size: 18),
+                  liked
+                      ? Icon(
+                          SolarIconsBold.like,
+                          color: Colors.purple,
+                          size: 22,
+                        )
+                      : Icon(
+                          SolarIconsOutline.like,
+                          size: 19,
+                        ),
                   SizedBox(width: 5),
-                  Text("${widget.post.likes} likes"),
+                  Text("${widget.post.likes}"),
                   SizedBox(width: 15),
-                  Icon(Icons.comment, size: 18),
+                  Icon(HugeIcons.strokeRoundedComment01, size: 18),
                   SizedBox(width: 5),
-                  Text("${widget.post.comments} comments"),
+                  Text("${widget.post.comments}"),
+                  SizedBox(
+                    width: 110,
+                  ),
+                  Icon(
+                    SolarIconsBold.mapArrowSquare,
+                    size: 22,
+                    color: Colors.grey,
+                  ),
                 ],
               ),
             )

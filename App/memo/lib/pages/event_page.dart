@@ -22,9 +22,10 @@ class _EventPageState extends State<EventPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
+        toolbarHeight: 40, //reduce Appbar height
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -54,7 +55,7 @@ class _EventPageState extends State<EventPage> {
             // Event Image
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFC7C5C5),
+                color: const Color.fromARGB(255, 241, 239, 239),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
@@ -99,7 +100,7 @@ class _EventPageState extends State<EventPage> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Text(
-                "Join us for Sky Light, teerrtteterwrwrw ",
+                "Join us  for       Sky Light,    teerrtteterwrwrw , tt ttt t    helloooo   we  rtabcdrththjyjytt     Sky  Light    2025 ",
                 style: TextStyle(fontSize: 14, color: Color(0xDD000000)),
               ),
             ),
@@ -110,7 +111,7 @@ class _EventPageState extends State<EventPage> {
               onTap: () {
                 setState(() {
                   isAttending = !isAttending;
-                  isAttending ? attendeeCount++ : attendeeCount--;
+                  isAttending ? attendeeCount++ : attendeeCount--; 
                 });
               },
               child: Container(
@@ -123,7 +124,7 @@ class _EventPageState extends State<EventPage> {
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: Text(
-                  isAttending ? "ATTENDING ✔ " : "ATTENDING",
+                  isAttending ? "ATTENDING" : "ATTENDING",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: Colors.white,

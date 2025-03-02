@@ -69,7 +69,7 @@ class _TimelinePageState extends State<TimelinePage> {
             icon: Icon(Icons.person_add),
             onPressed: () {
               // Call the showCustomPopup function when the icon is pressed
-              showCustomPopup(context);
+              showCustomPopup(context, widget.timelineId);
             },
           )
         ],

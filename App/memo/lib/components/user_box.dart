@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -8,7 +9,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserBox extends StatefulWidget {
   final String userId;
-  const UserBox({super.key, required this.userId});
+  final bool? isAdmin;
+  const UserBox({super.key, required this.userId, this.isAdmin});
 
   @override
   State<UserBox> createState() => _UserBoxState();
@@ -17,15 +19,10 @@ class UserBox extends StatefulWidget {
 class _UserBoxState extends State<UserBox> {
   final authService = AuthService();
   final userName = 'Sandinu Pinnawala';
-  String? recentMsg = 'Hello there!';
-  String time = '10:00 AM';
-  bool isSeen = true;
-  DateTime? time_stamp;
   final DP =
       'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/1734968788082';
   bool isLoading = false;
-  String recieverId = '';
-  String senderId = '';
+
   PostgrestMap? recieverDetails;
   final Color colorLight = const Color.fromARGB(255, 248, 240, 255);
   final Color colorDark = const Color(0xFF7f31c6);
@@ -64,8 +61,9 @@ class _UserBoxState extends State<UserBox> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: widget.isAdmin == true ? Colors.purple[100] : Colors.grey[100],
         borderRadius: BorderRadius.circular(15),
       ),
       child: isLoading
@@ -83,10 +81,12 @@ class _UserBoxState extends State<UserBox> {
             ))
           : InkWell(
               onTap: () {
-                Navigator.pushNamed(context, '/chat', arguments: {
-                  'chatId': cId,
-                  'recieverDetails': recieverDetails,
-                });
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProfilePage(
+                              userId: cId,
+                            )));
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5.0),

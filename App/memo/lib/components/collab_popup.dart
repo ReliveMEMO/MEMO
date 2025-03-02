@@ -9,8 +9,18 @@ Future<void> showCustomPopup(BuildContext context, String timelineId) async {
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return Center(
-        child: CircularProgressIndicator(),
+      return Dialog(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            width: 300,
+            height: 400,
+            color: Colors.white,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ),
       );
     },
   );
@@ -35,24 +45,24 @@ Future<void> showCustomPopup(BuildContext context, String timelineId) async {
     barrierDismissible: true, // Close the dialog when tapping outside
     builder: (BuildContext context) {
       return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
         child: GestureDetector(
           onTap: () {}, // Prevent dialog from closing if tapping inside
-          child: Container(
-            width: 300,
-            height: 400,
-            color: Colors.white,
-            padding: EdgeInsets.all(16),
-            child: ListView.builder(
-              itemCount: users.length,
-              itemBuilder: (context, index) {
-                return UserBox(
-                  userId: users[index],
-                  isAdmin: users[index] == admin,
-                );
-              },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              width: 300,
+              height: 400,
+              color: Colors.white,
+              padding: EdgeInsets.all(16),
+              child: ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  return UserBox(
+                    userId: users[index],
+                    isAdmin: users[index] == admin,
+                  );
+                },
+              ),
             ),
           ),
         ),

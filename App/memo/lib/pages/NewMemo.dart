@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'package:memo/components/timeLine_search.dart';
+import 'package:image/image.dart' as img;
 
 class NewMemo extends StatefulWidget {
   @override
@@ -19,16 +20,29 @@ class _NewMemoState extends State<NewMemo> {
       TextEditingController();
   final ImagePicker _picker = ImagePicker();
   String selectedTab = "Post";
-  DateTime? selectedDate;
+  DateTime? selectedDate = DateTime.now();
   Map<String, dynamic>? timelineId;
   String timeLineName = "Timeline Name";
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      final File imageFile = File(pickedImage.path);
+      final img.Image image = img.decodeImage(imageFile.readAsBytesSync())!;
+
+      if (image != null) {
+        final img.Image resizedImage =
+            img.copyResize(image, width: 500, height: 500);
+        final File compressedImage = File(pickedImage.path)
+          ..writeAsBytesSync(img.encodeJpg(resizedImage));
+
+        setState(() {
+          _selectedImage = compressedImage;
+        });
+      }
     }
   }
 
@@ -60,6 +74,27 @@ class _NewMemoState extends State<NewMemo> {
         });
   }
 
+  void showError() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text("Error"),
+          content: Text("Please select a timeline."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,9 +115,7 @@ class _NewMemoState extends State<NewMemo> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
               child: ElevatedButton(
-                onPressed: () {
-                  // Post Memo Logic
-                },
+                onPressed: timeLineName == "Timeline Name" ? showError : () {},
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF7D17BA),
                     shape: RoundedRectangleBorder(

@@ -1,9 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
-
-
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Achievement {
@@ -90,6 +87,17 @@ class _EditProfileState extends State<EditProfile> {
               Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               SizedBox(height: 10),
               AchievementsSection(),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // Handle update profile action
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  foregroundColor: Colors.white // Button color
+                ),
+                child: const Text('Update Profile'),
+              ),
             ],
           ),
         ),

@@ -666,7 +666,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                       const Icon(
                                                         Icons.emoji_events,
                                                         size: 40,
-                                                        color: Colors.purple,
+                                                        color: Color.fromRGBO(156, 39, 176, 1),
                                                       ),
                                                       SizedBox(height: 12),
                                                       Text(

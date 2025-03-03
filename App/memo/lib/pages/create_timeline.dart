@@ -52,7 +52,7 @@ class _CreateTimelineState extends State<CreateTimeline> {
   Future<void> uploadImage() async {
     if (_image == null) {
       avatarUrl =
-          'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/default.jpg';
+          'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/timeline_covers/uploads/Timeline%20Cover.png';
       return;
     }
 

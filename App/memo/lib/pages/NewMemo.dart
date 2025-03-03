@@ -4,6 +4,10 @@ import 'dart:io';
 
 import 'package:memo/components/timeLine_search.dart';
 import 'package:image/image.dart' as img;
+import 'package:memo/components/user_search.dart';
+import 'package:memo/pages/timeLine_page.dart';
+import 'package:memo/services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NewMemo extends StatefulWidget {
   @override
@@ -11,6 +15,7 @@ class NewMemo extends StatefulWidget {
 }
 
 class _NewMemoState extends State<NewMemo> {
+  final authService = AuthService();
   File? _selectedImage;
   final _captionController = TextEditingController();
   final _headingController = TextEditingController();
@@ -23,6 +28,9 @@ class _NewMemoState extends State<NewMemo> {
   DateTime? selectedDate = DateTime.now();
   Map<String, dynamic>? timelineId;
   String timeLineName = "Timeline Name";
+  List<String> collaborators = [];
+  File? _image;
+  String? imageUrl;
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -43,6 +51,51 @@ class _NewMemoState extends State<NewMemo> {
           _selectedImage = compressedImage;
         });
       }
+    }
+  }
+
+  Future<void> uploadImage() async {
+    if (_image == null) {
+      imageUrl =
+          'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/timeline_covers/uploads/Timeline%20Cover.png';
+      return;
+    }
+
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final path = 'uploads/$fileName';
+
+    await Supabase.instance.client.storage.from('memos').upload(path, _image!);
+
+    final url =
+        await Supabase.instance.client.storage.from('memos').getPublicUrl(path);
+
+    imageUrl = url;
+  }
+
+  Future<void> postMemo() async {
+    try {
+      await uploadImage();
+
+      final userId = authService.getCurrentUserID();
+
+      final response =
+          await Supabase.instance.client.from('Post_Table').insert({
+        'heading': _headingController.text,
+        'caption': _captionController.text,
+        'image_url': imageUrl,
+        'owner_id': userId,
+        'timeline_id': timelineId!['id'],
+        'tags': collaborators,
+        'date': selectedDate?.toUtc().toIso8601String(),
+      });
+
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  TimelinePage(timelineId: timelineId?['id'])));
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -95,6 +148,21 @@ class _NewMemoState extends State<NewMemo> {
     );
   }
 
+  void showUserSearchPopup() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return UserSearch(
+          onUsersSelected: (selectedUsers) {
+            setState(() {
+              collaborators = selectedUsers;
+            });
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,7 +183,11 @@ class _NewMemoState extends State<NewMemo> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
               child: ElevatedButton(
-                onPressed: timeLineName == "Timeline Name" ? showError : () {},
+                onPressed: timeLineName == "Timeline Name"
+                    ? showError
+                    : () {
+                        postMemo();
+                      },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF7D17BA),
                     shape: RoundedRectangleBorder(
@@ -335,7 +407,7 @@ class _NewMemoState extends State<NewMemo> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // Action for tagging friends
+                        showUserSearchPopup();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey,
@@ -343,7 +415,7 @@ class _NewMemoState extends State<NewMemo> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Tag Friends",
                         style: TextStyle(color: Colors.white),
                       ),
@@ -603,9 +675,7 @@ class _NewMemoState extends State<NewMemo> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        // Action for tagging friends
-                      },
+                      onPressed: showUserSearchPopup,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey,
                         shape: RoundedRectangleBorder(

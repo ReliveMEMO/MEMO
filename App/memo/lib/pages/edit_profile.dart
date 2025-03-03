@@ -24,6 +24,9 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController fullNameController = TextEditingController(text: "Sandinu Pinnawala");
   TextEditingController birthDateController = TextEditingController(text: "04.08.2003");
   TextEditingController aboutController = TextEditingController(text: "Blah Blah Blah");
+  TextEditingController gpacontroller = TextEditingController(text: "3.5");
+  TextEditingController agecontroller = TextEditingController(text: "21");
+  TextEditingController gradyearcontroller = TextEditingController(text: "2027");
 
   String? avatarUrl;
   File? _imageFile;
@@ -69,6 +72,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
               CustomTextField(label: "Full Name", controller: fullNameController),
               DatePickerTextField(label: "BirthDate", controller: birthDateController),
+              CustomTextField(label: "Age", controller: agecontroller),
               CustomDropdown(
                 label: "Programme",
                 value: "Software Engineering",
@@ -79,6 +83,8 @@ class _EditProfileState extends State<EditProfile> {
                 value: "Level 5",
                 items: ["Level 3", "Level 4", "Level 5", "Level 6",  "Alumni"],
               ),
+              CustomTextField(label: "GPA", controller: gpacontroller),
+              CustomTextField(label: "Graduation Year", controller: gradyearcontroller),
               CustomTextField(label: "About", controller: aboutController, maxLines: 3),
               SizedBox(height: 20),
               Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
@@ -113,7 +119,7 @@ class CustomTextField extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             filled: true,
             fillColor: Colors.grey.shade200,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
           ),
         ),
         SizedBox(height: 15),
@@ -172,7 +178,7 @@ class CustomDropdown extends StatelessWidget {
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.grey.shade200,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
           ),
         ),
         SizedBox(height: 15),

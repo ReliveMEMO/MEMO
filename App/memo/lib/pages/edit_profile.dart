@@ -1,10 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
-import 'package:memo/components/dropDown.dart';
-import 'package:memo/components/textField.dart';
-import 'package:intl/intl.dart';
-import 'package:memo/services/auth_service.dart';
+
+
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Achievement {
@@ -73,12 +72,12 @@ class _EditProfileState extends State<EditProfile> {
               CustomDropdown(
                 label: "Programme",
                 value: "Software Engineering",
-                items: ["Software Engineering", "IT", "CS"],
+                items: ["Software Engineering", "Computer Science", "AI and Data Science", "Business Information Systems"],
               ),
               CustomDropdown(
                 label: "Student Status",
                 value: "Level 5",
-                items: ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Alumni"],
+                items: ["Level 3", "Level 4", "Level 5", "Level 6",  "Alumni"],
               ),
               CustomTextField(label: "About", controller: aboutController, maxLines: 3),
               SizedBox(height: 20),

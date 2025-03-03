@@ -28,6 +28,29 @@ class _EditProfileState extends State<EditProfile> {
     {"icon": Icons.add, "title": "Add Achievement", "subtitle": ""},
   ];
 
+String? avatarUrl;
+  File? _imageFile;
+
+  Future<void> uploadImage() async {
+    if (_imageFile == null) {
+      avatarUrl =
+          'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/default.jpg';
+      return;
+    }
+
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final path = 'uploads/$fileName';
+
+    await Supabase.instance.client.storage
+        .from('profile-pictures')
+        .upload(path, _imageFile!);
+
+    final url = await Supabase.instance.client.storage
+        .from('profile-pictures')
+        .getPublicUrl(path);
+
+    avatarUrl = url;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,9 +62,12 @@ class _EditProfileState extends State<EditProfile> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage('assets/Vector.png'),
+              AvatarUpload(
+                onImageSelected: (File? imageFile) {
+                  setState(() {
+                    _imageFile = imageFile;
+                  });
+                },
               ),
               CustomTextField(label: "Full Name", controller: fullNameController),
               DatePickerTextField(label: "BirthDate", controller: birthDateController),

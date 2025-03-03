@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:memo/components/timeLine_search.dart';
 import 'package:image/image.dart' as img;
 import 'package:memo/components/user_search.dart';
+import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/timeLine_page.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -92,8 +93,9 @@ class _NewMemoState extends State<NewMemo> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  TimelinePage(timelineId: timelineId?['id'])));
+              builder: (context) => myPage(
+                    index: 0,
+                  )));
     } catch (e) {
       print(e);
     }

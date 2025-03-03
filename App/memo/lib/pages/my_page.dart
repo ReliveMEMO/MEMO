@@ -8,7 +8,8 @@ import 'package:memo/pages/profile_page.dart';
 import 'package:solar_icons/solar_icons.dart';
 
 class myPage extends StatefulWidget {
-  const myPage({super.key});
+  final int? index;
+  const myPage({Key? key, this.index}) : super(key: key);
 
   @override
   State<myPage> createState() => _myPageState();
@@ -26,6 +27,12 @@ class _myPageState extends State<myPage> {
   ];
 
   int currentIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.index ?? 0;
+  }
+
   void onTap(int index) {
     setState(() {
       currentIndex = index;

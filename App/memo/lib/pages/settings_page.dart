@@ -22,12 +22,12 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               leading: Icon(Icons.lock, color: Colors.black),
               title: Text("Account privacy",
-                  style: TextStyle(fontSize: 16, color: Colors.black54)),
+                  style: TextStyle(fontSize: 16, color: Colors.black)),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(isPrivate ? "Private" : "Public",
-                      style: TextStyle(color: Colors.black)),
+                      style: TextStyle(fontSize: 14, color: Colors.black54)),
                   SizedBox(width: 8),
                   Icon(Icons.arrow_forward_ios,
                       size: 16, color: Colors.black54),

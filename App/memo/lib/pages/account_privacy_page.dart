@@ -19,6 +19,33 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
     isPrivate = widget.initialIsPrivate;
   }
 
+  Future<void> _showConfirmationDialog(bool newValue) async {
+    final previousValue = isPrivate;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Make account ${newValue ? 'Private' : 'Public'}?"),
+        content: Text(newValue
+            ? "Only your followers will be able to see your posts and interact with your content. Your existing followers will remain."
+            : "Your posts and content will be visible to anyone on MEMO."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text("Confirm"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      setState(() => isPrivate = previousValue);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -58,10 +85,9 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
               ),
               Switch(
                 value: isPrivate,
-                onChanged: (value) {
-                  setState(() {
-                    isPrivate = value;
-                  });
+                onChanged: (newValue) {
+                  setState(() => isPrivate = newValue);
+                  _showConfirmationDialog(newValue);
                 },
               ),
             ],

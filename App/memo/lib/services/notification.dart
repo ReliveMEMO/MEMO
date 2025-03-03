@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -15,24 +16,34 @@ class NotificationService {
     NotificationSettings settings = await messaging.requestPermission();
     print("Permission status: ${settings.authorizationStatus}");
 
-    // Get the FCM token
-    String? token = await messaging.getToken();
-    print("FCM Token: $token");
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // Get the FCM token
+      String? token;
+      if (Platform.isAndroid) {
+        token = await messaging.getToken();
+        print("FCM Token: $token");
+      } else if (Platform.isIOS) {
+        token = await messaging.getAPNSToken();
+        print("APNS Token: $token");
+      }
 
-    // Send the token to your backend
-    await sendTokenToServer(token, userId);
+      // Send the token to your backend
+      await sendTokenToServer(token, userId);
 
-    // Configure local notifications for foreground messages
-    configureLocalNotifications();
+      // Configure local notifications for foreground messages
+      configureLocalNotifications();
 
-    // Listen to token refresh
-    messaging.onTokenRefresh.listen((newToken) {
-      print("New FCM Token: $newToken");
-      sendTokenToServer(newToken, userId);
-    });
+      // Listen to token refresh
+      messaging.onTokenRefresh.listen((newToken) {
+        print("New FCM Token: $newToken");
+        sendTokenToServer(newToken, userId);
+      });
 
-    // Listen for messages
-    listenForMessages();
+      // Listen for messages
+      listenForMessages();
+    } else {
+      print("User declined or has not accepted notification permissions");
+    }
   }
 
   static Future<void> sendTokenToServer(String? token, String userId) async {

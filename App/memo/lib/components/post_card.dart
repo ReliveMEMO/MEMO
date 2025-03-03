@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:solar_icons/solar_icons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PostCard extends StatefulWidget {
   const PostCard({
@@ -10,7 +11,7 @@ class PostCard extends StatefulWidget {
     required this.post,
   });
 
-  final Post post;
+  final PostgrestMap post;
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -23,24 +24,24 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-      elevation: 2,
+      elevation: 1,
       color: Colors.grey[100],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.post.title,
+            Text(widget.post['heading'],
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28)),
             SizedBox(height: 2),
-            Text(widget.post.date,
+            Text(widget.post['date'],
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: Colors.purple)),
             SizedBox(height: 15),
             CachedNetworkImage(
-              imageUrl: widget.post.imageUrl,
+              imageUrl: widget.post['image_url'],
               placeholder: (context, url) => Container(
                 width: 300,
                 height: 300,
@@ -57,7 +58,7 @@ class _PostCardState extends State<PostCard> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                widget.post.content,
+                widget.post['caption'],
               ),
             ),
             SizedBox(height: 20),
@@ -84,7 +85,7 @@ class _PostCardState extends State<PostCard> {
                         ),
                   SizedBox(width: 5),
                   Text(
-                    "${widget.post.likes}",
+                    "${100}",
                     style: TextStyle(color: Colors.black45),
                   ),
                   SizedBox(width: 15),
@@ -95,7 +96,7 @@ class _PostCardState extends State<PostCard> {
                   ),
                   SizedBox(width: 5),
                   Text(
-                    "${widget.post.comments}",
+                    "${100}",
                     style: TextStyle(color: Colors.black45),
                   ),
                   SizedBox(

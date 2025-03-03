@@ -3,16 +3,52 @@ import 'package:memo/components/collab_popup.dart';
 import 'dart:convert';
 
 import 'package:memo/components/post_card.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TimelinePage extends StatefulWidget {
+  final String timelinename;
   final String timelineId;
-  const TimelinePage({Key? key, required this.timelineId}) : super(key: key);
+  const TimelinePage(
+      {Key? key, required this.timelineId, required this.timelinename})
+      : super(key: key);
 
   @override
   State<TimelinePage> createState() => _TimelinePageState();
 }
 
 class _TimelinePageState extends State<TimelinePage> {
+  bool? isLoading = false;
+  PostgrestList? timelineData;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTimelineData();
+  }
+
+  Future<void> fetchTimelineData() async {
+    // Fetch timeline data from the server
+    setState(() {
+      isLoading = true;
+    });
+
+    // Simulate a delay of 2 seconds
+    final response = await Supabase.instance.client
+        .from('Post_Table')
+        .select()
+        .eq('timeline_id', widget.timelineId);
+
+    // Update the UI with the fetched data
+
+    setState(() {
+      timelineData = response;
+      isLoading = false;
+    });
+
+    print(timelineData);
+  }
+
   final String jsonData = '''
   [
     {
@@ -62,7 +98,9 @@ class _TimelinePageState extends State<TimelinePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Timeline"),
+        title: widget.timelinename == null
+            ? Text('Timeline')
+            : Text(widget.timelinename),
         centerTitle: true,
         actions: [
           IconButton(
@@ -77,48 +115,49 @@ class _TimelinePageState extends State<TimelinePage> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: Row(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: posts.length,
-              itemBuilder: (context, index) {
-                final post = posts[index];
-                return Padding(
-                  padding: const EdgeInsets.only(left: 15.0, top: 5, right: 5),
-                  child: PostCard(post: post),
-                );
-              },
+      body: isLoading == true
+          ? Skeletonizer(
+              child: Container(
+              width: 300,
+              height: 400,
+            ))
+          : Row(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: timelineData!.length,
+                    itemBuilder: (context, index) {
+                      final post = timelineData![index];
+                      return Padding(
+                        padding:
+                            const EdgeInsets.only(left: 15.0, top: 5, right: 5),
+                        child: PostCard(post: post),
+                      );
+                    },
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: List.generate(timelineData!.length, (index) {
+                    return TimelineDot(
+                      index: index,
+                      isLast: index == timelineData!.length - 1,
+                      isFirst: index == 0,
+                    );
+                  }),
+                )
+              ],
             ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: List.generate(posts.length, (index) {
-              return TimelineDot(
-                date: posts[index].date,
-                index: index,
-                isLast: index == posts.length - 1,
-                isFirst: index == 0,
-              );
-            }),
-          )
-        ],
-      ),
     );
   }
 }
 
 class TimelineDot extends StatelessWidget {
-  final String date;
   final int index;
   final bool isLast;
   final bool isFirst;
 
-  TimelineDot(
-      {required this.date,
-      required this.index,
-      this.isLast = false,
-      this.isFirst = false});
+  TimelineDot({required this.index, this.isLast = false, this.isFirst = false});
 
   @override
   Widget build(BuildContext context) {

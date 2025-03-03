@@ -95,6 +95,7 @@ class _TimelineCardState extends State<TimelineCard> {
           MaterialPageRoute(
               builder: (context) => TimelinePage(
                     timelineId: widget.timelineId,
+                    timelinename: timeLines?['timeline_name'],
                   )),
         );
       },

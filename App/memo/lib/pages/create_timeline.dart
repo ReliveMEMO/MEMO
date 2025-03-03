@@ -4,6 +4,7 @@ import "package:flutter/material.dart";
 import "package:hugeicons/hugeicons.dart";
 import "package:image_picker/image_picker.dart";
 import "package:memo/components/user_search.dart";
+import "package:memo/pages/my_page.dart";
 import "package:memo/services/auth_service.dart";
 import "package:solar_icons/solar_icons.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
@@ -88,7 +89,12 @@ class _CreateTimelineState extends State<CreateTimeline> {
         'collaborators': collaborators,
       });
       print(response);
-      Navigator.pushNamed(context, '/my-page');
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => myPage(
+                    index: 0,
+                  )));
     } catch (e) {
       print(e);
     }

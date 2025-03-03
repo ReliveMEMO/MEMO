@@ -7,6 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+class Achievement {
+  final String emoji;
+  final String description;
+  final String position;
+  Achievement({required this.emoji, required this.description, required this.position});
+}
+
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
 
@@ -19,16 +26,7 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController birthDateController = TextEditingController(text: "04.08.2003");
   TextEditingController aboutController = TextEditingController(text: "Blah Blah Blah");
 
-  final List<Map<String, dynamic>> achievements = [
-    {"icon": Icons.local_fire_department, "title": "IEEE Xtreme", "subtitle": "champions"},
-    {"icon": Icons.emoji_emotions, "title": "RCL'23", "subtitle": "participation"},
-    {"icon": Icons.language, "title": "WebSpire", "subtitle": "volunteer"},
-    {"icon": Icons.local_fire_department, "title": "IEEE Xtreme", "subtitle": "champions"},
-    {"icon": Icons.emoji_emotions, "title": "RCL'23", "subtitle": "participation"},
-    {"icon": Icons.add, "title": "Add Achievement", "subtitle": ""},
-  ];
-
-String? avatarUrl;
+  String? avatarUrl;
   File? _imageFile;
 
   Future<void> uploadImage() async {
@@ -51,6 +49,7 @@ String? avatarUrl;
 
     avatarUrl = url;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,24 +84,7 @@ String? avatarUrl;
               SizedBox(height: 20),
               Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               SizedBox(height: 10),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1,
-                ),
-                itemCount: achievements.length,
-                itemBuilder: (context, index) {
-                  return AchievementCard(
-                    icon: achievements[index]["icon"],
-                    title: achievements[index]["title"],
-                    subtitle: achievements[index]["subtitle"],
-                  );
-                },
-              ),
+              AchievementsSection(),
             ],
           ),
         ),
@@ -200,32 +182,108 @@ class CustomDropdown extends StatelessWidget {
   }
 }
 
-class AchievementCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
+class AchievementsSection extends StatefulWidget {
+  const AchievementsSection({Key? key}) : super(key: key);
 
-  const AchievementCard({required this.icon, required this.title, required this.subtitle});
+  @override
+  _AchievementsSectionState createState() => _AchievementsSectionState();
+}
+
+class _AchievementsSectionState extends State<AchievementsSection> {
+  final List<Achievement> _achievements = [];
+  final int _maxAchievements = 6;
+
+  void _addAchievement() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final emojiController = TextEditingController();
+        final descriptionController = TextEditingController();
+        final positionController = TextEditingController();
+
+        return AlertDialog(
+          title: const Text("Add Achievement"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: emojiController, decoration: const InputDecoration(labelText: "Emoji (e.g. 🔥)")),
+              TextField(controller: descriptionController, decoration: const InputDecoration(labelText: "Description")),
+              TextField(controller: positionController, decoration: const InputDecoration(labelText: "Position")),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
+            TextButton(
+              onPressed: () {
+                if (emojiController.text.isNotEmpty && descriptionController.text.isNotEmpty && positionController.text.isNotEmpty) {
+                  setState(() {
+                    if (_achievements.length < _maxAchievements) {
+                      _achievements.add(Achievement(
+                        emoji: emojiController.text,
+                        description: descriptionController.text,
+                        position: positionController.text,
+                      ));
+                    }
+                  });
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("All fields are required!")),
+                  );
+                }
+              },
+              child: const Text("Add"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 5)],
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 1,
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 30, color: Colors.orange),
-          SizedBox(height: 5),
-          Text(title, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-          if (subtitle.isNotEmpty)
-            Text(subtitle, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 10)),
-        ],
-      ),
+      itemCount: _achievements.length + 1,
+      itemBuilder: (context, index) {
+        if (index < _achievements.length) {
+          final achievement = _achievements[index];
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(achievement.emoji, style: const TextStyle(fontSize: 24)),
+                const SizedBox(height: 5),
+                Text(achievement.description, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 3),
+                Text(achievement.position, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10)),
+              ],
+            ),
+          );
+        } else if (_achievements.length < _maxAchievements) {
+          return GestureDetector(
+            onTap: _addAchievement,
+            child: Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.add, color: Colors.grey),
+            ),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/profile_page.dart';
+import 'package:memo/pages/settings_page.dart';
 import 'package:memo/pages/signup_page.dart';
 import 'package:memo/pages/verify_email_page.dart';
 import 'package:memo/providers/user_provider.dart';

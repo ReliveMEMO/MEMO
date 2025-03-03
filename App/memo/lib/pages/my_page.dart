@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/pages/NewMemo.dart';
 import 'package:memo/pages/chat_page.dart';
+import 'package:memo/pages/create_page.dart';
 import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/profile_page.dart';

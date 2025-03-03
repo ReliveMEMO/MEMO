@@ -3,7 +3,12 @@ import "dart:io";
 import "package:flutter/material.dart";
 import "package:hugeicons/hugeicons.dart";
 import "package:image_picker/image_picker.dart";
+import "package:memo/components/user_search.dart";
+import "package:memo/pages/my_page.dart";
+import "package:memo/services/auth_service.dart";
 import "package:solar_icons/solar_icons.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
+import 'package:image/image.dart' as img;
 
 class CreateTimeline extends StatefulWidget {
   const CreateTimeline({super.key});
@@ -13,10 +18,15 @@ class CreateTimeline extends StatefulWidget {
 }
 
 class _CreateTimelineState extends State<CreateTimeline> {
+  final authService = AuthService();
   final TextEditingController timelineNameController = TextEditingController();
   final TextEditingController timelineDescriptionController =
       TextEditingController();
   File? _image;
+  String? avatarUrl;
+  String? timelineNameError;
+  String? timelineId;
+  List<String> collaborators = [];
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -24,10 +34,93 @@ class _CreateTimelineState extends State<CreateTimeline> {
         await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
-      setState(() {
-        _image = File(pickedImage.path);
-      });
+      final File imageFile = File(pickedImage.path);
+      final img.Image image = img.decodeImage(imageFile.readAsBytesSync())!;
+
+      if (image != null) {
+        final img.Image resizedImage =
+            img.copyResize(image, width: 500, height: 500);
+        final File compressedImage = File(pickedImage.path)
+          ..writeAsBytesSync(img.encodeJpg(resizedImage));
+
+        setState(() {
+          _image = compressedImage;
+        });
+      }
     }
+  }
+
+  Future<void> uploadImage() async {
+    if (_image == null) {
+      avatarUrl =
+          'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/timeline_covers/uploads/Timeline%20Cover.png';
+      return;
+    }
+
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final path = 'uploads/$fileName';
+
+    await Supabase.instance.client.storage
+        .from('timeline_covers')
+        .upload(path, _image!);
+
+    final url = await Supabase.instance.client.storage
+        .from('timeline_covers')
+        .getPublicUrl(path);
+
+    avatarUrl = url;
+  }
+
+  Future<void> createTimeLIne() async {
+    try {
+      _validateFields();
+      await uploadImage();
+
+      final userId = authService.getCurrentUserID();
+
+      final response =
+          await Supabase.instance.client.from('Timeline_Table').insert({
+        'timeline_name': timelineNameController.text,
+        'timeLine_Description': timelineDescriptionController.text,
+        'timeline_Cover': avatarUrl,
+        'created_at': DateTime.now().toUtc().toIso8601String(),
+        'lastUpdate': DateTime.now().toUtc().toIso8601String(),
+        'admin': userId,
+        'collaborators': collaborators,
+      });
+      print(response);
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => myPage(
+                    index: 0,
+                  )));
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _validateFields() {
+    setState(() {
+      timelineNameController.text.isEmpty
+          ? timelineNameError = 'Please fill this field'
+          : timelineNameError = null;
+    });
+  }
+
+  void _showUserSearchPopup() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return UserSearch(
+          onUsersSelected: (selectedUsers) {
+            setState(() {
+              collaborators = selectedUsers;
+            });
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -56,6 +149,7 @@ class _CreateTimelineState extends State<CreateTimeline> {
                   fillColor: Colors.grey[200],
                   filled: true,
                   hintText: "Enter the timeline Name",
+                  errorText: timelineNameError,
                   hintStyle: const TextStyle(
                     fontSize: 14,
                     fontFamily: 'Poppins',
@@ -153,7 +247,7 @@ class _CreateTimelineState extends State<CreateTimeline> {
                 height: 30,
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: _showUserSearchPopup,
                 child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     decoration: BoxDecoration(
@@ -169,7 +263,7 @@ class _CreateTimelineState extends State<CreateTimeline> {
                               color: Colors.white, size: 17),
                           const SizedBox(width: 5),
                           Text(
-                            'Create Profile',
+                            'Add Collaborators',
                             style: TextStyle(color: Colors.white, fontSize: 17),
                           ),
                         ],
@@ -180,7 +274,7 @@ class _CreateTimelineState extends State<CreateTimeline> {
                 height: 20,
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: createTimeLIne,
                 child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     decoration: BoxDecoration(

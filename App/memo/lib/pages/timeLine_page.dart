@@ -37,7 +37,8 @@ class _TimelinePageState extends State<TimelinePage> {
     final response = await Supabase.instance.client
         .from('Post_Table')
         .select()
-        .eq('timeline_id', widget.timelineId);
+        .eq('timeline_id', widget.timelineId)
+        .order('date', ascending: false);
 
     // Update the UI with the fetched data
 

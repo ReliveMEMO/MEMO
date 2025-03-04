@@ -43,8 +43,16 @@ class _NewMemoState extends State<NewMemo> {
       final img.Image image = img.decodeImage(imageFile.readAsBytesSync())!;
 
       if (image != null) {
+        final int cropSize =
+            image.width < image.height ? image.width : image.height;
+        final int offsetX = (image.width - cropSize) ~/ 2;
+        final int offsetY = (image.height - cropSize) ~/ 2;
+        final img.Image croppedImage = img.copyCrop(image,
+            x: offsetX, y: offsetY, width: cropSize, height: cropSize);
+
+        // Resize the cropped image to 500x500
         final img.Image resizedImage =
-            img.copyResize(image, width: 500, height: 500);
+            img.copyResize(croppedImage, width: 500, height: 500);
         final File compressedImage = File(pickedImage.path)
           ..writeAsBytesSync(img.encodeJpg(resizedImage));
 
@@ -56,7 +64,7 @@ class _NewMemoState extends State<NewMemo> {
   }
 
   Future<void> uploadImage() async {
-    if (_image == null) {
+    if (_selectedImage == null) {
       imageUrl =
           'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/timeline_covers/uploads/Timeline%20Cover.png';
       return;
@@ -65,7 +73,9 @@ class _NewMemoState extends State<NewMemo> {
     final fileName = DateTime.now().millisecondsSinceEpoch.toString();
     final path = 'uploads/$fileName';
 
-    await Supabase.instance.client.storage.from('memos').upload(path, _image!);
+    await Supabase.instance.client.storage
+        .from('memos')
+        .upload(path, _selectedImage!);
 
     final url =
         await Supabase.instance.client.storage.from('memos').getPublicUrl(path);

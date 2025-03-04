@@ -25,8 +25,7 @@ class _myPageState extends State<myPage> {
     ProfilePage(),
     CreateProfile(),
     NewMemo(),
-    //ActivityPage(),
-    FollowingFollowerPage(),
+    ActivityPage(),
     ChatPage(),
   ];
 

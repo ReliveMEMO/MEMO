@@ -55,11 +55,9 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
     ],
-    child: const MyApp(),
+    child: MyApp(),
   ));
 }
-
-//final Supabase = Supabase.instance.clinet; //supabase
 
 void handleNotificationNavigation(RemoteMessage message) {
   // Example: Navigate to the chat screen with the senderId from the payload
@@ -71,9 +69,6 @@ void handleNotificationNavigation(RemoteMessage message) {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

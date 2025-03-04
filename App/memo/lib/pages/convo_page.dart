@@ -9,8 +9,10 @@ import 'package:memo/services/msg_encryption.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import 'call_pagee.dart'; // Import CallScreen
+
 class convoPage extends StatefulWidget {
-  const convoPage({super.key});
+  const convoPage({Key? key}) : super(key: key);
 
   @override
   State<convoPage> createState() => _convoPageState();
@@ -26,7 +28,7 @@ class _convoPageState extends State<convoPage> {
   int _currentBatch = 0;
   double bottomInsets = 0;
 
-  late WebSocketChannel channel;
+  late WebSocketChannel messagingChannel; // WebSocket for messaging
 
   final TextEditingController textMessageController = TextEditingController();
   final ValueNotifier<IconData> iconNotifier = ValueNotifier(Icons.mic);
@@ -38,11 +40,16 @@ class _convoPageState extends State<convoPage> {
 
     scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    _loadMessages();
     textMessageController.addListener(_updateIcon);
 
-    // Establish WebSocket connection and register receiver
-    _initializeWebSocket();
+    // Establish WebSocket connection for messaging
+    _initializeMessagingWebSocket();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadMessages();
   }
 
   void _onScroll() {
@@ -53,11 +60,11 @@ class _convoPageState extends State<convoPage> {
     }
   }
 
-  void _initializeWebSocket() {
+  void _initializeMessagingWebSocket() {
     try {
-      channel = WebSocketChannel.connect(
+      messagingChannel = WebSocketChannel.connect(
         Uri.parse(
-            'ws://memo-backend-9b73024f3215.herokuapp.com/messaging'), // Replace with your WebSocket server URL
+            'wss://memo-backend-9b73024f3215.herokuapp.com/messaging'), // Use the messaging WebSocket server URL
       );
 
       // Register the receiver
@@ -69,12 +76,13 @@ class _convoPageState extends State<convoPage> {
           "userId": "$receiverId",
         });
 
-        channel.sink.add(registerMessage);
+        messagingChannel.sink.add(registerMessage);
         print("Receiver registered with ID: $receiverId");
       });
 
       // Listen for messages
-      channel.stream.listen((message) {
+      messagingChannel.stream.listen((message) {
+        print("Received WebSocket message: $message"); // Log incoming messages
         _handleIncomingMessage(message);
       }, onError: (error) {
         print("WebSocket error: $error");
@@ -112,6 +120,7 @@ class _convoPageState extends State<convoPage> {
   void _handleIncomingMessage(String message) {
     try {
       final data = jsonDecode(message);
+      print("Handling incoming message: $data"); // Log the incoming message
 
       // Check if the incoming message type is a real-time message
       if (data['type'] == 'receiveMessage') {
@@ -135,8 +144,6 @@ class _convoPageState extends State<convoPage> {
   Future<void> _loadMessages() async {
     if (_loading) return;
     _loading = true;
-    // Add your loading logic here
-    await Future.delayed(Duration(seconds: 1));
 
     if (mounted) {
       final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
@@ -150,18 +157,19 @@ class _convoPageState extends State<convoPage> {
           .range(
               _currentBatch * _batchSize, (_currentBatch + 1) * _batchSize - 1);
 
-      if (response != null) {
-        if (mounted) {
-          setState(() {
-            messages.addAll(response);
-            _currentBatch++;
-            _loading = false;
-          });
-        } else {
+      if (response != null && response.isNotEmpty) {
+        setState(() {
+          messages.addAll(response
+              .map((msg) => {
+                    'sender_id': msg['sender_id'],
+                    'message': msg['message'],
+                    'time_stamp': msg['time_stamp'],
+                  })
+              .toList());
+          _currentBatch++;
           _loading = false;
-        }
+        });
       } else {
-        // Handle error
         _loading = false;
       }
     }
@@ -231,9 +239,10 @@ class _convoPageState extends State<convoPage> {
         'last_accessed': DateTime.now().toUtc().toIso8601String()
       }).eq('chat_id', chatId);
 
-      channel.sink.add(messagePayload);
+      messagingChannel.sink.add(messagePayload);
+      print("Sent message payload: $messagePayload"); // Log the sent message
 
-      if (response != null) {
+      if (response.error != null) {
         print("Error updating last_accessed: ${response.error!.message}");
       } else {
         print("last_accessed updated successfully");
@@ -249,7 +258,7 @@ class _convoPageState extends State<convoPage> {
     scrollController.dispose();
 
     // Close WebSocket connection
-    channel.sink.close();
+    messagingChannel.sink.close();
 
     super.dispose();
   }
@@ -257,8 +266,9 @@ class _convoPageState extends State<convoPage> {
   @override
   Widget build(BuildContext context) {
     final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-    final String chatId = arguments['chatId'];
     final recieverDetails = arguments['recieverDetails'];
+    final String calleeId = recieverDetails['id'];
+    final String calleeProfilePic = recieverDetails['profile_pic'] as String;
 
     // Detect keyboard height
     bottomInsets = MediaQuery.of(context).viewInsets.bottom;
@@ -289,11 +299,10 @@ class _convoPageState extends State<convoPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(HugeIcons.strokeRoundedCall02),
-            onPressed: () {
-              // Add your onPressed logic here
-            },
-          ),
+              icon: Icon(HugeIcons.strokeRoundedCall02),
+              onPressed: () {
+                //onpress logic here
+              }),
         ],
       ),
       body: Stack(

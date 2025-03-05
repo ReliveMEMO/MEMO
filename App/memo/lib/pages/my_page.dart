@@ -8,6 +8,7 @@ import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:solar_icons/solar_icons.dart';
 import 'package:memo/pages/activity_page.dart';
+import 'package:memo/pages/search_page.dart';
 
 class myPage extends StatefulWidget {
   final int? index;
@@ -22,7 +23,7 @@ class _myPageState extends State<myPage> {
 
   List pages = [
     ProfilePage(),
-    CreateProfile(),
+    SearchPage(),
     NewMemo(),
     ActivityPage(),
     ChatPage(),

@@ -35,30 +35,50 @@ class AboutUsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _sectionTitle("Development Team"),
+                    _sectionTitle("Our Team"),
                     SizedBox(height: 16),
-                    _buildTeamMember(name: "Sandinu Pinnawala"),
-                    _buildTeamMember(name: "Sachin Kulathilaka"),
-                    _buildTeamMember(name: "Thisas Ranchagoda"),
-                    _buildTeamMember(name: "Malsha Jayasinghe"),
-                    _buildTeamMember(name: "Monali Suriarachchi"),
-                    _buildTeamMember(name: "Sadinsa Welagedara"),
+                    _buildTeamMember(
+                        name: "Sandinu Pinnawala",
+                        linkedinUrl:
+                            "https://www.linkedin.com/in/sandinu-pinnawala-b85b2b20a/"),
+                    _buildTeamMember(
+                        name: "Sachin Kulathilaka",
+                        linkedinUrl:
+                            "https://www.linkedin.com/in/sachin-kulathilaka-064037267/"),
+                    _buildTeamMember(
+                        name: "Thisas Ranchagoda",
+                        linkedinUrl:
+                            "https://www.linkedin.com/in/thisas-ranchagoda-124b82294/"),
+                    _buildTeamMember(
+                        name: "Malsha Jayasinghe",
+                        linkedinUrl:
+                            "https://www.linkedin.com/in/malsha-pabodani-jayasinghe-64a805292/"),
+                    _buildTeamMember(
+                        name: "Monali Suriarachchi",
+                        linkedinUrl:
+                            "https://www.linkedin.com/in/monalisuriarachchi/"),
+                    _buildTeamMember(
+                        name: "Sadinsa Welagedara",
+                        linkedinUrl:
+                            "https://www.linkedin.com/in/sadinsa-welagedara-68013b295/"),
                     SizedBox(height: 32),
                     Center(
                       child: GestureDetector(
                         onTap: () async {
                           const url = 'https://www.relivememo.com/';
-                          if (await canLaunch(url)) {
-                            await launch(url);
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url),
+                                mode: LaunchMode.externalApplication);
                           }
                         },
                         child: Text(
                           "Visit our website: www.relivememo.com",
                           style: TextStyle(
                             fontSize: 16,
-                            color: Color.fromARGB(255, 145, 67, 223),
+                            color: Color.fromARGB(255, 160, 105, 211),
                             fontWeight: FontWeight.w400,
                             decoration: TextDecoration.underline,
+                            decorationColor: Color.fromARGB(255, 160, 105, 211),
                           ),
                         ),
                       ),
@@ -97,13 +117,16 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamMember({required String name}) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 1),
+  Widget _buildTeamMember({required String name, required String linkedinUrl}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      elevation: 3.5,
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+      color: const Color.fromARGB(230, 255, 255, 255),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         leading: CircleAvatar(
-          backgroundColor: Color.fromARGB(255, 198, 173, 220),
+          backgroundColor: Color.fromARGB(255, 160, 105, 211),
           child: Icon(Icons.person, color: Colors.white),
         ),
         title: Text(
@@ -114,6 +137,12 @@ class AboutUsPage extends StatelessWidget {
             color: Colors.black87,
           ),
         ),
+        onTap: () async {
+          if (await canLaunchUrl(Uri.parse(linkedinUrl))) {
+            await launchUrl(Uri.parse(linkedinUrl),
+                mode: LaunchMode.externalApplication);
+          }
+        },
       ),
     );
   }

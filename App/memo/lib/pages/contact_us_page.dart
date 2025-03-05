@@ -14,25 +14,32 @@ class ContactUsPage extends StatelessWidget {
     );
   }
 
-  // Function to launch email app
+// Function to launch email app
   Future<void> _launchEmail() async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
       path: email,
+      query: 'subject=Support Inquiry&body=Hello,', // Optional query parameters
     );
+
     if (await canLaunchUrl(emailUri)) {
       await launchUrl(emailUri);
+    } else {
+      debugPrint("Could not launch $emailUri");
     }
   }
 
-  // Function to launch phone dialer
+// Function to launch phone dialer
   Future<void> _launchPhone() async {
     final Uri phoneUri = Uri(
       scheme: 'tel',
-      path: phone,
+      path: phone.replaceAll(' ', ''), // Remove spaces for compatibility
     );
+
     if (await canLaunchUrl(phoneUri)) {
       await launchUrl(phoneUri);
+    } else {
+      debugPrint("Could not launch $phoneUri");
     }
   }
 
@@ -58,7 +65,7 @@ class ContactUsPage extends StatelessWidget {
                   ),
                   IconButton(
                     icon: Icon(Icons.open_in_new, color: Colors.grey),
-                    onPressed: _launchEmail,
+                    onPressed: () async => await _launchEmail(),
                   ),
                 ],
               ),

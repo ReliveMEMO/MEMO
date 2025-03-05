@@ -19,17 +19,19 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'pages/NewMemo.dart';
+import 'pages/create_page.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await Supabase.initialize(
     anonKey:
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFicXdiZXBweWxpYXZ2ZnpyeXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM1ODU5NTcsImV4cCI6MjA0OTE2MTk1N30.dKEe4wJ7lJq87GKHzgIR-U-jUYpV3pZWgXQuMpeU9DU",
     url: "https://qbqwbeppyliavvfzryze.supabase.co",
   );
 
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   final authService = AuthService();
@@ -55,11 +57,9 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
     ],
-    child: const MyApp(),
+    child: MyApp(),
   ));
 }
-
-//final Supabase = Supabase.instance.clinet; //supabase
 
 void handleNotificationNavigation(RemoteMessage message) {
   // Example: Navigate to the chat screen with the senderId from the payload
@@ -71,9 +71,6 @@ void handleNotificationNavigation(RemoteMessage message) {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -95,7 +92,11 @@ class MyApp extends StatelessWidget {
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
+
+        '/create-page': (context) => CreatePage(),
+
     
+
         //Testing the CI pipeline xoxo
 
       },

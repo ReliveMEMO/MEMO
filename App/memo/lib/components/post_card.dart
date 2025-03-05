@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:memo/pages/full_post.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:solar_icons/solar_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -40,19 +41,27 @@ class _PostCardState extends State<PostCard> {
                     fontWeight: FontWeight.w500,
                     color: Colors.purple)),
             SizedBox(height: 15),
-            CachedNetworkImage(
-              imageUrl: widget.post['image_url'],
-              placeholder: (context, url) => Container(
-                width: 300,
-                height: 300,
-                color: Colors.grey[300],
-                child: Center(
-                  child: Skeletonizer(
-                    child: SizedBox(width: 300, height: 300),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FullPost(post: widget.post)));
+              },
+              child: CachedNetworkImage(
+                imageUrl: widget.post['image_url'],
+                placeholder: (context, url) => Container(
+                  width: 300,
+                  height: 300,
+                  color: Colors.grey[300],
+                  child: Center(
+                    child: Skeletonizer(
+                      child: SizedBox(width: 300, height: 300),
+                    ),
                   ),
                 ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
             SizedBox(height: 15),
             Padding(

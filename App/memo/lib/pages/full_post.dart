@@ -1,78 +1,85 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:memo/pages/full_post.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:solar_icons/solar_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class PostCard extends StatefulWidget {
-  const PostCard({
+class FullPost extends StatefulWidget {
+  final PostgrestMap post;
+
+  const FullPost({
     super.key,
     required this.post,
   });
 
-  final PostgrestMap post;
-
   @override
-  State<PostCard> createState() => _PostCardState();
+  State<FullPost> createState() => _FullPostState();
 }
 
-class _PostCardState extends State<PostCard> {
+class _FullPostState extends State<FullPost> {
   bool liked = true;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-      elevation: 1,
-      color: Colors.grey[100],
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey[900],
+        foregroundColor: Colors.white,
+        title: Text(widget.post['heading']),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.grey[900],
+      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(widget.post['heading'],
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28)),
-            SizedBox(height: 2),
-            Text(widget.post['date'],
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.purple)),
-            SizedBox(height: 15),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => FullPost(post: widget.post)));
-              },
-              child: CachedNetworkImage(
-                imageUrl: widget.post['image_url'],
-                placeholder: (context, url) => Container(
-                  width: 300,
-                  height: 300,
-                  color: Colors.grey[300],
-                  child: Center(
-                    child: Skeletonizer(
-                      child: SizedBox(width: 300, height: 300),
-                    ),
+            Center(
+              child: Container(
+                width: 100,
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(10)),
+                child: Text(
+                  widget.post['date'],
+                  style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            SizedBox(height: 50),
+            CachedNetworkImage(
+              imageUrl: widget.post['image_url'],
+              width: 400,
+              placeholder: (context, url) => Container(
+                width: 300,
+                height: 300,
+                color: Colors.grey[300],
+                child: Center(
+                  child: Skeletonizer(
+                    child: SizedBox(width: 300, height: 300),
                   ),
                 ),
-                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
             ),
-            SizedBox(height: 15),
+            SizedBox(height: 40),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
               child: Text(
                 widget.post['caption'],
+                style: TextStyle(color: Colors.white, fontSize: 15),
+                textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(
+              height: 25,
+            ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              margin: EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey[300]!),
                 borderRadius: BorderRadius.circular(20),
@@ -122,35 +129,6 @@ class _PostCardState extends State<PostCard> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class Post {
-  final String date;
-  final String title;
-  final String content;
-  final int likes;
-  final int comments;
-  final String imageUrl;
-
-  Post({
-    required this.date,
-    required this.title,
-    required this.content,
-    required this.likes,
-    required this.comments,
-    required this.imageUrl,
-  });
-
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return Post(
-      date: json['date'],
-      title: json['title'],
-      content: json['content'],
-      likes: json['likes'],
-      comments: json['comments'],
-      imageUrl: json['imageUrl'],
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -8,7 +9,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserTile extends StatefulWidget {
   final String userId;
-  const UserTile({super.key, required this.userId});
+  final bool? isChat;
+  final Function? onTap;
+
+  const UserTile({super.key, required this.userId, this.isChat, this.onTap});
 
   @override
   State<UserTile> createState() => _UserTileState();
@@ -82,12 +86,23 @@ class _UserTileState extends State<UserTile> {
                   const CircleAvatar(radius: 22, backgroundColor: Colors.grey),
             ))
           : InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, '/chat', arguments: {
-                  'chatId': cId,
-                  'recieverDetails': recieverDetails,
-                });
-              },
+              onTap: widget.isChat == true
+                  ? () {
+                      Navigator.pushNamed(context, '/chat', arguments: {
+                        'chatId': cId,
+                        'recieverDetails': recieverDetails
+                      });
+                    }
+                  : () {
+                      widget.onTap!();
+
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfilePage(
+                                    userId: cId,
+                                  )));
+                    },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5.0),
                 child: ListTile(

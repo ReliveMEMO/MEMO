@@ -4,11 +4,17 @@ import 'package:memo/pages/NewMemo.dart';
 import 'package:memo/pages/chat_page.dart';
 import 'package:memo/pages/create_page.dart';
 import 'package:memo/pages/create_profile.dart';
+import 'package:memo/pages/event_page.dart';
 import 'package:memo/pages/create_timeline.dart';
+import 'package:memo/pages/memoryReminder_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:solar_icons/solar_icons.dart';
 import 'package:memo/pages/activity_page.dart';
-import 'package:memo/pages/following_follower_page.dart';
+
+import 'package:memo/pages/search_page.dart';
+
+
+
 
 class myPage extends StatefulWidget {
   final int? index;
@@ -23,9 +29,17 @@ class _myPageState extends State<myPage> {
 
   List pages = [
     ProfilePage(),
-    CreateProfile(),
+
+    SearchPage(),
     NewMemo(),
     ActivityPage(),
+
+    CreateProfile(),
+    EventPage(),
+   
+    //ProfilePage(),
+    //CreateTimeline(),
+
     ChatPage(),
   ];
 

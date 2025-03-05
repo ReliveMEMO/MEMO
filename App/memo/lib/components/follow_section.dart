@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memo/pages/edit_profile.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/follow.dart';
 
@@ -55,7 +56,10 @@ class _FollowSectionsState extends State<FollowSections> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => EditProfile()));
+                  },
                   child: Text(
                     'Edit Profile',
                     style: TextStyle(color: Colors.grey),

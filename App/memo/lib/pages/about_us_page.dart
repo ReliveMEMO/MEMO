@@ -1,83 +1,84 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutUsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("About MEMO"),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-      ),
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final theme = Theme.of(context).copyWith(
+      scaffoldBackgroundColor: Colors.grey[50],
+      textTheme: Theme.of(context).textTheme.apply(
+            fontFamily: 'Roboto',
+          ),
+    );
+
+    return Theme(
+      data: theme,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "About Us",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 20,
+              color: Colors.black87,
+            ),
+          ),
+          backgroundColor: Colors.grey[50],
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black54),
+        ),
+        body: Column(
           children: [
-            Text(
-              "MEMO – Relive Every Vibe! 🚀✨",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            Text(
-              "MEMO is a collaborative social media platform designed for university students and alumni "
-              "to preserve, share, and relive memories through interactive timelines.",
-              textAlign: TextAlign.justify, // Moved outside TextStyle
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[700],
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle("Development Team"),
+                    SizedBox(height: 16),
+                    _buildTeamMember(name: "Sandinu Pinnawala"),
+                    _buildTeamMember(name: "Sachin Kulathilaka"),
+                    _buildTeamMember(name: "Thisas Ranchagoda"),
+                    _buildTeamMember(name: "Malsha Jayasinghe"),
+                    _buildTeamMember(name: "Monali Suriarachchi"),
+                    _buildTeamMember(name: "Sadinsa Welagedara"),
+                    SizedBox(height: 32),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () async {
+                          const url = 'https://www.relivememo.com/';
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          }
+                        },
+                        child: Text(
+                          "Visit our website: www.relivememo.com",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color.fromARGB(255, 145, 67, 223),
+                            fontWeight: FontWeight.w400,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                  ],
+                ),
               ),
             ),
-            SizedBox(height: 24),
-            Text(
-              "Why MEMO?",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Unlike other platforms, MEMO focuses on group memory sharing rather than short-lived interactions.",
-              textAlign: TextAlign.justify, // Moved outside TextStyle
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[700],
+            Container(
+              padding: EdgeInsets.all(20),
+              alignment: Alignment.center,
+              child: Text(
+                "© 2024 MEMO. All Rights Reserved",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
               ),
-            ),
-            SizedBox(height: 24),
-            Text(
-              "Key Features:",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 9),
-            _buildFeatureItem(
-                "•Personalized Timelines – Organize & revisit life moments."),
-            _buildFeatureItem(
-                "•Collaborative Memory Sharing – Friends contribute to shared timelines "),
-            _buildFeatureItem(
-                "•Event Notifications – Stay updated on important events."),
-            _buildFeatureItem(
-                "•Memory Reminders – Never forget a special moment."),
-            _buildFeatureItem(
-                "•Detailed Profiles – Showcase your journey & achievements."),
-            SizedBox(height: 24),
-            Text(
-              "Development Team",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            _buildTeamMember(name: "Sandinu Pinnawala"),
-            _buildTeamMember(name: "Sachin Kulathilaka"),
-            _buildTeamMember(name: "Thisas Ranchagoda"),
-            _buildTeamMember(name: "Malsha Jayasinghe"),
-            _buildTeamMember(name: "Monali Suriarachchi"),
-            _buildTeamMember(name: "Sadinsa Welagedara"),
-            SizedBox(height: 30),
-            Text(
-              "Reconnect, reminisce, and relive every vibe with MEMO! 🎉",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
             ),
           ],
         ),
@@ -85,27 +86,34 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureItem(String text) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 10),
-      child: Text(
-        text,
-        textAlign: TextAlign.justify, // Moved outside TextStyle
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.grey[700],
-        ),
+  Widget _sectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+        color: Colors.black87,
       ),
     );
   }
 
-  Widget _buildTeamMember({required String name, String? imagePath}) {
-    return Card(
-      margin: EdgeInsets.only(bottom: 12),
+  Widget _buildTeamMember({required String name}) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 1),
       child: ListTile(
-        contentPadding: EdgeInsets.all(16),
-        leading: CircleAvatar(child: Icon(Icons.person)),
-        title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+        contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        leading: CircleAvatar(
+          backgroundColor: Color.fromARGB(255, 198, 173, 220),
+          child: Icon(Icons.person, color: Colors.white),
+        ),
+        title: Text(
+          name,
+          style: TextStyle(
+            fontWeight: FontWeight.w400,
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        ),
       ),
     );
   }

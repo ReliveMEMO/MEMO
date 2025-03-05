@@ -1,12 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
 import 'package:memo/components/bio_section.dart';
 import 'package:memo/components/follow_section.dart';
 import 'package:memo/components/timeline_card.dart';
-
-import 'package:memo/components/achievements_section.dart';
-
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -373,86 +369,8 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
 
-                     // Achievements Section
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 20),
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          // Achievements Title
-                                          Positioned(
-                                            top: -15,
-                                            left: 120,
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8),
-                                              color: Colors.white,
-                                              child: const Text(
-                                                "Achievements",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-
-                                          // Achievements Section Container
-                                          LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              return Container(
-                                                width: 340,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 20),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(25),
-                                                  border: Border.all(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.4)),
-                                                ),
-                                                child: Column(
-                                                  children: [
-                                                    // Achievements GridView
-                                                    AchievementsSection(
-                                                      achievements: [
-                                                        // Achievement(
-                                                        //   emoji: "🏆",
-                                                        //   description: "SE",
-                                                        //   position: "1st",
-                                                        // ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-
         ),
-      ),
-    );
-  }
+     ),
+);
+}
 }

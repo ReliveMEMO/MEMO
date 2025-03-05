@@ -1,6 +1,4 @@
 
-
-
 // import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
@@ -157,20 +155,15 @@
 //           child: Icon(Icons.person, color: Colors.black), // Optional icon inside the avatar
 //         ),
 //         title: Text(userName),
-//         trailing: isFollowing 
-//           ? null // No icon for following
-//           : IconButton(
-//               icon: Icon(Icons.person_add_alt_1), // Follow/unfollow icon for followers
-//               onPressed: () {
-//                 // No action when pressed (for now)
-//               },
-//             ),
+//         // Making each tile tappable (Button)
+//         onTap: () {
+//           // No action when pressed for now, can be added later
+//         },
 //       ),
 //       elevation: 0,
 //     );
 //   }
 // }
-
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -214,6 +207,13 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage> with Sing
       appBar: AppBar(
         toolbarHeight: screenHeight * 0.05,
         automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Navigate back to the previous page
+            Navigator.pop(context);
+          },
+        ),
         flexibleSpace: Padding(
           padding: EdgeInsets.only(top: screenHeight * 0.04),
           child: Row(

@@ -6,6 +6,7 @@ import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/event_page.dart';
 import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/login_page.dart';
+import 'package:memo/pages/memoryReminder_page.dart';
 import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/signup_page.dart';
@@ -94,6 +95,7 @@ class MyApp extends StatelessWidget {
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
+    
         //Testing the CI pipeline xoxo
 
       },

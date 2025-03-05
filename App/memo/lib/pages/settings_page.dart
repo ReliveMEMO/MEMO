@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memo/pages/account_privacy_page.dart';
 import 'package:memo/pages/about_us_page.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:memo/pages/contact_us_page.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -10,17 +10,6 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool isPrivate = false;
-
-  Future<void> _launchWebsite() async {
-    const url = 'https://www.relivememo.com';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not launch website')),
-      );
-    }
-  }
 
   void _showLogoutConfirmation() {
     showDialog(
@@ -126,7 +115,10 @@ class _SettingsPageState extends State<SettingsPage> {
         leading: Icon(Icons.mail_outline, color: Colors.black),
         title: Text("Contact Us", style: TextStyle(fontSize: 16)),
         trailing: Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: _launchWebsite,
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ContactUsPage()),
+        ),
       );
 
   Widget _buildLogoutOption() => ListTile(

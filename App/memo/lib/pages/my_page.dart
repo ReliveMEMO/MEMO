@@ -13,9 +13,6 @@ import 'package:memo/pages/activity_page.dart';
 
 import 'package:memo/pages/search_page.dart';
 
-
-
-
 class myPage extends StatefulWidget {
   final int? index;
   const myPage({Key? key, this.index}) : super(key: key);
@@ -29,17 +26,9 @@ class _myPageState extends State<myPage> {
 
   List pages = [
     ProfilePage(),
-
     SearchPage(),
     NewMemo(),
     ActivityPage(),
-
-    CreateProfile(),
-    EventPage(),
-   
-    //ProfilePage(),
-    //CreateTimeline(),
-
     ChatPage(),
   ];
 

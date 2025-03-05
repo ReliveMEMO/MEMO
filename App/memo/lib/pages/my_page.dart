@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:memo/pages/NewMemo.dart';
 import 'package:memo/pages/chat_page.dart';
+import 'package:memo/pages/create_page.dart';
 import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:solar_icons/solar_icons.dart';
+import 'package:memo/pages/activity_page.dart';
 import 'package:memo/pages/search_page.dart';
-import 'package:memo/pages/edit_profile.dart';
-
 
 class myPage extends StatefulWidget {
-  const myPage({super.key});
+  final int? index;
+  const myPage({Key? key, this.index}) : super(key: key);
 
   @override
   State<myPage> createState() => _myPageState();
@@ -22,12 +24,18 @@ class _myPageState extends State<myPage> {
   List pages = [
     ProfilePage(),
     SearchPage(),
-    CreateTimeline(),
-    EditProfile(),
+    NewMemo(),
+    ActivityPage(),
     ChatPage(),
   ];
 
   int currentIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.index ?? 0;
+  }
+
   void onTap(int index) {
     setState(() {
       currentIndex = index;

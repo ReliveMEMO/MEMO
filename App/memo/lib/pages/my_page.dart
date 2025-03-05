@@ -10,7 +10,11 @@ import 'package:memo/pages/memoryReminder_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:solar_icons/solar_icons.dart';
 import 'package:memo/pages/activity_page.dart';
+
 import 'package:memo/pages/search_page.dart';
+
+
+
 
 class myPage extends StatefulWidget {
   final int? index;

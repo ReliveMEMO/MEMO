@@ -8,6 +8,7 @@ import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:memo/pages/following_follower_page.dart';
+import 'package:memo/pages/settings_page.dart';
 
 void profilePage() {
   runApp(ProfilePage());
@@ -109,7 +110,12 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
+              );
+            },
           ),
         ],
       ),

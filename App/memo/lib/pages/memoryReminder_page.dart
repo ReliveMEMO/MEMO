@@ -1,25 +1,18 @@
 import 'package:flutter/material.dart';
 
-class MemoryReminderPage extends StatelessWidget {
-  final String imageUrl;
-  final String date;
-  final String memoryText;
-  final String heading;
-  final List<String> collaborators;
-  final VoidCallback onClose;
-
-  const MemoryReminderPage({
-    super.key,
-    required this.imageUrl,
-    required this.date,
-    required this.memoryText,
-    required this.heading,
-    required this.collaborators,
-    required this.onClose, required String postImage, required String memoryDate, required String postHeading, required List collaboratorAvatars, required List collaboratorNames,
-  });
+class MemoryReminderPopup extends StatelessWidget {
+  const MemoryReminderPopup({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Fetch arguments safely
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    final args = arguments is Map<String, dynamic> ? arguments : {};
+    VoidCallback onClose = args['onClose'] ??
+        () {
+          Navigator.of(context).pop();
+        };
+
     return Stack(
       children: [
         // Dark Transparent Background
@@ -32,12 +25,20 @@ class MemoryReminderPage extends StatelessWidget {
           ),
         ),
 
-    
+        // Close Button
+        Positioned(
+          right: 20,
+          top: 40,
+          child: GestureDetector(
+            onTap: onClose,
+            child: const Icon(
+              Icons.close,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        ),
       ],
     );
   }
 }
-
-
-
-

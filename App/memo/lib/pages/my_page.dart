@@ -22,7 +22,7 @@ class _myPageState extends State<myPage> {
     ProfilePage(),
     CreateProfile(),
     EventPage(),
-   
+    MemoryReminderPopup(),
     //ProfilePage(),
     //CreateTimeline(),
     ChatPage(),

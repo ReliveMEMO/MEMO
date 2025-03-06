@@ -187,7 +187,7 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20.0, vertical: 4),
-                      child: UserTile(userId: user['id']),
+                      child: UserTile(userId: user['id'], isChat: true),
                     );
                   },
                 )

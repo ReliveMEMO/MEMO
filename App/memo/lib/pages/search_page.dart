@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/user_tile.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/search_service.dart';
 import 'package:provider/provider.dart';
@@ -19,11 +20,13 @@ class _SearchPageState extends State<SearchPage> {
   var searchResults = [];
   bool isSearching = false;
   final searchService = SearchService();
+  List<String> recentSearches = [];
 
   @override
   void initState() {
     super.initState();
     searchController.addListener(_onSearchChanged);
+    loadRecentSearch();
   }
 
   void _onSearchChanged() {
@@ -54,6 +57,20 @@ class _SearchPageState extends State<SearchPage> {
       recentSearches.insert(0, userID);
       await prefs.setStringList('recentSearches', recentSearches);
     }
+    print('======================================');
+    print(recentSearches);
+    loadRecentSearch();
+  }
+
+  Future<void> loadRecentSearch() async {
+    print('==========loading=========');
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      isLoading = true;
+      recentSearches = prefs.getStringList('recentSearches') ?? [];
+      isLoading = false;
+    });
   }
 
   Future<void> _searchUsers(String query) async {
@@ -184,27 +201,61 @@ class _SearchPageState extends State<SearchPage> {
                     ],
                   ),
                   Expanded(
-                    child: TabBarView(
-                      children: [
-                        isSearching
-                            ? isLoading
-                                ? Center(child: CircularProgressIndicator())
-                                : ListView.builder(
-                                    itemCount: searchResults.length,
-                                    itemBuilder: (context, index) {
-                                      final user = searchResults[index];
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20.0, vertical: 4),
-                                        child: UserTile(userId: user['id']),
-                                      );
-                                    },
-                                  )
-                            : Center(child: Text('Search for accounts')),
-                        Center(
-                            child:
-                                Text('Events section is blank')), // Events tab
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TabBarView(
+                        children: [
+                          isSearching
+                              ? isLoading
+                                  ? Center(child: CircularProgressIndicator())
+                                  : ListView.builder(
+                                      itemCount: searchResults.length,
+                                      itemBuilder: (context, index) {
+                                        final user = searchResults[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 4),
+                                          child: UserTile(
+                                              userId: user['id'],
+                                              onTap: () {
+                                                saveRecentSearch(user['id']);
+                                              }),
+                                        );
+                                      },
+                                    )
+                              : recentSearches.isEmpty
+                                  ? Center(
+                                      child:
+                                          Text('You have no recent searches'))
+                                  : ListView.builder(
+                                      itemCount: recentSearches.length,
+                                      itemBuilder: (context, index) {
+                                        final user = recentSearches[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 4),
+                                          child: UserTile(
+                                            userId: user,
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ProfilePage(
+                                                            userId:
+                                                                recentSearches[
+                                                                    index],
+                                                          )));
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ), // Accounts tab
+                          Center(
+                              child: Text(
+                                  'Events section is blank')), // Events tab
+                        ],
+                      ),
                     ),
                   ),
                 ],

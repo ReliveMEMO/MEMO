@@ -12,9 +12,10 @@ class MemoryReminderPopup extends StatelessWidget {
         : {
             'imageUrl': "https://via.placeholder.com/300",
             'date': "March 6, 2025",
-            'memoryText': "Throwback to our best day!",
+            'memoryText': "Memo Meeting!",
             'collaborators': [
               "https://via.placeholder.com/"
+              
             ],
             'onClose': () {
               Navigator.of(context).pop();
@@ -35,7 +36,7 @@ class MemoryReminderPopup extends StatelessWidget {
         GestureDetector(
           onTap: onClose,
           child: Container(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withOpacity(0.9),
             width: double.infinity,
             height: double.infinity,
           ),
@@ -62,9 +63,9 @@ class MemoryReminderPopup extends StatelessWidget {
               const Text(
                 "#ThrowBacks",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color.fromARGB(255, 255, 255, 255),
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontSize: 24,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -73,24 +74,24 @@ class MemoryReminderPopup extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  color: Colors.black,
+                  color: const Color.fromARGB(255, 208, 207, 207),
                   padding: const EdgeInsets.all(8),
                   child: Image.network(
                     imageUrl,
                     width: 300,
-                    height: 350,
+                    height: 400,
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 25),
 
               const Text(
                 "Remember that day",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 20,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -117,7 +118,7 @@ class MemoryReminderPopup extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 70),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

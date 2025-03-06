@@ -8,14 +8,18 @@ class MemoryReminderPopup extends StatelessWidget {
     // Fetch arguments safely
     final arguments = ModalRoute.of(context)?.settings.arguments;
     final args = arguments is Map<String, dynamic> ? arguments : {
-      'imageUrl': "https://via.placeholder.com/300"
+      'imageUrl': "https://via.placeholder.com/300",
+      'date': "March 6, 2025",
+      'memoryHeading': "Heading!"
     };
     VoidCallback onClose = args['onClose'] ??
         () {
           Navigator.of(context).pop();
         };
 
-    String imageUrl = args['imageUrl'] ?? '';    
+    String imageUrl = args['imageUrl'] ?? ''; 
+    String date = args['date'] ?? '';
+    String memoryHeading = args['memoryHeading'] ?? '';   
 
     return Stack(
       children: [
@@ -42,7 +46,7 @@ class MemoryReminderPopup extends StatelessWidget {
             ),
           ),
         ),
-        
+
           // Main Content
         Center(
           child: Column(
@@ -84,6 +88,29 @@ class MemoryReminderPopup extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
+
+              const SizedBox(height: 5),
+
+              Text(
+                date,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+
+              const SizedBox(height: 5),
+
+              Text(
+                memoryHeading,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+
             ],
           ),  
         ),  

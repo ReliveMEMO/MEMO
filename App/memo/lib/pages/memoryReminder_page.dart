@@ -7,23 +7,31 @@ class MemoryReminderPopup extends StatelessWidget {
   Widget build(BuildContext context) {
     // Fetch arguments safely
     final arguments = ModalRoute.of(context)?.settings.arguments;
-    final args = arguments is Map<String, dynamic> ? arguments : {
-      'imageUrl': "https://via.placeholder.com/300",
-      'date': "March 6, 2025",
-      'memoryHeading': "Heading!"
-    };
-    VoidCallback onClose = args['onClose'] ??
-        () {
-          Navigator.of(context).pop();
-        };
+    final args = arguments is Map<String, dynamic>
+        ? arguments
+        : {
+            'imageUrl': "https://via.placeholder.com/300",
+            'date': "March 6, 2025",
+            'memoryText': "Throwback to our best day!",
+            'collaborators': [
+              "https://via.placeholder.com/"
+            ],
+            'onClose': () {
+              Navigator.of(context).pop();
+            },
+          };
 
-    String imageUrl = args['imageUrl'] ?? ''; 
+    String imageUrl = args['imageUrl'] ?? '';
     String date = args['date'] ?? '';
-    String memoryHeading = args['memoryHeading'] ?? '';   
+    String memoryHeading = args['memoryText'] ?? '';
+    List<String> collaborators = List<String>.from(args['collaborators'] ?? []);
+    VoidCallback onClose = args['onClose'] ?? () {
+      Navigator.of(context).pop();
+    };
 
     return Stack(
       children: [
-        // Dark Transparent Background
+        // Transparent Background
         GestureDetector(
           onTap: onClose,
           child: Container(
@@ -33,7 +41,7 @@ class MemoryReminderPopup extends StatelessWidget {
           ),
         ),
 
-        // Close Button
+        // Close Button 
         Positioned(
           right: 20,
           top: 40,
@@ -47,7 +55,6 @@ class MemoryReminderPopup extends StatelessWidget {
           ),
         ),
 
-          // Main Content
         Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -63,7 +70,6 @@ class MemoryReminderPopup extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
-              //image box
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
@@ -111,12 +117,36 @@ class MemoryReminderPopup extends StatelessWidget {
                 ),
               ),
 
-            ],
-          ),  
-        ),  
+              const SizedBox(height: 10),
 
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: collaborators
+                    .map((avatar) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: CircleAvatar(
+                            radius: 15,
+                            backgroundImage: NetworkImage(avatar),
+                          ),
+                        ))
+                    .toList(),
+              ),
+
+              const SizedBox(height: 5),
+
+              Text(
+                collaborators.isNotEmpty
+                    ? collaborators.map((c) => "@$c").join(", ") + " were with you!"
+                    : "no collaborators",
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
-    
   }
 }

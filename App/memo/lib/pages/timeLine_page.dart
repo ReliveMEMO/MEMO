@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/collab_popup.dart';
 import 'dart:convert';
 
 import 'package:memo/components/post_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:solar_icons/solar_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TimelinePage extends StatefulWidget {
@@ -37,7 +39,8 @@ class _TimelinePageState extends State<TimelinePage> {
     final response = await Supabase.instance.client
         .from('Post_Table')
         .select()
-        .eq('timeline_id', widget.timelineId);
+        .eq('timeline_id', widget.timelineId)
+        .order('date', ascending: false);
 
     // Update the UI with the fetched data
 
@@ -104,7 +107,10 @@ class _TimelinePageState extends State<TimelinePage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.person_add),
+            icon: Icon(
+              SolarIconsBold.usersGroupTwoRounded,
+              size: 25,
+            ),
             onPressed: () {
               // Call the showCustomPopup function when the icon is pressed
               showCustomPopup(context, widget.timelineId);

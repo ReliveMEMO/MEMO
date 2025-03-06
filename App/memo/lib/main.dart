@@ -5,8 +5,10 @@ import 'package:memo/pages/NewMemo.dart';
 import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_page.dart';
 import 'package:memo/pages/create_profile.dart';
+import 'package:memo/pages/event_page.dart';
 import 'package:memo/pages/create_timeline.dart';
 import 'package:memo/pages/login_page.dart';
+import 'package:memo/pages/memoryReminder_page.dart';
 import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/pages/settings_page.dart';
@@ -55,11 +57,9 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
     ],
-    child: const MyApp(),
+    child: MyApp(),
   ));
 }
-
-//final Supabase = Supabase.instance.clinet; //supabase
 
 void handleNotificationNavigation(RemoteMessage message) {
   // Example: Navigate to the chat screen with the senderId from the payload
@@ -71,9 +71,6 @@ void handleNotificationNavigation(RemoteMessage message) {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -85,6 +82,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color: Colors.white)),
       routes: {
+        '/event': (context) => EventPage(),     
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
@@ -94,9 +92,11 @@ class MyApp extends StatelessWidget {
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
+
         '/create-page': (context) => CreatePage(),
         '/settings-page': (context) => SettingsPage(),
         //Testing the CI pipeline xoxo
+
       },
     );
   }

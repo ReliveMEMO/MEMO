@@ -1,4 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/main.dart';
+import 'package:memo/services/notification.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -9,8 +12,19 @@ class AuthService {
     String email,
     String password,
   ) async {
-    return await _supabase.auth
+    AuthResponse response = await _supabase.auth
         .signInWithPassword(email: email, password: password);
+    await NotificationService.initializeFCM(
+        _supabase.auth.currentSession?.user.id);
+
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        // Handle notification tap
+        handleNotificationNavigation(message);
+      }
+    });
+
+    return response;
   }
 
   Future<AuthResponse> signUpWithEmailPassword(
@@ -43,19 +57,9 @@ class AuthService {
   }
 
   Future<AuthResponse> signInWithGoogle() async {
-    /// TODO: update the Web client ID with your own.
-    ///
-    /// Web Client ID that you registered with Google Cloud.
+    // Web Client ID that registered with Google Cloud.
     const webClientId =
         '1047457511880-jeorj6kvv0ddfneplopr4km951tsbhh3.apps.googleusercontent.com';
-
-    /// TODO: update the iOS client ID with your own.
-    ///
-    /// iOS Client ID that you registered with Google Cloud.
-    //const iosClientId = 'my-ios.apps.googleusercontent.com';
-
-    // Google sign in on Android will work without providing the Android
-    // Client ID registered on Google Cloud.
 
     final GoogleSignIn googleSignIn = GoogleSignIn(
       //clientId: iosClientId,
@@ -80,24 +84,33 @@ class AuthService {
     );
   }
 
-  // // New method for Google Sign-In
-  // Future<AuthResponse> signInWithGoogle() async {
-  //   return await _supabase.auth.signInWithOAuth(Provider.google);
-  // }
+  Future<String?> getDisplayPicture(String userId) async {
+    final response = await _supabase
+        .from('User_Info')
+        .select('profile_pic')
+        .eq('id', userId)
+        .maybeSingle();
 
-  //  // New method for Google Sign-In
-  // Future<bool> signInWithGoogle() async {
-  //   try {
-  //     // Call the signInWithOAuth method and wait for its response
-  //     bool result = await _supabase.auth.signInWithOAuth(
-  //       OAuthProvider.google, // Use OAuthProvider.google
+    if (response == null || response['avatar_url'] == null) {
+      print('Error fetching display picture');
+      return null;
+    }
 
-  //       redirectTo: 'io.supabase.flutter://login-callback',// Replace with your actual redirect URL
-  //     );
-  //     return result; // Return the boolean indicating success
-  //   } catch (e) {
-  //     print('Error during Google Sign-In: $e');
-  //     return false; // Return false in case of error
-  //   }
-  // }
+    return response['avatar_url'] as String?;
+  }
+
+  Future<String?> getDisplayName(String userId) async {
+    final response = await _supabase
+        .from('User_Info')
+        .select('full_name')
+        .eq('id', userId)
+        .maybeSingle();
+
+    if (response == null || response['full_name'] == null) {
+      print('Error fetching display name');
+      return null;
+    }
+
+    return response['full_name'] as String?;
+  }
 }

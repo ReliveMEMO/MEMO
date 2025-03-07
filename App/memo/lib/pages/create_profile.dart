@@ -65,6 +65,7 @@ class _CreateProfileState extends State<CreateProfile> {
       await uploadImage();
 
       final userId = authService.getCurrentUserID();
+      final displayName = authService.getCurrentUser();
 
       final response = await Supabase.instance.client.from('User_Info').insert({
         'id': userId,
@@ -74,9 +75,10 @@ class _CreateProfileState extends State<CreateProfile> {
         'programme': selectedProgram,
         'status': selectedStatus,
         'profile_pic': avatarUrl,
+        'display_name': displayName
       });
       print(response);
-      Navigator.pushNamed(context, '/profile');
+      Navigator.pushNamed(context, '/my-page');
     } catch (e) {
       print(e);
     }
@@ -144,6 +146,7 @@ class _CreateProfileState extends State<CreateProfile> {
             hintText: "Full Name",
             obscureText: false,
             controller: fullnameController,
+            // borderRadius: 10,
             errorText: fullnameErrorText,
             clearErrorText: () {
               setState(() {
@@ -156,6 +159,7 @@ class _CreateProfileState extends State<CreateProfile> {
             obscureText: false,
             controller: iitIdController,
             errorText: iitIdErrorText,
+            // borderRadius: 10,
             clearErrorText: () {
               setState(() {
                 iitIdErrorText = null;

@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
       final userExist = await checkUserExist(authService.getCurrentUserID());
 
       if (userExist) {
-        Navigator.pushNamed(context, '/profile');
+        Navigator.pushNamed(context, '/my-page');
       } else {
         Navigator.pushNamed(context, '/create-profile');
       }
@@ -139,6 +139,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
               child: TextFormField(
                 controller: passwordController,
+                obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Password",
                   errorText: passwordError,
@@ -251,7 +252,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
 
 
-            /*const*/ Googlelog(),
+            /*const*/ 
+            Googlelog(),
             //Signup link
 
             const SizedBox(

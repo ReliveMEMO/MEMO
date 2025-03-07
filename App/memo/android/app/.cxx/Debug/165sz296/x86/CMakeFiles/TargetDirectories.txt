@@ -1,0 +1,2 @@
+D:/SDGP Front End/MEMO/App/memo/android/app/.cxx/Debug/165sz296/x86/CMakeFiles/edit_cache.dir
+D:/SDGP Front End/MEMO/App/memo/android/app/.cxx/Debug/165sz296/x86/CMakeFiles/rebuild_cache.dir

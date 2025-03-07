@@ -1,6 +1,3 @@
-
-
-
 // import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:flutter/material.dart';
 // import 'package:memo/providers/user_provider.dart';
@@ -163,18 +160,20 @@
 //   }
 // }
 
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/providers/user_provider.dart';
+import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ActivityPage extends StatefulWidget {
   @override
   _ActivityPageState createState() => _ActivityPageState();
 }
 
-class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderStateMixin {
+class _ActivityPageState extends State<ActivityPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -195,6 +194,24 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
     final userDetails = userProvider.userDetails;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final authService = AuthService();
+    bool isLoading = false;
+    PostgrestMap activityList;
+
+    Future<void> fetchActivity() async {
+      setState(() {
+        isLoading = true;
+      });
+
+      final activityResponse = Supabase.instance.client
+          .from('notification_table')
+          .select()
+          .eq('receiver_id', authService.getCurrentUserID() ?? " ");
+
+      setState(() {
+        activityList = activityResponse;
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -271,8 +288,9 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
 
     return ScrollbarTheme(
       data: ScrollbarThemeData(
-        thumbColor: MaterialStateProperty.all(Colors.purple),  // Set the thumb color to purple
-        radius: Radius.circular(10),  // Set the corners to be rounded
+        thumbColor: MaterialStateProperty.all(
+            Colors.purple), // Set the thumb color to purple
+        radius: Radius.circular(10), // Set the corners to be rounded
         //thickness: MaterialStateProperty.all(8),  // Keeping default thickness (no change)
       ),
       child: Scrollbar(
@@ -306,8 +324,9 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
 
     return ScrollbarTheme(
       data: ScrollbarThemeData(
-        thumbColor: MaterialStateProperty.all(Colors.purple),  // Set the thumb color to purple
-        radius: Radius.circular(10),  // Set the corners to be rounded
+        thumbColor: MaterialStateProperty.all(
+            Colors.purple), // Set the thumb color to purple
+        radius: Radius.circular(10), // Set the corners to be rounded
       ),
       child: Scrollbar(
         child: ListView.builder(

@@ -14,7 +14,7 @@ Future<void> showCustomPopup(BuildContext context, String timelineId) async {
           borderRadius: BorderRadius.circular(10),
           child: Container(
             width: 300, //400
-            height: 400,//600
+            height: 400, //600
             color: Colors.white,
             child: Center(
               child: CircularProgressIndicator(),

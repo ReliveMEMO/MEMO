@@ -28,7 +28,7 @@ class _myPageState extends State<myPage> {
     ProfilePage(),
     CreateProfile(),
     EventPage(),
-    MemoryReminderPopup(),
+    ActivityPage(),
     //ProfilePage(),
     //CreateTimeline()
     SearchPage(),

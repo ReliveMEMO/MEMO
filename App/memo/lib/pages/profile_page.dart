@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/bio_section.dart';
 import 'package:memo/components/follow_section.dart';
 import 'package:memo/components/timeline_card.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
+import 'package:memo/services/follow.dart';
 import 'package:provider/provider.dart';
+import 'package:solar_icons/solar_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void profilePage() {
@@ -22,10 +25,13 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final authService = AuthService();
+  final followService = FollowService();
   String? selectedProgram;
   PostgrestMap? userDetails;
   List<String> timelineIds = [];
   bool isLoading = true;
+  bool privateProfile = false;
+  String isFollowing = 'not-following';
 
   @override
   void initState() {
@@ -60,11 +66,11 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       userDetails = response;
     });
-    userDetails?['user_name'] = authService.getCurrentUser();
 
     PostgrestList? timelines;
 
     if (widget.userId == null) {
+      userDetails?['user_name'] = authService.getCurrentUser();
       timelines = await Supabase.instance.client
           .from('Timeline_Table')
           .select('id')
@@ -78,6 +84,16 @@ class _ProfilePageState extends State<ProfilePage> {
           .or('admin.eq.${widget.userId},collaborators.cs.{${widget.userId}}')
           .order('lastUpdate', ascending: false);
       ;
+
+      if (userDetails?['private_profile'] == true) {
+        final followResponse = await followService.checkFollow(widget.userId!);
+        setState(() {
+          privateProfile = true;
+          isFollowing = followResponse as String;
+          print("=====================================");
+          print(isFollowing);
+        });
+      }
     }
 
     if (!mounted) return;
@@ -315,9 +331,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           SizedBox(height: 10),
                           // Following Button and Icon
                           FollowSections(
-                              userId: widget.userId != null
-                                  ? widget.userId
-                                  : authService.getCurrentUserID()),
+                            userId: widget.userId != null
+                                ? widget.userId
+                                : authService.getCurrentUserID(),
+                            privateProfile: privateProfile,
+                          ),
                           SizedBox(height: 5),
                           // TabBar for Bio and Timelines
                           const TabBar(
@@ -346,19 +364,41 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: TabBarView(
                       children: [
                         // Timeline Section
-                        GridView.count(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          shrinkWrap: true,
-                          physics:
-                              NeverScrollableScrollPhysics(), // Disable scrolling for GridView
-                          children: [
-                            ...timelineIds.map((id) {
-                              return TimelineCard(timelineId: id);
-                            }).toList()
-                          ],
-                        ),
+                        isFollowing != "following" && privateProfile
+                            ? Column(
+                                children: [
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Icon(
+                                    HugeIcons.strokeRoundedSquareLock02,
+                                    size: 120,
+                                    color: Colors.black87,
+                                  ),
+                                  SizedBox(height: 15),
+                                  Text(
+                                    "This account is private",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : GridView.count(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                shrinkWrap: true,
+                                physics:
+                                    NeverScrollableScrollPhysics(), // Disable scrolling for GridView
+                                children: [
+                                  ...timelineIds.map((id) {
+                                    return TimelineCard(timelineId: id);
+                                  }).toList()
+                                ],
+                              ),
                         // Bio Section
                         bio_section(),
                       ],
@@ -368,9 +408,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ],
           ),
-
         ),
-     ),
-);
-}
+      ),
+    );
+  }
 }

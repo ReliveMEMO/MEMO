@@ -1,6 +1,3 @@
-
-
-
 // import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:flutter/material.dart';
 // import 'package:memo/providers/user_provider.dart';
@@ -163,9 +160,9 @@
 //   }
 // }
 
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -174,7 +171,8 @@ class ActivityPage extends StatefulWidget {
   _ActivityPageState createState() => _ActivityPageState();
 }
 
-class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderStateMixin {
+class _ActivityPageState extends State<ActivityPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -213,16 +211,22 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
                   height: screenWidth * 0.2,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: CircleAvatar(
-                  radius: 25,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: userDetails?['profile_pic'] as String? ?? '',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ProfilePage()));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 15),
+                  child: CircleAvatar(
+                    radius: 25,
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: userDetails?['profile_pic'] as String? ?? '',
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
@@ -271,8 +275,9 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
 
     return ScrollbarTheme(
       data: ScrollbarThemeData(
-        thumbColor: MaterialStateProperty.all(Colors.purple),  // Set the thumb color to purple
-        radius: Radius.circular(10),  // Set the corners to be rounded
+        thumbColor: MaterialStateProperty.all(
+            Colors.purple), // Set the thumb color to purple
+        radius: Radius.circular(10), // Set the corners to be rounded
         //thickness: MaterialStateProperty.all(8),  // Keeping default thickness (no change)
       ),
       child: Scrollbar(
@@ -306,8 +311,9 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
 
     return ScrollbarTheme(
       data: ScrollbarThemeData(
-        thumbColor: MaterialStateProperty.all(Colors.purple),  // Set the thumb color to purple
-        radius: Radius.circular(10),  // Set the corners to be rounded
+        thumbColor: MaterialStateProperty.all(
+            Colors.purple), // Set the thumb color to purple
+        radius: Radius.circular(10), // Set the corners to be rounded
       ),
       child: Scrollbar(
         child: ListView.builder(

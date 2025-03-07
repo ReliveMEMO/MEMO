@@ -101,36 +101,42 @@ class _SearchPageState extends State<SearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: screenHeight * 0.06,
+        toolbarHeight: screenHeight * 0.07,
         automaticallyImplyLeading: false,
-        flexibleSpace: Container(
-          margin: EdgeInsets.only(top: screenHeight * 0.06),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: Image.asset(
-                  'assets/images/TextLogo.png',
-                  width: screenWidth * 0.2,
-                  height: screenWidth * 0.2,
+        flexibleSpace: GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfilePage()));
+          },
+          child: Container(
+            margin: EdgeInsets.only(top: screenHeight * 0.06),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Image.asset(
+                    'assets/images/TextLogo.png',
+                    width: screenWidth * 0.2,
+                    height: screenWidth * 0.2,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: CircleAvatar(
-                  radius: 25,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: userDetails?['profile_pic'] as String? ?? '',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
+                Padding(
+                  padding: const EdgeInsets.only(right: 15),
+                  child: CircleAvatar(
+                    radius: 25,
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: userDetails?['profile_pic'] as String? ?? '',
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

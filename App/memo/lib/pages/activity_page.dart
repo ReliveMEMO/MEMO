@@ -162,11 +162,9 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:memo/components/notification_tile.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ActivityPage extends StatefulWidget {
@@ -177,16 +175,11 @@ class ActivityPage extends StatefulWidget {
 class _ActivityPageState extends State<ActivityPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final authService = AuthService();
-  bool isLoading = false;
-  PostgrestList? activityList;
-  PostgrestList? notificationList;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    fetchActivity();
   }
 
   @override
@@ -195,40 +188,30 @@ class _ActivityPageState extends State<ActivityPage>
     super.dispose();
   }
 
-  Future<void> fetchActivity() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    final activityResponse = await Supabase.instance.client
-        .from('notification_table')
-        .select('id')
-        .eq('receiver_id', authService.getCurrentUserID() ?? "")
-        .eq('notification_type', 'activity')
-        .order('created_at', ascending: false);
-    ;
-
-    final notificationResponse = await Supabase.instance.client
-        .from('notification_table')
-        .select('id')
-        .eq('receiver_id', authService.getCurrentUserID() ?? "")
-        .eq('notification_type', 'notification')
-        .order('created_at', ascending: false);
-    ;
-
-    setState(() {
-      activityList = activityResponse;
-      notificationList = notificationResponse;
-      isLoading = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final userDetails = userProvider.userDetails;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final authService = AuthService();
+    bool isLoading = false;
+    PostgrestMap activityList;
+
+    Future<void> fetchActivity() async {
+      setState(() {
+        isLoading = true;
+      });
+
+      final activityResponse = Supabase.instance.client
+          .from('notification_table')
+          .select()
+          .eq('receiver_id', authService.getCurrentUserID() ?? " ");
+
+      setState(() {
+        activityList = activityResponse;
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -275,15 +258,12 @@ class _ActivityPageState extends State<ActivityPage>
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5),
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildActivityList(),
-            _buildNotificationList(),
-          ],
-        ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildActivityList(),
+          _buildNotificationList(),
+        ],
       ),
     );
   }
@@ -314,32 +294,12 @@ class _ActivityPageState extends State<ActivityPage>
         //thickness: MaterialStateProperty.all(8),  // Keeping default thickness (no change)
       ),
       child: Scrollbar(
-        child: isLoading
-            ? ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return Skeletonizer(
-                      child: ListTile(
-                    title:
-                        Container(width: 100, height: 20, color: Colors.grey),
-                    subtitle:
-                        Container(width: 150, height: 20, color: Colors.grey),
-                    leading:
-                        CircleAvatar(radius: 22, backgroundColor: Colors.grey),
-                  ));
-                },
-              )
-            : ListView.builder(
-                itemCount: activityList!.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 5.0, horizontal: 10),
-                    child: NotificationTile(
-                        notificationId: activityList![index]['id']),
-                  );
-                },
-              ),
+        child: ListView.builder(
+          itemCount: activities.length,
+          itemBuilder: (context, index) {
+            return _buildActivityItem(activities[index]);
+          },
+        ),
       ),
     );
   }
@@ -369,32 +329,12 @@ class _ActivityPageState extends State<ActivityPage>
         radius: Radius.circular(10), // Set the corners to be rounded
       ),
       child: Scrollbar(
-        child: isLoading
-            ? ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return Skeletonizer(
-                      child: ListTile(
-                    title:
-                        Container(width: 100, height: 20, color: Colors.grey),
-                    subtitle:
-                        Container(width: 150, height: 20, color: Colors.grey),
-                    leading:
-                        CircleAvatar(radius: 22, backgroundColor: Colors.grey),
-                  ));
-                },
-              )
-            : ListView.builder(
-                itemCount: notificationList!.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 5.0, horizontal: 10),
-                    child: NotificationTile(
-                        notificationId: notificationList![index]['id']),
-                  );
-                },
-              ),
+        child: ListView.builder(
+          itemCount: notifications.length,
+          itemBuilder: (context, index) {
+            return _buildNotificationItem(notifications[index]);
+          },
+        ),
       ),
     );
   }

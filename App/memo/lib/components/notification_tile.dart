@@ -17,7 +17,7 @@ class _NotificationTileState extends State<NotificationTile> {
   String time = 'Just now';
   String? profilePic;
   String? userName;
-
+  
   @override
   void initState() {
     super.initState();
@@ -30,22 +30,22 @@ class _NotificationTileState extends State<NotificationTile> {
     });
 
     final response = await Supabase.instance.client
-        .from('notification_table')
-        .select()
+        .from('notifications')
+        .select('user_id, message, timestamp')
         .eq('id', widget.notificationId)
         .single();
 
     final userResponse = await Supabase.instance.client
         .from('User_Info')
         .select('full_name, profile_pic')
-        .eq('id', response['sender_id'])
+        .eq('id', response['user_id'])
         .maybeSingle();
 
     if (!mounted) return;
 
     setState(() {
       notificationText = response['message'];
-      time = formatTimeStamp(response['created_at']);
+      time = formatTimeStamp(response['timestamp']);
       userName = userResponse?['full_name'] ?? 'Unknown User';
       profilePic = userResponse?['profile_pic'];
       isLoading = false;
@@ -71,7 +71,9 @@ class _NotificationTileState extends State<NotificationTile> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.grey[100], borderRadius: BorderRadius.circular(20)),
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(20)
+      ),
       child: isLoading
           ? Skeletonizer(
               child: ListTile(

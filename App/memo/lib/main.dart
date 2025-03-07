@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/pages/NewMemo.dart';
 import 'package:memo/pages/convo_page.dart';
+import 'package:memo/pages/create_page.dart';
 import 'package:memo/pages/create_profile.dart';
 import 'package:memo/pages/event_page.dart';
 import 'package:memo/pages/create_timeline.dart';
@@ -9,6 +11,7 @@ import 'package:memo/pages/login_page.dart';
 import 'package:memo/pages/memoryReminder_page.dart';
 import 'package:memo/pages/my_page.dart';
 import 'package:memo/pages/profile_page.dart';
+import 'package:memo/pages/settings_page.dart';
 import 'package:memo/pages/signup_page.dart';
 import 'package:memo/pages/verify_email_page.dart';
 import 'package:memo/providers/user_provider.dart';
@@ -17,9 +20,6 @@ import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/notification.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'pages/NewMemo.dart';
-import 'pages/create_page.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -92,12 +92,10 @@ class MyApp extends StatelessWidget {
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
+        'memoryReminder': (context) => MemoryReminderPopup(),
 
         '/create-page': (context) => CreatePage(),
-
-    
-
-        //Testing the CI pipeline xoxo
+        '/settings-page': (context) => SettingsPage(),
 
       },
     );

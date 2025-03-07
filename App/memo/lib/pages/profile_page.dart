@@ -31,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> timelineIds = [];
   bool isLoading = true;
   bool privateProfile = false;
+  bool? personalProfile = false;
   String isFollowing = 'not-following';
 
   @override
@@ -109,6 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (userDetails?['id'] == authService.getCurrentUserID()) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.userDetails = userDetails;
+      personalProfile = true;
     }
   }
 
@@ -122,10 +124,12 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
-          ),
+          personalProfile == true
+              ? IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.black),
+                  onPressed: () {},
+                )
+              : Container(),
         ],
       ),
       body: DefaultTabController(
@@ -373,7 +377,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Icon(
                                     HugeIcons.strokeRoundedSquareLock02,
                                     size: 120,
-                                    color: Colors.black87,
+                                    color: Colors.grey[400],
                                   ),
                                   SizedBox(height: 15),
                                   Text(

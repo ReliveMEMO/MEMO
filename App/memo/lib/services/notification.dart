@@ -76,19 +76,9 @@ class NotificationService {
         AndroidInitializationSettings(
             '@mipmap/ic_launcher'); // Replace with your app icon
 
-    const IOSInitializationSettings initializationSettingsIOS =
-        IOSInitializationSettings(
-            requestAlertPermission: true,
-            requestBadgePermission: true,
-            requestSoundPermission: true,
-            onDidReceiveLocalNotification: (id, title, body, payload) async {
-              // Handle the notification tapped logic here
-            });
-
     final InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
     );
 
     localNotificationsPlugin.initialize(initializationSettings);

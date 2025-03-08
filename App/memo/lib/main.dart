@@ -52,6 +52,25 @@ void main() async {
     // Handle notification tap
     handleNotificationNavigation(message);
   });
+  NotificationSettings settings =
+      await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print('User granted permission');
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    print('User granted provisional permission');
+  } else {
+    print('User declined or has not accepted permission');
+  }
+  // Handle foreground notifications
+  FirebaseMessaging.onMessage.listen((message) {
+    // Show a notification or update the UI
+    print('Received a foreground message: ${message.notification?.title}');
+  });
 
   runApp(MultiProvider(
     providers: [
@@ -82,7 +101,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color: Colors.white)),
       routes: {
-        '/event': (context) => EventPage(),     
+        '/event': (context) => EventPage(),
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
@@ -95,10 +114,7 @@ class MyApp extends StatelessWidget {
 
         '/create-page': (context) => CreatePage(),
 
-    
-
         //Testing the CI pipeline xoxo
-
       },
     );
   }

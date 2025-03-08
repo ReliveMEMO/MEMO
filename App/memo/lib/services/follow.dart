@@ -19,7 +19,7 @@ class FollowService {
     }
   }
 
-  Future<String> checkFollow(String userId) async {
+  Future<bool> checkFollow(String userId) async {
     try {
       final response = await supabase
           .from('user_following')
@@ -28,16 +28,11 @@ class FollowService {
           .eq('followed_id', userId)
           .single();
 
-      await Future.delayed(Duration(milliseconds: 50));
-
-      if (response['following'] == 'requested') {
-        return 'requested';
-      } else {
-        return 'following';
-      }
+      print(response);
+      return response.isNotEmpty;
     } catch (e) {
       // Handle the error appropriately, e.g., log it or rethrow
-      return 'not-following';
+      return false;
     }
   }
 }

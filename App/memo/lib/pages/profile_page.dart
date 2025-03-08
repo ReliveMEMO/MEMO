@@ -10,8 +10,6 @@ import 'package:memo/services/follow.dart';
 import 'package:provider/provider.dart';
 import 'package:solar_icons/solar_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:memo/pages/following_follower_page.dart';
-import 'package:memo/pages/settings_page.dart';
 
 void profilePage() {
   runApp(ProfilePage());
@@ -126,16 +124,10 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-
           personalProfile == true
               ? IconButton(
                   icon: const Icon(Icons.settings, color: Colors.black),
-                  onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsPage()),
-              );
-            },
+                  onPressed: () {},
                 )
               : Container(),
         ],
@@ -249,123 +241,94 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ),
-
-
-
-                     GestureDetector(
-                      onTap: () {
-                        // Navigate to FollowingFollowerPage and select the "Following" tab
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FollowingFollowerPage(selectedTab: 0), // 0 for Following tab
+                    Container(
+                      margin: EdgeInsets.only(top: 170),
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: [
+                          // Follower Stats
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                    "100",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Followers",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    "100",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Following",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Timelines",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(top: 170),
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children: [
-                            // Follower Stats
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                // Followers Column
-                                Column(
-                                  children: [
-                                    Text(
-                                      "100",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      "Followers",
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
+                          SizedBox(height: 11),
+                          // User's Name and Handle
+                          Column(
+                            children: [
+                              Text(
+                                userDetails?['full_name'] ?? 'Unknown User',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
                                 ),
-                                // Following Column (Navigate to Following Tab when clicked)
-                                GestureDetector(
-                                  onTap: () {
-                                    // Navigate to FollowingFollowerPage and select the "Following" tab
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => FollowingFollowerPage(selectedTab: 1), // 1 for Following tab
-                                      ),
-                                    );
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        "100",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "Following",
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                              ),
+                              SizedBox(height: 0),
+                              Text(
+                                userLoggedIn != null
+                                    ? '@$userLoggedIn'
+                                    : 'Unknown User',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
                                 ),
-                                // Timelines Column
-                                Column(
-                                  children: [
-                                    Text(
-                                      "0",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      "Timelines",
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 11),
-                            // User's Name and Handle
-                            Column(
-                              children: [
-                                Text(
-                                  userDetails?['full_name'] ?? 'Unknown User',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                SizedBox(height: 0),
-                                Text(
-                                  userLoggedIn != null
-                                      ? '@$userLoggedIn'
-                                      : 'Unknown User',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                  ),
-                                ),
-
                               ),
                             ],
                           ),
@@ -390,15 +353,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-
-
-
-
-
               Container(
                 margin: const EdgeInsets.only(top: 10),
                 child: Padding(

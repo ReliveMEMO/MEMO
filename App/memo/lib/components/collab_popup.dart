@@ -13,8 +13,8 @@ Future<void> showCustomPopup(BuildContext context, String timelineId) async {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Container(
-            width: 300, //400
-            height: 400,//600
+            width: 300,
+            height: 400,
             color: Colors.white,
             child: Center(
               child: CircularProgressIndicator(),

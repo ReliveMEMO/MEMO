@@ -74,7 +74,7 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
 
     // Fetching group chats
     final responseGroupChats = await Supabase.instance.client
-        .from('group_msg_table')
+        .from('group_chat_table')
         .select('group_id')
         .contains('members', [currentUserId]).order('last_accessed',
             ascending: false);

@@ -64,13 +64,12 @@ class _convoPageState extends State<convoPage> {
     try {
       messagingChannel = WebSocketChannel.connect(
         Uri.parse(
-            'wss://memo-backend-9b73024f3215.herokuapp.com/messaging'), // Use the messaging WebSocket server URL
+            'wss://memo-backend-9b73024f3215.herokuapp.com/group-messages'), // Use the group WebSocket server URL
       );
 
-      // Register the receiver
+      // Register the receiver for group messages
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final String? receiverId = authService.getCurrentUserID();
-
         final registerMessage = jsonEncode({
           "type": "register",
           "userId": "$receiverId",
@@ -80,7 +79,7 @@ class _convoPageState extends State<convoPage> {
         print("Receiver registered with ID: $receiverId");
       });
 
-      // Listen for messages
+      // Listen for incoming group messages
       messagingChannel.stream.listen((message) {
         print("Received WebSocket message: $message"); // Log incoming messages
         _handleIncomingMessage(message);
@@ -120,21 +119,21 @@ class _convoPageState extends State<convoPage> {
   void _handleIncomingMessage(String message) {
     try {
       final data = jsonDecode(message);
-      print("Handling incoming message: $data"); // Log the incoming message
+      print("Handling incoming message: $data");
 
-      // Check if the incoming message type is a real-time message
-      if (data['type'] == 'receiveMessage') {
+      // Check if the incoming message type is a real-time group message
+      if (data['type'] == 'receiveGroupMessage') {
         final newMessage = {
           'sender_id': data['senderId'],
           'message': data['message'],
           'time_stamp': data['timestamp'],
         };
 
-        // Update the state to append the new message
         setState(() {
-          messages.insert(0, newMessage); // Add the new message to the top
+          messages.insert(
+              0, newMessage); // Add the new group message to the top
         });
-        print("New real-time message added: $newMessage");
+        print("New group message added: $newMessage");
       }
     } catch (e) {
       print("Error handling incoming message: $e");
@@ -147,13 +146,13 @@ class _convoPageState extends State<convoPage> {
 
     if (mounted) {
       final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-      final String chatId = arguments['chatId'];
+      final String groupId = arguments['groupId'];
 
       final response = await Supabase.instance.client
-          .from('ind_message_table')
-          .select('sender_id, message, time_stamp')
-          .eq('chat_id', chatId)
-          .order('time_stamp', ascending: false)
+          .from('grp_msg_table') // Using grp_msg_table for group messages
+          .select('sender_id, content, time_of_msg')
+          .eq('grp_id', groupId) // Fetching messages for the group
+          .order('time_of_msg', ascending: false)
           .range(
               _currentBatch * _batchSize, (_currentBatch + 1) * _batchSize - 1);
 
@@ -162,8 +161,8 @@ class _convoPageState extends State<convoPage> {
           messages.addAll(response
               .map((msg) => {
                     'sender_id': msg['sender_id'],
-                    'message': msg['message'],
-                    'time_stamp': msg['time_stamp'],
+                    'message': msg['content'], // Changed 'message' to 'content'
+                    'time_stamp': msg['time_of_msg'],
                   })
               .toList());
           _currentBatch++;
@@ -201,12 +200,8 @@ class _convoPageState extends State<convoPage> {
     try {
       final String? senderId = authService.getCurrentUserID();
       final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-      final recieverDetails = arguments['recieverDetails'];
-      print(recieverDetails);
-      final String recieverId =
-          recieverDetails['id']; // Adjust key as per actual argument
-
-      print(recieverId);
+      final String groupId =
+          arguments['groupId']; // Group ID instead of individual receiver
 
       final String encryptedMessage = text;
 
@@ -225,27 +220,30 @@ class _convoPageState extends State<convoPage> {
 
       // Send the message via WebSocket
       final messagePayload = jsonEncode({
-        "type": "sendMessage",
+        "type": "sendGroupMessage", // New type for group message
         "senderId": senderId,
-        "receiverId": recieverId,
+        "groupId": groupId, // Send the groupId for group messaging
         "message": encryptedMessage,
       });
 
-      final String chatId = arguments['chatId'];
-      print(chatId + " chatId");
       final response = await Supabase.instance.client
-          .from('ind_chat_table')
-          .update({
-        'last_accessed': DateTime.now().toUtc().toIso8601String()
-      }).eq('chat_id', chatId);
+          .from('grp_msg_table') // Insert into the group message table
+          .insert([
+        {
+          'sender_id': senderId,
+          'grp_id': groupId,
+          'content': encryptedMessage,
+          'time_of_msg': DateTime.now().toUtc().toIso8601String(),
+          'is_seen': false
+        }
+      ]);
 
-      messagingChannel.sink.add(messagePayload);
-      print("Sent message payload: $messagePayload"); // Log the sent message
+      messagingChannel.sink.add(messagePayload); // Send message via WebSocket
 
       if (response.error != null) {
-        print("Error updating last_accessed: ${response.error!.message}");
+        print("Error sending group message: ${response.error!.message}");
       } else {
-        print("last_accessed updated successfully");
+        print("Group message sent successfully");
       }
     } catch (e) {
       print("Error sending message: $e");
@@ -329,13 +327,13 @@ class _convoPageState extends State<convoPage> {
                       final message = messages[index];
                       final isSender = message['sender_id'] ==
                           authService.getCurrentUserID();
-                      final messageTime = DateTime.parse(message['time_stamp'])
-                          .toLocal(); // Assuming 'timestamp' is in ISO 8601 format
-                      final formattedTime = DateFormat('hh:mm a').format(
-                          messageTime); // Using intl package for formatting
+                      final messageTime =
+                          DateTime.parse(message['time_stamp']).toLocal();
+                      final formattedTime =
+                          DateFormat('hh:mm a').format(messageTime);
+
                       final formattedDate =
                           DateFormat('dd MMM yyyy').format(messageTime);
-
                       bool showDateHeader = true;
                       if (index < messages.length - 1) {
                         final nextMessageTime =
@@ -386,53 +384,10 @@ class _convoPageState extends State<convoPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  if (message['imageUrl'] != null)
-                                    CachedNetworkImage(
-                                      imageUrl: message['imageUrl'] as String,
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                    )
-                                  else
-                                    Builder(
-                                      builder: (context) {
-                                        final decryptedMessage =
-                                            message.containsKey('isEncrypted')
-                                                ? message['message']
-                                                : msgEncryption.decrypt(
-                                                        message['message']) ??
-                                                    'Decryption failed';
-
-                                        // Check if the decrypted message is a single emoji
-                                        final isSingleEmoji = RegExp(
-                                                r'^[\u{1F1E6}-\u{1F1FF}' + // Regional indicator symbols (flags)
-                                                    r'\u{1F300}-\u{1F5FF}' + // Miscellaneous Symbols and Pictographs
-                                                    r'\u{1F600}-\u{1F64F}' + // Emoticons
-                                                    r'\u{1F680}-\u{1F6FF}' + // Transport and Map Symbols
-                                                    r'\u{1F700}-\u{1F77F}' + // Alchemical Symbols
-                                                    r'\u{1F780}-\u{1F7FF}' + // Geometric Shapes Extended
-                                                    r'\u{1F800}-\u{1F8FF}' + // Supplemental Arrows-C
-                                                    r'\u{1F900}-\u{1F9FF}' + // Supplemental Symbols and Pictographs
-                                                    r'\u{1FA00}-\u{1FA6F}' + // Chess Symbols
-                                                    r'\u{1FA70}-\u{1FAFF}' + // Symbols and Pictographs Extended-A
-                                                    r'\u{2600}-\u{26FF}' + // Miscellaneous Symbols
-                                                    r'\u{2700}-\u{27BF}' + // Dingbats
-                                                    r'\u{FE0F}' + // Variation Selector-16 (emoji variation)
-                                                    r']$',
-                                                unicode: true)
-                                            .hasMatch(decryptedMessage.trim());
-
-                                        return Text(
-                                          decryptedMessage,
-                                          style: TextStyle(
-                                            fontSize: isSingleEmoji
-                                                ? 48
-                                                : 16, // Larger font size for single emoji
-                                          ),
-                                        );
-                                      },
-                                    ),
+                                  Text(
+                                    message['message'],
+                                    style: TextStyle(fontSize: 16),
+                                  ),
                                   const SizedBox(height: 5),
                                   Text(
                                     formattedTime,

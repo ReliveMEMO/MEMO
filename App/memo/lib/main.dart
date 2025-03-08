@@ -82,7 +82,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color: Colors.white)),
       routes: {
-        '/event': (context) => EventPage(),     
+        '/event': (context) => EventPage(),
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
@@ -95,7 +95,11 @@ class MyApp extends StatelessWidget {
         'memoryReminder': (context) => MemoryReminderPopup(),
 
         '/create-page': (context) => CreatePage(),
+
         '/settings-page': (context) => SettingsPage(),
+
+
+        //Testing the CI pipeline xoxo
 
       },
     );

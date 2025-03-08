@@ -73,19 +73,5 @@
             <key>NSAllowsArbitraryLoads</key>
             <true/>
         </dict>
-        <key>FirebaseAppDelegateProxyEnabled</key>
-<false/>
-<key>UIBackgroundModes</key>
-<array>
-  <string>fetch</string>
-  <string>remote-notification</string>
-</array>
-<key>NSAppTransportSecurity</key>
-<dict>
-  <key>NSAllowsArbitraryLoads</key>
-  <true/>
-</dict>
-<key>NSPushNotificationsUsageDescription</key>
-<string>We use push notifications to inform you about important updates.</string>
     </dict>
 </plist>

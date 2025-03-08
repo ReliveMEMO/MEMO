@@ -27,12 +27,12 @@ class _myPageState extends State<myPage> {
   List pages = [
     ProfilePage(),
     CreateProfile(),
-    //EventPage(),
+    EventPage(),
     MemoryReminderPopup(),
     //ProfilePage(),
     //CreateTimeline()
-    //SearchPage(),
-    //NewMemo(),
+    SearchPage(),
+    NewMemo(),
     ActivityPage(),
     ChatPage(),
   ];

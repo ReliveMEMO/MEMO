@@ -24,7 +24,11 @@ class NotificationService {
         print("FCM Token: $token");
       } else if (Platform.isIOS) {
         token = await messaging.getAPNSToken();
-        print("APNS Token: $token");
+        if (token == null) {
+          print("Failed to get APNS Token");
+        } else {
+          print("APNS Token: $token");
+        }
       }
 
       // Send the token to your backend

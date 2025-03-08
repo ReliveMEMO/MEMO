@@ -8,19 +8,22 @@ class FollowSections extends StatefulWidget {
   _FollowSectionsState createState() => _FollowSectionsState();
 
   final String? userId;
-  const FollowSections({super.key, required this.userId});
+  final bool? privateProfile;
+  const FollowSections({super.key, required this.userId, this.privateProfile});
 }
 
 class _FollowSectionsState extends State<FollowSections> {
   final authService = AuthService();
   final followService = FollowService();
   String? userId;
-  bool following = false;
+  String following = 'not-following';
 
   @override
   void initState() {
     super.initState();
-    following = widget.userId == authService.getCurrentUserID() ? true : false;
+    following = widget.userId == authService.getCurrentUserID()
+        ? "following"
+        : "not-following";
     userId = widget.userId;
     checkFollow();
   }
@@ -28,9 +31,17 @@ class _FollowSectionsState extends State<FollowSections> {
   Future<void> checkFollow() async {
     final response = await followService.checkFollow(userId!);
 
-    if (response) {
+    if (response == 'following') {
       setState(() {
-        following = true;
+        following = "following";
+      });
+    } else if (response == 'requested') {
+      setState(() {
+        following = "requested";
+      });
+    } else {
+      setState(() {
+        following = "not-following";
       });
     }
     return;
@@ -42,9 +53,15 @@ class _FollowSectionsState extends State<FollowSections> {
     print('response');
     print(response);
     if (response) {
-      setState(() {
-        following = true;
-      });
+      if (widget.privateProfile == true) {
+        setState(() {
+          following = "requested";
+        });
+      } else {
+        setState(() {
+          following = "following";
+        });
+      }
     }
   }
 
@@ -86,7 +103,7 @@ class _FollowSectionsState extends State<FollowSections> {
                 ),
               ],
             )
-          : following
+          : following == 'following'
               ? ElevatedButton(
                   onPressed: handleFollow,
                   child: Text(
@@ -101,17 +118,33 @@ class _FollowSectionsState extends State<FollowSections> {
                       side: WidgetStateProperty.all(
                           BorderSide(color: Colors.purple, width: 1))),
                 )
-              : ElevatedButton(
-                  onPressed: handleFollow,
-                  child: Text(
-                    'Follow',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ButtonStyle(
-                      elevation: WidgetStateProperty.all(0),
-                      backgroundColor: WidgetStateProperty.all(Colors.purple),
-                      fixedSize: MaterialStateProperty.all(Size(170, 40))),
-                ),
+              : following == "requested"
+                  ? ElevatedButton(
+                      onPressed: handleFollow,
+                      child: Text(
+                        'Requested',
+                        style: TextStyle(color: Colors.grey[500]),
+                      ),
+                      style: ButtonStyle(
+                          elevation: WidgetStateProperty.all(0),
+                          backgroundColor:
+                              WidgetStateProperty.all(Colors.transparent),
+                          fixedSize: MaterialStateProperty.all(Size(170, 40)),
+                          side: WidgetStateProperty.all(
+                              BorderSide(color: Colors.purple, width: 1))),
+                    )
+                  : ElevatedButton(
+                      onPressed: handleFollow,
+                      child: Text(
+                        'Follow',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ButtonStyle(
+                          elevation: WidgetStateProperty.all(0),
+                          backgroundColor:
+                              WidgetStateProperty.all(Colors.purple),
+                          fixedSize: MaterialStateProperty.all(Size(170, 40))),
+                    ),
     );
   }
 }

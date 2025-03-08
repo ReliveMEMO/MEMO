@@ -1,14 +1,11 @@
 
+
 // import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
 // import 'package:memo/providers/user_provider.dart';
 
 // class FollowingFollowerPage extends StatefulWidget {
-//   final int selectedTab; // Add a parameter to indicate the selected tab
-
-//   FollowingFollowerPage({required this.selectedTab}); // Constructor to accept the selectedTab
-
 //   @override
 //   _FollowingFollowerPageState createState() => _FollowingFollowerPageState();
 // }
@@ -19,8 +16,7 @@
 //   @override
 //   void initState() {
 //     super.initState();
-//     // Initialize the TabController with the passed selectedTab
-//     _tabController = TabController(length: 2, vsync: this, initialIndex: widget.selectedTab);
+//     _tabController = TabController(length: 2, vsync: this);
 //   }
 
 //   @override
@@ -97,10 +93,26 @@
 //   // Followers Tab
 //   Widget _buildFollowersList() {
 //     List<String> followers = [
-//       '@user1', '@user2', '@user3', '@user4', '@user5',
-//       '@user6', '@user7', '@user8', '@user9', '@user10',
-//       '@user11', '@user12', '@user13', '@user14', '@user15',
-//       '@user16', '@user17', '@user18', '@user19', '@user20',
+//       '@user1',
+//       '@user2',
+//       '@user3',
+//       '@user4',
+//       '@user5',
+//       '@user6',
+//       '@user7',
+//       '@user8',
+//       '@user9',
+//       '@user10',
+//       '@user11',
+//       '@user12',
+//       '@user13',
+//       '@user14',
+//       '@user15',
+//       '@user16',
+//       '@user17',
+//       '@user18',
+//       '@user19',
+//       '@user20',
 //     ];
 
 //     return ScrollbarTheme(
@@ -122,10 +134,26 @@
 //   // Following Tab
 //   Widget _buildFollowingList() {
 //     List<String> following = [
-//       '@user1', '@user2', '@user3', '@user4', '@user5',
-//       '@user6', '@user7', '@user8', '@user9', '@user10',
-//       '@user11', '@user12', '@user13', '@user14', '@user15',
-//       '@user16', '@user17', '@user18', '@user19', '@user20',
+//       '@user1',
+//       '@user2',
+//       '@user3',
+//       '@user4',
+//       '@user5',
+//       '@user6',
+//       '@user7',
+//       '@user8',
+//       '@user9',
+//       '@user10',
+//       '@user11',
+//       '@user12',
+//       '@user13',
+//       '@user14',
+//       '@user15',
+//       '@user16',
+//       '@user17',
+//       '@user18',
+//       '@user19',
+//       '@user20',
 //     ];
 
 //     return ScrollbarTheme(
@@ -155,15 +183,20 @@
 //           child: Icon(Icons.person, color: Colors.black), // Optional icon inside the avatar
 //         ),
 //         title: Text(userName),
-//         // Making each tile tappable (Button)
-//         onTap: () {
-//           // No action when pressed for now, can be added later
-//         },
+//         trailing: isFollowing 
+//           ? null // No icon for following
+//           : IconButton(
+//               icon: Icon(Icons.person_add_alt_1), // Follow/unfollow icon for followers
+//               onPressed: () {
+//                 // No action when pressed (for now)
+//               },
+//             ),
 //       ),
 //       elevation: 0,
 //     );
 //   }
 // }
+
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -207,13 +240,6 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage> with Sing
       appBar: AppBar(
         toolbarHeight: screenHeight * 0.05,
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            // Navigate back to the previous page
-            Navigator.pop(context);
-          },
-        ),
         flexibleSpace: Padding(
           padding: EdgeInsets.only(top: screenHeight * 0.04),
           child: Row(
@@ -328,10 +354,14 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage> with Sing
           child: Icon(Icons.person, color: Colors.black), // Optional icon inside the avatar
         ),
         title: Text(userName),
-        // Making each tile tappable (Button)
-        onTap: () {
-          // No action when pressed for now, can be added later
-        },
+        trailing: isFollowing 
+          ? null // No icon for following
+          : IconButton(
+              icon: Icon(Icons.person_add_alt_1), // Follow/unfollow icon for followers
+              onPressed: () {
+                // No action when pressed (for now)
+              },
+            ),
       ),
       elevation: 0,
     );

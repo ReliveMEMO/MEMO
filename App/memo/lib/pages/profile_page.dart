@@ -7,8 +7,6 @@ import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:memo/pages/following_follower_page.dart';
-import 'package:memo/pages/settings_page.dart';
 
 void profilePage() {
   runApp(ProfilePage());
@@ -108,6 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
+<<<<<<< HEAD
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
             onPressed: () {
@@ -117,6 +116,14 @@ class _ProfilePageState extends State<ProfilePage> {
               );
             },
           ),
+=======
+          personalProfile == true
+              ? IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.black),
+                  onPressed: () {},
+                )
+              : Container(),
+>>>>>>> parent of 0604ea0 (Merge pull request #116 from ReliveMEMO/main)
         ],
       ),
       body: DefaultTabController(
@@ -228,79 +235,95 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ),
-
-
-
-                     GestureDetector(
-                      onTap: () {
-                        // Navigate to FollowingFollowerPage and select the "Following" tab
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FollowingFollowerPage(selectedTab: 0), // 0 for Following tab
-                          ),
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(top: 170),
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children: [
-                            // Follower Stats
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                // Followers Column
-                                Column(
-                                  children: [
-                                    Text(
-                                      "100",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
+                    Container(
+                      margin: EdgeInsets.only(top: 170),
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: [
+                          // Follower Stats
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                    "100",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
                                     ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      "Followers",
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                // Following Column (Navigate to Following Tab when clicked)
-                                GestureDetector(
-                                  onTap: () {
-                                    // Navigate to FollowingFollowerPage and select the "Following" tab
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => FollowingFollowerPage(selectedTab: 1), // 1 for Following tab
-                                      ),
-                                    );
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        "100",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "Following",
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
                                   ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Followers",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    "100",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Following",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Timelines",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 11),
+                          // User's Name and Handle
+                          Column(
+                            children: [
+                              Text(
+                                userDetails?['full_name'] ?? 'Unknown User',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
                                 ),
+                              ),
+                              SizedBox(height: 0),
+                              Text(
+                                userLoggedIn != null
+                                    ? '@$userLoggedIn'
+                                    : 'Unknown User',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+<<<<<<< HEAD
                                 // Timelines Column
                                 Column(
                                   children: [
@@ -365,16 +388,36 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ],
                         ),
+=======
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          // Following Button and Icon
+                          FollowSections(
+                            userId: widget.userId != null
+                                ? widget.userId
+                                : authService.getCurrentUserID(),
+                            privateProfile: privateProfile,
+                          ),
+                          SizedBox(height: 5),
+                          // TabBar for Bio and Timelines
+                          const TabBar(
+                            labelColor: Colors.purple,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: Colors.purple,
+                            tabs: [
+                              Tab(text: "Timeline"),
+                              Tab(text: "Bio"),
+                            ],
+                          ),
+                        ],
+>>>>>>> parent of 0604ea0 (Merge pull request #116 from ReliveMEMO/main)
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-
-
-
-
-
               Container(
                 margin: const EdgeInsets.only(top: 10),
                 child: Padding(

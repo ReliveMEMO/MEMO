@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/pages/NewMemo.dart';
+import 'package:memo/pages/activity_page.dart';
 import 'package:memo/pages/convo_page.dart';
 import 'package:memo/pages/create_page.dart';
 import 'package:memo/pages/create_profile.dart';
@@ -93,6 +94,7 @@ class MyApp extends StatelessWidget {
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
         'memoryReminder': (context) => MemoryReminderPopup(),
+        '/activity-page': (context) => ActivityPage(),
 
         '/create-page': (context) => CreatePage(),
         '/settings-page': (context) => SettingsPage(),

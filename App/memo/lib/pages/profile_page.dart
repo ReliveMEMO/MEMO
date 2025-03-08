@@ -106,7 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-<<<<<<< HEAD
+
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
             onPressed: () {
@@ -116,14 +116,12 @@ class _ProfilePageState extends State<ProfilePage> {
               );
             },
           ),
-=======
           personalProfile == true
               ? IconButton(
                   icon: const Icon(Icons.settings, color: Colors.black),
                   onPressed: () {},
                 )
               : Container(),
->>>>>>> parent of 0604ea0 (Merge pull request #116 from ReliveMEMO/main)
         ],
       ),
       body: DefaultTabController(
@@ -323,7 +321,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: Colors.grey,
                                   fontSize: 14,
                                 ),
-<<<<<<< HEAD
                                 // Timelines Column
                                 Column(
                                   children: [
@@ -333,39 +330,59 @@ class _ProfilePageState extends State<ProfilePage> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
                                       ),
+
                                     ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      "Timelines",
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                      ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Following",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 11),
-                            // User's Name and Handle
-                            Column(
-                              children: [
-                                Text(
-                                  userDetails?['full_name'] ?? 'Unknown User',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
                                   ),
-                                ),
-                                SizedBox(height: 0),
-                                Text(
-                                  userLoggedIn != null
-                                      ? '@$userLoggedIn'
-                                      : 'Unknown User',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
                                   ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Timelines",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 11),
+                          // User's Name and Handle
+                          Column(
+                            children: [
+                              Text(
+                                userDetails?['full_name'] ?? 'Unknown User',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              SizedBox(height: 0),
+                              Text(
+                                userLoggedIn != null
+                                    ? '@$userLoggedIn'
+                                    : 'Unknown User',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
                                 ),
                               ],
                             ),
@@ -388,7 +405,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ],
                         ),
-=======
+
                               ),
                             ],
                           ),
@@ -412,7 +429,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                           ),
                         ],
->>>>>>> parent of 0604ea0 (Merge pull request #116 from ReliveMEMO/main)
                       ),
                     ),
                   ],

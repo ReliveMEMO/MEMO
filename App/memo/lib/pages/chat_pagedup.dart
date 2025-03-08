@@ -5,7 +5,6 @@ import 'package:memo/components/chat_tile.dart' as chatTile;
 import 'package:memo/components/user_tile.dart';
 import 'package:memo/components/group_chat_tile.dart' as group;
 import 'package:memo/main.dart';
-import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/search_service.dart';
@@ -75,7 +74,7 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
 
     // Fetching group chats
     final responseGroupChats = await Supabase.instance.client
-        .from('group_msg_table')
+        .from('group_chat_table')
         .select('group_id')
         .contains('members', [currentUserId]).order('last_accessed',
             ascending: false);
@@ -177,22 +176,16 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
         ),
         titleSpacing: 0, // Reduce the margin around centerTitle
         actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()));
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 15),
-              child: CircleAvatar(
-                radius: 25,
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: userProvider.userDetails['profile_pic'] as String,
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                  ),
+          Padding(
+            padding: const EdgeInsets.only(right: 15),
+            child: CircleAvatar(
+              radius: 25,
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: userProvider.userDetails['profile_pic'] as String,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),

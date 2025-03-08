@@ -76,14 +76,11 @@ class NotificationService {
         AndroidInitializationSettings(
             '@mipmap/ic_launcher'); // Replace with your app icon
 
-    const IOSInitializationSettings initializationSettingsIOS =
-        IOSInitializationSettings(
+    final DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
             requestAlertPermission: true,
             requestBadgePermission: true,
-            requestSoundPermission: true,
-            onDidReceiveLocalNotification: (id, title, body, payload) async {
-              // Handle the notification tapped logic here
-            });
+            requestSoundPermission: true);
 
     final InitializationSettings initializationSettings =
         InitializationSettings(

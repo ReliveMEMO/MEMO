@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 import 'package:memo/components/collab_popup.dart';
 import 'dart:convert';
 
@@ -23,7 +26,7 @@ class _TimelinePageState extends State<TimelinePage> {
   bool? isLoading = false;
   PostgrestList? timelineData;
   List<DateTime> dates = [];
-  DateTime? selectedDate;
+  DateTime? selectedDate = DateTime.now();
   final ScrollController scrollController = ScrollController();
 
   @override
@@ -67,7 +70,7 @@ class _TimelinePageState extends State<TimelinePage> {
 
     scrollController.animateTo(
       index * itemHeight,
-      duration: Duration(seconds: 1),
+      duration: Duration(milliseconds: 200),
       curve: Curves.easeInOut,
     );
   }
@@ -159,15 +162,46 @@ class _TimelinePageState extends State<TimelinePage> {
                 ],
               ),
               Positioned(
-                  bottom: 25,
-                  right: 0,
-                  left: 0,
-                  child: Center(
-                      child: ElevatedButton(
-                          onPressed: () {
-                            _selectDate(context);
-                          },
-                          child: Text('sa'))))
+                bottom: 25,
+                right: 0,
+                left: 0,
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: ClipRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.55),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _selectDate(context);
+                            },
+                            child: Text(
+                              selectedDate != null
+                                  ? DateFormat('yyyy-MM-dd')
+                                      .format(selectedDate!)
+                                  : 'Select Date',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            style: ButtonStyle(
+                              elevation: MaterialStateProperty.all(0),
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.transparent),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
             ]),
     );
   }

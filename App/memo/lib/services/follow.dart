@@ -70,4 +70,24 @@ class FollowService {
       return 0;
     }
   }
+
+  Future<void> requestHandle(String userId, bool accept) async {
+    try {
+      if (accept) {
+        final response = await supabase
+            .from('user_following')
+            .upsert({'following': 'following'})
+            .eq('follower_id', userId)
+            .eq('followed_id', authSevice.getCurrentUserID() ?? '');
+      } else {
+        final response = await supabase
+            .from('user_following')
+            .delete()
+            .eq('follower_id', userId)
+            .eq('followed_id', authSevice.getCurrentUserID() ?? '');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 }

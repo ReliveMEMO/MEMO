@@ -224,6 +224,14 @@ class _ActivityPageState extends State<ActivityPage>
     });
   }
 
+  void removeNotification(String id) {
+    setState(() {
+      notificationList = notificationList!
+          .where((notification) => notification['id'] != id)
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -345,7 +353,8 @@ class _ActivityPageState extends State<ActivityPage>
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 10),
                     child: NotificationTile(
-                        notificationId: activityList![index]['id']),
+                      notificationId: activityList![index]['id'],
+                    ),
                   );
                 },
               ),
@@ -400,7 +409,10 @@ class _ActivityPageState extends State<ActivityPage>
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 10),
                     child: NotificationTile(
-                        notificationId: notificationList![index]['id']),
+                      notificationId: notificationList![index]['id'],
+                      onRemove: () =>
+                          removeNotification(notificationList![index]['id']),
+                    ),
                   );
                 },
               ),

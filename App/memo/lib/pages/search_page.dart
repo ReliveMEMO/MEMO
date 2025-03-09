@@ -244,17 +244,17 @@ class _SearchPageState extends State<SearchPage> {
                                               horizontal: 20.0, vertical: 4),
                                           child: UserTile(
                                             userId: user,
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ProfilePage(
-                                                            userId:
-                                                                recentSearches[
-                                                                    index],
-                                                          )));
-                                            },
+                                            // onTap: () {
+                                            //   Navigator.push(
+                                            //       context,
+                                            //       MaterialPageRoute(
+                                            //           builder: (context) =>
+                                            //               ProfilePage(
+                                            //                 userId:
+                                            //                     recentSearches[
+                                            //                         index],
+                                            //               )));
+                                            // },
                                           ),
                                         );
                                       },

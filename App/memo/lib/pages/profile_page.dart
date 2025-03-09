@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/bio_section.dart';
 import 'package:memo/components/follow_section.dart';
 import 'package:memo/components/timeline_card.dart';
+import 'package:memo/pages/following_follower_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/follow.dart';
@@ -33,11 +35,14 @@ class _ProfilePageState extends State<ProfilePage> {
   bool privateProfile = false;
   bool? personalProfile = false;
   String isFollowing = 'not-following';
+  int followers = 0;
+  int following = 0;
 
   @override
   void initState() {
     super.initState();
     getUser();
+    getFollowCounts();
   }
 
   void logout() async {
@@ -45,6 +50,19 @@ class _ProfilePageState extends State<ProfilePage> {
     if (mounted) {
       Navigator.pushNamed(context, '/login');
     }
+  }
+
+  void getFollowCounts() async {
+    final followersCount = await followService
+        .getFollowersCount(widget.userId ?? authService.getCurrentUserID()!);
+
+    final followingCount = await followService
+        .getFollowingCount(widget.userId ?? authService.getCurrentUserID()!);
+
+    setState(() {
+      followers = followersCount;
+      following = followingCount;
+    });
   }
 
   void getUser() async {
@@ -91,8 +109,6 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           privateProfile = true;
           isFollowing = followResponse as String;
-          print("=====================================");
-          print(isFollowing);
         });
       }
     }
@@ -247,16 +263,26 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         children: [
                           // Follower Stats
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Column(
                                 children: [
-                                  Text(
-                                    "100",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(context,
+                                          MaterialPageRoute(builder: (Context) {
+                                        return FollowingFollowerPage(
+                                          selectedTab: 0,
+                                        );
+                                      }));
+                                    },
+                                    child: Text(
+                                      followers.toString(),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: 4),
@@ -271,11 +297,21 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               Column(
                                 children: [
-                                  Text(
-                                    "100",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(context,
+                                          MaterialPageRoute(builder: (Context) {
+                                        return FollowingFollowerPage(
+                                          selectedTab: 1,
+                                        );
+                                      }));
+                                    },
+                                    child: Text(
+                                      following.toString(),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: 4),
@@ -291,7 +327,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               Column(
                                 children: [
                                   Text(
-                                    "0",
+                                    timelineIds.length.toString(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,

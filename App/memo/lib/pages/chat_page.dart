@@ -1,9 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:memo/components/chat_tile.dart' as chatTile;
+import 'package:memo/components/chat_tile.dart';
 import 'package:memo/components/user_tile.dart';
-import 'package:memo/components/group_chat_tile.dart' as group;
 import 'package:memo/main.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
@@ -65,30 +64,16 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
 
     final currentUserId = authService.getCurrentUserID();
 
-    // Fetching individual chats
-    final responseIndividualChats = await Supabase.instance.client
+    final response = await Supabase.instance.client
         .from('ind_chat_table')
         .select('chat_id')
         .or('user1.eq.$currentUserId,user2.eq.$currentUserId')
         .order('last_accessed', ascending: false);
 
-    // Fetching group chats
-    final responseGroupChats = await Supabase.instance.client
-        .from('group_msg_table')
-        .select('group_id')
-        .contains('members', [currentUserId]).order('last_accessed',
-            ascending: false);
-
     if (!mounted) return;
 
     setState(() {
-      // Combine individual and group chats
-      chats = [
-        ...responseIndividualChats
-            .map((chat) => {'type': 'individual', 'id': chat['chat_id']}),
-        ...responseGroupChats
-            .map((chat) => {'type': 'group', 'id': chat['group_id']}),
-      ];
+      chats = (response as List).map((chat) => chat['chat_id']).toList();
       isLoading = false;
     });
   }
@@ -126,12 +111,12 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
         searchResults = results;
         isLoading = false;
       });
-      debugPrint(results.toString());
+      print(results);
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      debugPrint('Error Searching users: $e');
+      print('Error Searching users: $e');
     }
   }
 
@@ -215,32 +200,17 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
                 child: Column(
                   children: [
                     Expanded(
-                      child: ListView.builder(
+                      child: ListView(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 5),
-                        itemCount: chats.length,
-                        itemBuilder: (context, index) {
-                          final chat = chats[index];
-                          if (chat['type'] == 'group') {
-                            // Display group chat
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 6.0),
-                              child: group.GroupChatTile(
-                                  groupId: chat[
-                                      'id']), // Custom widget for group chats
-                            );
-                          } else {
-                            // Display individual chat
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 6.0),
-                              child: chatTile.ChatTile(
-                                  chatId: chat[
-                                      'id']), // Custom widget for individual chats
-                            );
-                          }
-                        },
+                        children: chats
+                            .map((chat) => Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 6.0),
+                                  child: ChatTile(
+                                    chatId: chat,
+                                  ),
+                                ))
+                            .toList(),
                       ),
                     )
                   ],

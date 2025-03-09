@@ -163,6 +163,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/components/notification_tile.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -249,14 +250,22 @@ class _ActivityPageState extends State<ActivityPage>
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 15),
-                child: CircleAvatar(
-                  radius: 25,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: userDetails?['profile_pic'] as String? ?? '',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (Context) {
+                      return ProfilePage();
+                    }));
+                  },
+                  child: CircleAvatar(
+                    radius: 25,
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: userDetails?['profile_pic'] as String? ?? '',
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),

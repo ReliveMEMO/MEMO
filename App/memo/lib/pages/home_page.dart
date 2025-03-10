@@ -1,11 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
-
 import 'package:provider/provider.dart';
-
+import 'package:memo/components/post_card.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -18,6 +16,26 @@ class _HomePageState extends State<HomePage> {
     final userDetails = Provider.of<UserProvider>(context).userDetails;
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
+    List<Map<String, dynamic>> posts = [
+      {
+        'heading': 'Post 1 Title',
+        'date': '2025-03-10',
+        
+        'image_url': '',  
+        'caption': ' fisrt post caption.',
+        'likes': 100,
+        'comments': 50,
+      },
+      {
+        'heading': 'Post 2 Title',
+        'date': '2025-03-09',
+        'image_url': '', 
+        'caption': ' second post caption.',
+        'likes': 150,
+        'comments': 30,
+      },
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                     radius: 25,
                     child: ClipOval(
                       child: CachedNetworkImage(
-                        imageUrl: userDetails?['profile_pic'] as String? ?? '',
+                        imageUrl: userDetails?['profile_pic'] ?? '',
                         width: 40,
                         height: 40,
                         fit: BoxFit.cover,
@@ -62,8 +80,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: Center(
-        child: Text('Home Page Content'),
+      body: ListView.builder(
+        itemCount: posts.length,
+        itemBuilder: (context, index) {
+          return PostCard(post: posts[index]);
+        },
       ),
     );
   }

@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 import 'package:memo/components/collab_popup.dart';
 import 'dart:convert';
 
@@ -22,6 +25,9 @@ class TimelinePage extends StatefulWidget {
 class _TimelinePageState extends State<TimelinePage> {
   bool? isLoading = false;
   PostgrestList? timelineData;
+  List<DateTime> dates = [];
+  DateTime? selectedDate = DateTime.now();
+  final ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
@@ -46,58 +52,52 @@ class _TimelinePageState extends State<TimelinePage> {
 
     setState(() {
       timelineData = response;
+      dates = response
+          .map<DateTime>((post) => DateTime.parse(post['date']))
+          .toList();
+
       isLoading = false;
     });
 
+    print("########################");
     print(timelineData);
+    print(dates);
   }
 
-  final String jsonData = '''
-  [
-    {
-      "date": "11th Nov 2024",
-      "title": "Journey of the life",
-      "content": "Lorem ipsum blah blah Lorem ipsum blah blah",
-      "likes": 100000,
-      "comments": 10,
-      "imageUrl": "https://i.pinimg.com/originals/35/77/cc/3577cc8ffbaa0797b446942ef44df9cc.jpg"
-    },
-    {
-      "date": "22nd Oct 2024",
-      "title": "Heading",
-      "content": "Lorem ipsum blah blah Lorem ipsum blah blah",
-      "likes": 50000,
-      "comments": 5,
-      "imageUrl": "https://i.pinimg.com/originals/35/77/cc/3577cc8ffbaa0797b446942ef44df9cc.jpg"
+  void scrollToIndex(int index) {
+    final itemHeight =
+        MediaQuery.of(context).size.height * 0.5; // Adjust the factor as needed
+
+    scrollController.animateTo(
+      index * itemHeight,
+      duration: Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != selectedDate) {
+      setState(() {
+        selectedDate = pickedDate;
+      });
+
+      final index =
+          dates.indexWhere((date) => date.isAtSameMomentAs(selectedDate!));
+      if (index != -1) {
+        scrollToIndex(index);
+      }
     }
-    ,
-    {
-      "date": "22nd Oct 2024",
-      "title": "Heading",
-      "content": "Lorem ipsum blah blah Lorem ipsum blah blah",
-      "likes": 50000,
-      "comments": 5,
-      "imageUrl": "https://i.pinimg.com/originals/35/77/cc/3577cc8ffbaa0797b446942ef44df9cc.jpg"
-    },
-    {
-      "date": "22nd Oct 2024",
-      "title": "Heading",
-      "content": "Lorem ipsum blah blah Lorem ipsum blah blah",
-      "likes": 50000,
-      "comments": 5,
-      "imageUrl": "https://i.pinimg.com/originals/35/77/cc/3577cc8ffbaa0797b446942ef44df9cc.jpg"
-    }
-  ]
-  ''';
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<Post> posts = (json.decode(jsonData) as List)
-        .map((data) => Post.fromJson(data))
-        .toList();
-
     // Sort posts by date (latest on top)
-    posts.sort((a, b) => b.date.compareTo(a.date));
 
     return Scaffold(
       appBar: AppBar(
@@ -127,33 +127,82 @@ class _TimelinePageState extends State<TimelinePage> {
               width: 300,
               height: 400,
             ))
-          : Row(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: timelineData!.length,
-                    itemBuilder: (context, index) {
-                      final post = timelineData![index];
-                      return Padding(
-                        padding:
-                            const EdgeInsets.only(left: 15.0, top: 5, right: 5),
-                        child: PostCard(post: post),
+          : Stack(children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      itemCount: timelineData!.length,
+                      itemBuilder: (context, index) {
+                        final post = timelineData![index];
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15.0, top: 5, right: 5),
+                          child: PostCard(post: post),
+                        );
+                      },
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: List.generate(timelineData!.length, (index) {
+                      return GestureDetector(
+                        onTap: () {
+                          scrollToIndex(index);
+                        },
+                        child: TimelineDot(
+                          index: index,
+                          isLast: index == timelineData!.length - 1,
+                          isFirst: index == 0,
+                        ),
                       );
-                    },
+                    }),
+                  )
+                ],
+              ),
+              Positioned(
+                bottom: 25,
+                right: 0,
+                left: 0,
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: ClipRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.55),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _selectDate(context);
+                            },
+                            child: Text(
+                              selectedDate != null
+                                  ? DateFormat('yyyy-MM-dd')
+                                      .format(selectedDate!)
+                                  : 'Select Date',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            style: ButtonStyle(
+                              elevation: MaterialStateProperty.all(0),
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.transparent),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: List.generate(timelineData!.length, (index) {
-                    return TimelineDot(
-                      index: index,
-                      isLast: index == timelineData!.length - 1,
-                      isFirst: index == 0,
-                    );
-                  }),
-                )
-              ],
-            ),
+              )
+            ]),
     );
   }
 }

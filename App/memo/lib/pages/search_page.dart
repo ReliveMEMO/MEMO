@@ -118,14 +118,22 @@ class _SearchPageState extends State<SearchPage> {
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 15),
-                child: CircleAvatar(
-                  radius: 25,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: userDetails?['profile_pic'] as String? ?? '',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (Context) {
+                      return ProfilePage();
+                    }));
+                  },
+                  child: CircleAvatar(
+                    radius: 25,
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: userDetails?['profile_pic'] as String? ?? '',
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),

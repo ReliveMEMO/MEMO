@@ -40,4 +40,34 @@ class FollowService {
       return 'not-following';
     }
   }
+
+  Future<int> getFollowersCount(String userId) async {
+    try {
+      final response = await supabase
+          .from('user_following')
+          .select()
+          .eq('followed_id', userId)
+          .eq('following', 'following')
+          .count();
+
+      return response.count;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> getFollowingCount(String userId) async {
+    try {
+      final response = await supabase
+          .from('user_following')
+          .select()
+          .eq('follower_id', userId)
+          .eq('following', 'following')
+          .count();
+
+      return response.count;
+    } catch (e) {
+      return 0;
+    }
+  }
 }

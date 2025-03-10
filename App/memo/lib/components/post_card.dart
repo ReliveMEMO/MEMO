@@ -25,7 +25,7 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-      elevation: 3,
+      elevation: 1,
       color: Colors.grey[100],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
@@ -56,7 +56,7 @@ class _PostCardState extends State<PostCard> {
                   color: Colors.grey[300],
                   child: Center(
                     child: Skeletonizer(
-                      child: SizedBox(width: 300, height: 300),
+                      child: Center(child: SizedBox(width: 300, height: 300)),
                     ),
                   ),
                 ),

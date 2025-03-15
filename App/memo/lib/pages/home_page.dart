@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/components/post_box.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
@@ -69,6 +70,8 @@ class _HomePageState extends State<HomePage> {
         'likes': 0,
         'comments': 50,
         'liked_by': [],
+        'owner_id': "e514c8db-ac71-46d3-84c5-eb467d06e205",
+        'timeline_id': "39ceb52e-4620-4059-a145-bae2944ed58b"
       },
       {
         'heading': 'Post 2 Title',
@@ -79,6 +82,8 @@ class _HomePageState extends State<HomePage> {
         'likes': 150,
         'comments': 30,
         'liked_by': [],
+        'owner_id': "5e04d1e8-589f-4fab-a39e-e9cb3c4654bf",
+        'timeline_id': "d2f30a55-786c-4b24-8537-1c344cddef20"
       },
       {
         'heading': 'Post 2 Title',
@@ -89,6 +94,8 @@ class _HomePageState extends State<HomePage> {
         'likes': 150,
         'comments': 30,
         'liked_by': [],
+        'owner_id': "39ceb52e-4620-4059-a145-bae2944ed58b",
+        'timeline_id': "3e9758d5-0d6a-42a3-9adb-dc2c499c85c0"
       },
     ];
 
@@ -139,14 +146,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: ListView.builder(
-          itemCount: posts.length,
-          itemBuilder: (context, index) {
-            return PostCard(post: posts[index]);
-          },
-        ),
+      body: ListView.builder(
+        itemCount: posts.length,
+        itemBuilder: (context, index) {
+          return PostBox(post: posts[index]);
+        },
       ),
     );
   }

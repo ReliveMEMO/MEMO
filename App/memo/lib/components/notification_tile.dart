@@ -84,7 +84,7 @@ class _NotificationTileState extends State<NotificationTile> {
 
   Future<void> handleRequest(bool accept) async {
     if (accept) {
-      followService.requestHandle(userId!, true);
+      await followService.requestHandle(userId!, true);
 
       final response =
           await Supabase.instance.client.from('notification_table').update({
@@ -133,7 +133,7 @@ class _NotificationTileState extends State<NotificationTile> {
                     : null,
                 child: profilePic == null ? Icon(Icons.person) : null,
               ),
-              trailing: notificationTitle == "Follow_Req"
+              trailing: notificationTitle == "Follow-Request"
                   ? SizedBox(
                       width: 70,
                       // Adjust the width as needed

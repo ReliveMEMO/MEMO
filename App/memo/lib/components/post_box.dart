@@ -9,8 +9,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:solar_icons/solar_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class PostCard extends StatefulWidget {
-  const PostCard({
+class PostBox extends StatefulWidget {
+  const PostBox({
     super.key,
     required this.post,
   });
@@ -18,10 +18,10 @@ class PostCard extends StatefulWidget {
   final PostgrestMap post;
 
   @override
-  State<PostCard> createState() => _PostCardState();
+  State<PostBox> createState() => _PostBoxState();
 }
 
-class _PostCardState extends State<PostCard> {
+class _PostBoxState extends State<PostBox> {
   bool liked = false;
   final likeService = LikeService();
   late int likes;

@@ -66,8 +66,9 @@ class _HomePageState extends State<HomePage> {
         'image_url':
             'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/memos/uploads/1741159042068',
         'caption': ' fisrt post caption.',
-        'likes': 100,
+        'likes': 0,
         'comments': 50,
+        'liked_by': [],
       },
       {
         'heading': 'Post 2 Title',
@@ -77,6 +78,7 @@ class _HomePageState extends State<HomePage> {
         'caption': ' second post caption.',
         'likes': 150,
         'comments': 30,
+        'liked_by': [],
       },
       {
         'heading': 'Post 2 Title',
@@ -86,6 +88,7 @@ class _HomePageState extends State<HomePage> {
         'caption': ' second post caption.',
         'likes': 150,
         'comments': 30,
+        'liked_by': [],
       },
     ];
 

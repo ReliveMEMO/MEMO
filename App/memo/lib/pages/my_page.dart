@@ -12,6 +12,7 @@ import 'package:solar_icons/solar_icons.dart';
 import 'package:memo/pages/activity_page.dart';
 
 import 'package:memo/pages/search_page.dart';
+import 'package:memo/pages/home_page.dart';
 
 class myPage extends StatefulWidget {
   final int? index;
@@ -26,12 +27,7 @@ class _myPageState extends State<myPage> {
 
   List pages = [
     ProfilePage(),
-    CreateProfile(),
-    EventPage(),
-    MemoryReminderPopup(),
-    //ProfilePage(),
-    //CreateTimeline()
-    SearchPage(),
+    HomePage(),
     NewMemo(),
     ActivityPage(),
     ChatPage(),

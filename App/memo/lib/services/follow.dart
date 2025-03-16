@@ -75,7 +75,7 @@ class FollowService {
       final List<dynamic> response = await supabase
           .from('user_following')
           .select(
-              'follower_id, User_Info!user_following_follower_id_fkey(full_name)')
+              'follower_id, User_Info!user_following_follower_id_fkey(full_name, profile_pic)')
           .eq('followed_id', userId)
           .eq('following', 'following');
 
@@ -95,7 +95,7 @@ class FollowService {
       final List<dynamic> response = await supabase
           .from('user_following')
           .select(
-              'followed_id, User_Info!user_following_followed_id_fkey(full_name)')
+              'followed_id, User_Info!user_following_followed_id_fkey(full_name,profile_pic)')
           .eq('follower_id', userId)
           .eq('following', 'following');
 

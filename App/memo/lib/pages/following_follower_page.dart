@@ -107,10 +107,10 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
           itemCount: _followers.length,
           itemBuilder: (context, index) {
             final user = _followers[index];
-            print(
-                "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKBuilding follower: ${user}");
+            print("Building follower: ${user}");
             return _buildUserItem(
               user['User_Info']?['full_name'] ?? 'Unknown',
+              user['User_Info']?['profile_pic'],
               isFollowing: false,
             );
           },
@@ -130,10 +130,10 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
           itemCount: _following.length,
           itemBuilder: (context, index) {
             final user = _following[index];
-            print(
-                "lLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLBuilding following: ${user}");
+            print("Building following: ${user}");
             return _buildUserItem(
               user['User_Info']?['full_name'] ?? 'Unknown',
+              user['User_Info']?['profile_pic'],
               isFollowing: true,
             );
           },
@@ -142,14 +142,19 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
     );
   }
 
-  Widget _buildUserItem(String fullName, {required bool isFollowing}) {
+  Widget _buildUserItem(String fullName, String? profilePicUrl,
+      {required bool isFollowing}) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: ListTile(
         leading: CircleAvatar(
           radius: 20,
+          backgroundImage:
+              profilePicUrl != null ? NetworkImage(profilePicUrl) : null,
           backgroundColor: Colors.grey.shade300,
-          child: Icon(Icons.person, color: Colors.black),
+          child: profilePicUrl == null
+              ? Icon(Icons.person, color: Colors.black)
+              : null,
         ),
         title: Text(fullName),
         trailing: isFollowing

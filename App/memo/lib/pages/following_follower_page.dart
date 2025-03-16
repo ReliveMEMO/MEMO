@@ -4,6 +4,7 @@ import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/follow.dart';
+import 'package:memo/pages/profile_page.dart';
 
 class FollowingFollowerPage extends StatefulWidget {
   final int selectedTab;
@@ -109,6 +110,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
             final user = _followers[index];
             print("Building follower: ${user}");
             return _buildUserItem(
+              user['User_Info']?['id'] ?? '',
               user['User_Info']?['full_name'] ?? 'Unknown',
               user['User_Info']?['profile_pic'],
               isFollowing: false,
@@ -132,6 +134,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
             final user = _following[index];
             print("Building following: ${user}");
             return _buildUserItem(
+              user['User_Info']?['id'],
               user['User_Info']?['full_name'] ?? 'Unknown',
               user['User_Info']?['profile_pic'],
               isFollowing: true,
@@ -142,7 +145,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
     );
   }
 
-  Widget _buildUserItem(String fullName, String? profilePicUrl,
+  Widget _buildUserItem(String? userId, String fullName, String? profilePicUrl,
       {required bool isFollowing}) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -165,6 +168,18 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
                   // No action when pressed (for now)
                 },
               ),
+        onTap: () {
+          if (userId != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfilePage(userId: userId),
+              ),
+            );
+          } else {
+            print("User ID is null");
+          }
+        },
       ),
       elevation: 0,
     );

@@ -101,10 +101,12 @@ class _SearchPageState extends State<SearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: screenHeight * 0.06,
+        toolbarHeight: 70,
         automaticallyImplyLeading: false,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.white30,
         flexibleSpace: Container(
-          margin: EdgeInsets.only(top: screenHeight * 0.06),
+          margin: EdgeInsets.only(top: 40),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -112,8 +114,8 @@ class _SearchPageState extends State<SearchPage> {
                 padding: const EdgeInsets.only(left: 20.0),
                 child: Image.asset(
                   'assets/images/TextLogo.png',
-                  width: screenWidth * 0.2,
-                  height: screenWidth * 0.2,
+                  width: screenWidth * 0.25,
+                  height: screenWidth * 0.25,
                 ),
               ),
               Padding(
@@ -121,19 +123,21 @@ class _SearchPageState extends State<SearchPage> {
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (Context) {
+                        MaterialPageRoute(builder: (context) {
                       return ProfilePage();
                     }));
                   },
                   child: CircleAvatar(
                     radius: 25,
                     child: ClipOval(
-                      child: CachedNetworkImage(
-                        imageUrl: userDetails?['profile_pic'] as String? ?? '',
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                      ),
+                      child: userDetails?['profile_pic'] == null
+                          ? CircularProgressIndicator()
+                          : CachedNetworkImage(
+                              imageUrl: userDetails?['profile_pic'] ?? '',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                 ),
@@ -167,7 +171,7 @@ class _SearchPageState extends State<SearchPage> {
           //     ),
           //   ],
           // ),
-          SizedBox(height: 15),
+          SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(
               color: Colors.black12,
@@ -244,17 +248,17 @@ class _SearchPageState extends State<SearchPage> {
                                               horizontal: 20.0, vertical: 4),
                                           child: UserTile(
                                             userId: user,
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ProfilePage(
-                                                            userId:
-                                                                recentSearches[
-                                                                    index],
-                                                          )));
-                                            },
+                                            // onTap: () {
+                                            //   Navigator.push(
+                                            //       context,
+                                            //       MaterialPageRoute(
+                                            //           builder: (context) =>
+                                            //               ProfilePage(
+                                            //                 userId:
+                                            //                     recentSearches[
+                                            //                         index],
+                                            //               )));
+                                            // },
                                           ),
                                         );
                                       },

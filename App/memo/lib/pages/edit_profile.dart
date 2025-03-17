@@ -29,6 +29,7 @@ class _EditProfileState extends State<EditProfile> {
   File? _imageFile;
   String? ageError;
   String? gpaError;
+  String? gradYearError;
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {
@@ -76,6 +77,21 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
+  void validateGradYear() {
+  final gradYear = int.tryParse(gradyearcontroller.text);
+  final currentYear = DateTime.now().year;
+
+  if (gradYear == null || gradYear < currentYear || gradYear > currentYear + 15) {
+    setState(() {
+      gradYearError = "Enter a valid graduation year ($currentYear - ${currentYear + 6}).";
+    });
+  } else {
+    setState(() {
+      gradYearError = null;
+    });
+  }
+}
+
 
 
   @override
@@ -110,7 +126,7 @@ class _EditProfileState extends State<EditProfile> {
                 items: ["Level 3", "Level 4", "Level 5", "Level 6",  "Alumni"],
               ),
               CustomTextField(label: "GPA", controller: gpacontroller, errorText: gpaError, onChanged: (value) => validateGpa()),
-              CustomTextField(label: "Graduation Year", controller: gradyearcontroller),
+              CustomTextField(label: "Graduation Year", controller: gradyearcontroller, errorText: gradYearError, onChanged: (value) => validateGradYear()),
               CustomTextField(label: "About", controller: aboutController, maxLines: 3),
               SizedBox(height: 20),
               Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),

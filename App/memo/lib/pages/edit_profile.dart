@@ -65,7 +65,7 @@ class _EditProfileState extends State<EditProfile> {
 
   void validateGpa() {
     final gpa = double.tryParse(gpacontroller.text);
-    if (gpa == null || gpa < 0 || gpa <= 4) {
+    if (gpa == null || gpa < 0 || gpa > 4) {
       setState(() {
         gpaError = "Please enter a valid gpa.";
       });

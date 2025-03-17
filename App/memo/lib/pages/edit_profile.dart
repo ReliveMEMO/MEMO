@@ -28,6 +28,7 @@ class _EditProfileState extends State<EditProfile> {
   String? avatarUrl;
   File? _imageFile;
   String? ageError;
+  String? gpaError;
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {
@@ -53,7 +54,7 @@ class _EditProfileState extends State<EditProfile> {
     final age = int.tryParse(agecontroller.text);
     if (age == null || age < 0 || age > 120) {
       setState(() {
-        ageError = "Please enter a valid age between 0 and 120.";
+        ageError = "Please enter a valid age.";
       });
     } else {
       setState(() {
@@ -61,6 +62,20 @@ class _EditProfileState extends State<EditProfile> {
       });
     }
   }
+
+  void validateGpa() {
+    final gpa = double.tryParse(gpacontroller.text);
+    if (gpa == null || gpa < 0 || gpa <= 4) {
+      setState(() {
+        gpaError = "Please enter a valid gpa.";
+      });
+    } else {
+      setState(() {
+        gpaError = null;
+      });
+    }
+  }
+
 
 
   @override
@@ -94,7 +109,7 @@ class _EditProfileState extends State<EditProfile> {
                 value: "Level 5",
                 items: ["Level 3", "Level 4", "Level 5", "Level 6",  "Alumni"],
               ),
-              CustomTextField(label: "GPA", controller: gpacontroller),
+              CustomTextField(label: "GPA", controller: gpacontroller, errorText: gpaError, onChanged: (value) => validateGpa()),
               CustomTextField(label: "Graduation Year", controller: gradyearcontroller),
               CustomTextField(label: "About", controller: aboutController, maxLines: 3),
               SizedBox(height: 20),

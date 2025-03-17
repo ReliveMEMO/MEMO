@@ -7,9 +7,10 @@ import 'package:memo/services/follow.dart';
 import 'package:memo/pages/profile_page.dart';
 
 class FollowingFollowerPage extends StatefulWidget {
+  final String userId; // Add userId parameter
   final int selectedTab;
 
-  FollowingFollowerPage({required this.selectedTab});
+  FollowingFollowerPage({required this.userId, required this.selectedTab});
 
   @override
   _FollowingFollowerPageState createState() => _FollowingFollowerPageState();
@@ -18,11 +19,11 @@ class FollowingFollowerPage extends StatefulWidget {
 class _FollowingFollowerPageState extends State<FollowingFollowerPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final authService = AuthService();
   final FollowService _followService = FollowService();
   List<Map<String, dynamic>> _followers = [];
   List<Map<String, dynamic>> _following = [];
   bool _isLoading = true;
+  final AuthService authService = AuthService();
 
   @override
   void initState() {
@@ -33,7 +34,8 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
   }
 
   Future<void> _fetchData() async {
-    final userId = AuthService().getCurrentUserID();
+    final userId =
+        widget.userId; // Use the userId passed to the FollowingFollowerPage
     if (userId != null) {
       final followersData = await _followService.getFollowers(userId);
       final followingData = await _followService.getFollowing(userId);

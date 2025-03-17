@@ -273,6 +273,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (Context) {
                                         return FollowingFollowerPage(
+                                          userId: widget.userId ?? '',
                                           selectedTab: 0,
                                         );
                                       }));
@@ -302,6 +303,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (Context) {
                                         return FollowingFollowerPage(
+                                          userId: widget.userId ?? '',
                                           selectedTab: 1,
                                         );
                                       }));

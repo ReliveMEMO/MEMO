@@ -174,7 +174,7 @@ class CustomTextField extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             filled: true,
             fillColor: Colors.grey.shade200,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: errorText != null ? BorderSide(color: Colors.red) : BorderSide.none),
             errorText: errorText,
           ),
           onChanged: onChanged,

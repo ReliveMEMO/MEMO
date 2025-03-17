@@ -24,6 +24,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
   List<Map<String, dynamic>> _following = [];
   bool _isLoading = true;
   final AuthService authService = AuthService();
+  String _profileName = '';
 
   @override
   void initState() {
@@ -34,11 +35,17 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
   }
 
   Future<void> _fetchData() async {
-    final userId =
-        widget.userId; // Use the userId passed to the FollowingFollowerPage
-    if (userId != null) {
+    final userId;
+    if (widget.userId.isNotEmpty) {
+      userId =
+          widget.userId; // Use the userId passed to the FollowingFollowerPage
+    } else {
+      userId = authService.getCurrentUserID();
+    }
+    if (userId.isNotEmpty) {
       final followersData = await _followService.getFollowers(userId);
       final followingData = await _followService.getFollowing(userId);
+      final profileName = await authService.getDisplayName(userId);
 
       print("Followers Data: $followersData");
       print("Following Data: $followingData");
@@ -47,6 +54,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
         _followers = followersData;
         _following = followingData;
         _isLoading = false;
+        _profileName = profileName ?? '';
       });
     } else {
       setState(() {
@@ -73,7 +81,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
         automaticallyImplyLeading: true,
         centerTitle: true,
         title: Text(
-          '@${authService.getCurrentUser()}',
+          '@${_profileName}',
           style: TextStyle(fontSize: 18),
         ),
         bottom: TabBar(

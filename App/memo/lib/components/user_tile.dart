@@ -94,9 +94,7 @@ class _UserTileState extends State<UserTile> {
                       });
                     }
                   : () {
-                      if (widget.onTap != null) {
-                        widget.onTap!();
-                      }
+                      widget.onTap!();
 
                       Navigator.push(
                           context,

@@ -138,7 +138,6 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: Colors.white, // Set the entire background to white
       appBar: AppBar(
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: true,
         elevation: 0,
         actions: [
           personalProfile == true
@@ -207,16 +206,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                           bottom: 1,
                                           right: 10),
                                       decoration: BoxDecoration(
-                                        color: userDetails != null &&
-                                                userDetails!['status']
-                                                    .toString()
-                                                    .contains("Level")
-                                            ? Colors.blue
-                                            : Colors.purple,
+                                        color: Colors.blue,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        userDetails?['status'] ?? 'Active',
+                                        "LEVEL 05",
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,

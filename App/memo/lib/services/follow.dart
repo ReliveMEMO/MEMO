@@ -1,17 +1,33 @@
 import 'package:memo/services/auth_service.dart';
+import 'package:memo/services/notification.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FollowService {
   final supabase = Supabase.instance.client;
-  final authService = AuthService();
-
-  Future<bool> handleFollow(String userId) async {
+  final authSevice = AuthService();
+  final notificationService = NotificationService();
+  Future<bool> handleFollow(String userId, bool privateProfile) async {
     try {
-      final response = await supabase.from('user_following').insert({
-        'follower_id': authService.getCurrentUserID(),
-        'followed_id': userId,
-        'created_at': DateTime.now().toIso8601String()
-      });
+
+      if (privateProfile) {
+        final response = await supabase.from('user_following').insert({
+          'follower_id': authSevice.getCurrentUserID(),
+          'followed_id': userId,
+          'created_at': DateTime.now().toIso8601String(),
+          'following': 'requested',
+        });
+
+        await notificationService.sendNotificationsCom(
+            "Follow-Request", userId);
+      } else {
+        final response = await supabase.from('user_following').insert({
+          'follower_id': authSevice.getCurrentUserID(),
+          'followed_id': userId,
+          'created_at': DateTime.now().toIso8601String(),
+          'following': 'following',
+        });
+        await notificationService.sendNotificationsCom("Follow", userId);
+      }
 
       return true;
     } catch (e) {
@@ -105,6 +121,24 @@ class FollowService {
     } catch (e) {
       print("Error fetching following: $e");
       return [];
+
+  Future<void> requestHandle(String userId, bool accept) async {
+    try {
+      if (accept) {
+        final response = await supabase
+            .from('user_following')
+            .update({'following': 'following'})
+            .eq('follower_id', userId)
+            .eq('followed_id', authSevice.getCurrentUserID() ?? '');
+      } else {
+        final response = await supabase
+            .from('user_following')
+            .delete()
+            .eq('follower_id', userId)
+            .eq('followed_id', authSevice.getCurrentUserID() ?? '');
+      }
+    } catch (e) {
+      print(e);
     }
   }
 }

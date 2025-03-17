@@ -27,6 +27,7 @@ class _EditProfileState extends State<EditProfile> {
 
   String? avatarUrl;
   File? _imageFile;
+  String? ageError;
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {
@@ -48,6 +49,19 @@ class _EditProfileState extends State<EditProfile> {
 
     avatarUrl = url;
   }
+  void validateAge() {
+    final age = int.tryParse(agecontroller.text);
+    if (age == null || age < 0 || age > 120) {
+      setState(() {
+        ageError = "Please enter a valid age between 0 and 120.";
+      });
+    } else {
+      setState(() {
+        ageError = null;
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +83,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
               CustomTextField(label: "Full Name", controller: fullNameController),
               DatePickerTextField(label: "BirthDate", controller: birthDateController),
-              CustomTextField(label: "Age", controller: agecontroller),
+              CustomTextField(label: "Age", controller: agecontroller, errorText: ageError, onChanged: (value) => validateAge()),
               CustomDropdown(
                 label: "Programme",
                 value: "Software Engineering",
@@ -110,8 +124,10 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final int maxLines;
+  final String? errorText;
+  final Function(String)? onChanged;
 
-  const CustomTextField({required this.label, required this.controller, this.maxLines = 1});
+  const CustomTextField({required this.label, required this.controller, this.maxLines = 1, this.errorText, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +144,9 @@ class CustomTextField extends StatelessWidget {
             filled: true,
             fillColor: Colors.grey.shade200,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+            errorText: errorText,
           ),
+          onChanged: onChanged,
         ),
         SizedBox(height: 15),
       ],

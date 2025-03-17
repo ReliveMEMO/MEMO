@@ -79,8 +79,7 @@ class FollowService {
           .eq('followed_id', userId)
           .eq('following', 'following');
 
-      print(
-          "######################################################################################################################Fetched Followers: $response");
+      print("Fetched Followers: $response");
 
       // Ensure the response is a list of maps
       return response.map((e) => e as Map<String, dynamic>).toList();
@@ -99,8 +98,7 @@ class FollowService {
           .eq('follower_id', userId)
           .eq('following', 'following');
 
-      print(
-          "##################################################################################################Fetched Following: $response");
+      print("Fetched Following: $response");
 
       // Ensure the response is a list of maps
       return response.map((e) => e as Map<String, dynamic>).toList();

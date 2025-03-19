@@ -24,7 +24,7 @@ class FollowService {
       final response = await supabase
           .from('user_following')
           .select()
-          .eq('follower_id', authSevice.getCurrentUserID() ?? '')
+          .eq('follower_id', authService.getCurrentUserID() ?? '')
           .eq('followed_id', userId)
           .single();
 
@@ -105,7 +105,6 @@ class FollowService {
     } catch (e) {
       print("Error fetching following: $e");
       return [];
-
     }
   }
 
@@ -116,18 +115,16 @@ class FollowService {
             .from('user_following')
             .update({'following': 'following'})
             .eq('follower_id', userId)
-            .eq('followed_id', authSevice.getCurrentUserID() ?? '');
+            .eq('followed_id', authService.getCurrentUserID() ?? '');
       } else {
         final response = await supabase
             .from('user_following')
             .delete()
             .eq('follower_id', userId)
-            .eq('followed_id', authSevice.getCurrentUserID() ?? '');
+            .eq('followed_id', authService.getCurrentUserID() ?? '');
       }
     } catch (e) {
       print(e);
-
     }
   }
 }
-  

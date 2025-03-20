@@ -111,6 +111,7 @@ class NotificationService {
     });
   }
 
+  //send common notifications
   Future<void> sendNotificationsCom(String type, String recieverId) async {
     const String apiUrl =
         "https://memo-backend-9b73024f3215.herokuapp.com/api/send-com-notification";

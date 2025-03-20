@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
+import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Achievement {
@@ -33,6 +34,7 @@ class _EditProfileState extends State<EditProfile> {
   String? gpaError;
   String? gradYearError;
   bool isLoading = true;
+   final authService = AuthService();
 
   @override
   void initState() {
@@ -41,14 +43,14 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> fetchUserProfile() async {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
+    
 
-    if (userId == null) return;
+    
 
     final response = await Supabase.instance.client
-        .from('UserProfile')
+        .from('User_info')
         .select()
-        .eq('user_id', userId)
+        .eq('user_id', authService.getCurrentUserID() ?? '')
         .single();
 
     if (response != null) {

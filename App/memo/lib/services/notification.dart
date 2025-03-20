@@ -2,14 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:memo/pages/create_page.dart';
+import 'package:memo/services/auth_service.dart';
 
 class NotificationService {
   static FirebaseMessaging messaging = FirebaseMessaging.instance;
   static FlutterLocalNotificationsPlugin localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+  final authService = AuthService();
 
   // Initialize FCM
   static Future<void> initializeFCM(userId) async {
@@ -109,7 +111,6 @@ class NotificationService {
     });
   }
 
-  //send common notifications
   Future<void> sendNotificationsCom(String type, String recieverId) async {
     const String apiUrl =
         "https://memo-backend-9b73024f3215.herokuapp.com/api/send-com-notification";

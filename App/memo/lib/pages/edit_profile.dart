@@ -7,6 +7,8 @@ class Achievement {
   final String emoji;
   final String description;
   final String position;
+
+  
   Achievement({required this.emoji, required this.description, required this.position});
 }
 
@@ -18,18 +20,50 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  TextEditingController fullNameController = TextEditingController(text: "Sandinu Pinnawala");
-  TextEditingController birthDateController = TextEditingController(text: "04.08.2003");
-  TextEditingController aboutController = TextEditingController(text: "Blah Blah Blah");
-  TextEditingController gpacontroller = TextEditingController(text: "3.5");
-  TextEditingController agecontroller = TextEditingController(text: "21");
-  TextEditingController gradyearcontroller = TextEditingController(text: "2027");
+  TextEditingController fullNameController = TextEditingController();
+  TextEditingController birthDateController = TextEditingController();
+  TextEditingController aboutController = TextEditingController();
+  TextEditingController gpacontroller = TextEditingController();
+  TextEditingController agecontroller = TextEditingController();
+  TextEditingController gradyearcontroller = TextEditingController();
 
   String? avatarUrl;
   File? _imageFile;
   String? ageError;
   String? gpaError;
   String? gradYearError;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserProfile();
+  }
+
+  Future<void> fetchUserProfile() async {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+
+    if (userId == null) return;
+
+    final response = await Supabase.instance.client
+        .from('UserProfile')
+        .select()
+        .eq('user_id', userId)
+        .single();
+
+    if (response != null) {
+      setState(() {
+        fullNameController.text = response['full_name'] ?? '';
+        birthDateController.text = response['birth_date'] ?? '';
+        agecontroller.text = response['age']?.toString() ?? '';
+        gpacontroller.text = response['gpa']?.toString() ?? '';
+        gradyearcontroller.text = response['grad_year']?.toString() ?? '';
+        aboutController.text = response['about'] ?? '';
+        avatarUrl = response['avatar_url'];
+        isLoading = false;
+      });
+    }
+  }
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {

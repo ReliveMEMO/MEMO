@@ -1,14 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
+import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Achievement {
   final String emoji;
   final String description;
   final String position;
-  Achievement(
-      {required this.emoji, required this.description, required this.position});
+
+  
+  Achievement({required this.emoji, required this.description, required this.position});
 }
 
 class EditProfile extends StatefulWidget {
@@ -19,19 +21,54 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  TextEditingController fullNameController =
-      TextEditingController(text: "Sandinu Pinnawala");
-  TextEditingController birthDateController =
-      TextEditingController(text: "04.08.2003");
-  TextEditingController aboutController =
-      TextEditingController(text: "Blah Blah Blah");
-  TextEditingController gpacontroller = TextEditingController(text: "3.5");
-  TextEditingController agecontroller = TextEditingController(text: "21");
-  TextEditingController gradyearcontroller =
-      TextEditingController(text: "2027");
+
+  TextEditingController fullNameController = TextEditingController();
+  TextEditingController birthDateController = TextEditingController();
+  TextEditingController aboutController = TextEditingController();
+  TextEditingController gpacontroller = TextEditingController();
+  TextEditingController agecontroller = TextEditingController();
+  TextEditingController gradyearcontroller = TextEditingController();
 
   String? avatarUrl;
   File? _imageFile;
+  String? ageError;
+  String? gpaError;
+  String? gradYearError;
+  bool isLoading = true;
+   final authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserProfile();
+  }
+
+  Future<void> fetchUserProfile() async {
+  try {
+    final response = await Supabase.instance.client
+        .from('User_Info')
+        .select()
+        .eq('user_id', authService.getCurrentUserID() ?? '')
+        .single();
+
+    print("Fetched User Profile: $response"); // Debugging log
+
+    //if (response == null) {
+      setState(() {
+        fullNameController.text = response['full_name'] ?? '';
+        birthDateController.text = response['birth_date'] ?? '';
+        agecontroller.text = response['user_age']?.toString() ?? '';
+        gpacontroller.text = response['user_gpa']?.toString() ?? '';
+        gradyearcontroller.text = response['user_grad_year']?.toString() ?? '';
+        aboutController.text = response['user_about'] ?? '';
+        avatarUrl = response['profile_pic'];
+        isLoading = false;
+      });
+    //}
+  } catch (e) {
+    print("Error fetching user profile: $e"); 
+  }
+}
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {

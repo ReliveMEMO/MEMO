@@ -27,6 +27,9 @@ class _EditProfileState extends State<EditProfile> {
 
   String? avatarUrl;
   File? _imageFile;
+  String? ageError;
+  String? gpaError;
+  String? gradYearError;
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {
@@ -48,6 +51,48 @@ class _EditProfileState extends State<EditProfile> {
 
     avatarUrl = url;
   }
+  void validateAge() {
+    final age = int.tryParse(agecontroller.text);
+    if (age == null || age < 0 || age > 120) {
+      setState(() {
+        ageError = "Please enter a valid age.";
+      });
+    } else {
+      setState(() {
+        ageError = null;
+      });
+    }
+  }
+
+  void validateGpa() {
+    final gpa = double.tryParse(gpacontroller.text);
+    if (gpa == null || gpa < 0 || gpa > 4) {
+      setState(() {
+        gpaError = "Please enter a valid gpa.";
+      });
+    } else {
+      setState(() {
+        gpaError = null;
+      });
+    }
+  }
+
+  void validateGradYear() {
+  final gradYear = int.tryParse(gradyearcontroller.text);
+  final currentYear = DateTime.now().year;
+
+  if (gradYear == null || gradYear < currentYear || gradYear > currentYear + 15) {
+    setState(() {
+      gradYearError = "Enter a valid graduation year ($currentYear - ${currentYear + 6}).";
+    });
+  } else {
+    setState(() {
+      gradYearError = null;
+    });
+  }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +114,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
               CustomTextField(label: "Full Name", controller: fullNameController),
               DatePickerTextField(label: "BirthDate", controller: birthDateController),
-              CustomTextField(label: "Age", controller: agecontroller),
+              CustomTextField(label: "Age", controller: agecontroller, errorText: ageError, onChanged: (value) => validateAge()),
               CustomDropdown(
                 label: "Programme",
                 value: "Software Engineering",
@@ -80,8 +125,8 @@ class _EditProfileState extends State<EditProfile> {
                 value: "Level 5",
                 items: ["Level 3", "Level 4", "Level 5", "Level 6",  "Alumni"],
               ),
-              CustomTextField(label: "GPA", controller: gpacontroller),
-              CustomTextField(label: "Graduation Year", controller: gradyearcontroller),
+              CustomTextField(label: "GPA", controller: gpacontroller, errorText: gpaError, onChanged: (value) => validateGpa()),
+              CustomTextField(label: "Graduation Year", controller: gradyearcontroller, errorText: gradYearError, onChanged: (value) => validateGradYear()),
               CustomTextField(label: "About", controller: aboutController, maxLines: 3),
               SizedBox(height: 20),
               Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
@@ -110,8 +155,10 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final int maxLines;
+  final String? errorText;
+  final Function(String)? onChanged;
 
-  const CustomTextField({required this.label, required this.controller, this.maxLines = 1});
+  const CustomTextField({required this.label, required this.controller, this.maxLines = 1, this.errorText, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -127,8 +174,10 @@ class CustomTextField extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             filled: true,
             fillColor: Colors.grey.shade200,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: errorText != null ? BorderSide(color: Colors.red) : BorderSide.none),
+            errorText: errorText,
           ),
+          onChanged: onChanged,
         ),
         SizedBox(height: 15),
       ],

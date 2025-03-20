@@ -43,29 +43,31 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> fetchUserProfile() async {
-    
-
-    
-
+  try {
     final response = await Supabase.instance.client
-        .from('User_info')
+        .from('User_Info')
         .select()
         .eq('user_id', authService.getCurrentUserID() ?? '')
         .single();
 
-    if (response != null) {
+    print("Fetched User Profile: $response"); // Debugging log
+
+    //if (response == null) {
       setState(() {
         fullNameController.text = response['full_name'] ?? '';
         birthDateController.text = response['birth_date'] ?? '';
-        agecontroller.text = response['age']?.toString() ?? '';
-        gpacontroller.text = response['gpa']?.toString() ?? '';
-        gradyearcontroller.text = response['grad_year']?.toString() ?? '';
-        aboutController.text = response['about'] ?? '';
-        avatarUrl = response['avatar_url'];
+        agecontroller.text = response['user_age']?.toString() ?? '';
+        gpacontroller.text = response['user_gpa']?.toString() ?? '';
+        gradyearcontroller.text = response['user_grad_year']?.toString() ?? '';
+        aboutController.text = response['user_about'] ?? '';
+        avatarUrl = response['profile_pic'];
         isLoading = false;
       });
-    }
+    //}
+  } catch (e) {
+    print("Error fetching user profile: $e"); 
   }
+}
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {

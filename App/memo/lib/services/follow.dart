@@ -5,6 +5,7 @@ class FollowService {
   final supabase = Supabase.instance.client;
   final authService = AuthService();
 
+
   Future<bool> handleFollow(String userId) async {
     try {
       final response = await supabase.from('user_following').insert({
@@ -12,6 +13,28 @@ class FollowService {
         'followed_id': userId,
         'created_at': DateTime.now().toIso8601String()
       });
+  final notificationService = NotificationService();
+
+  Future<bool> handleFollow(String userId, bool privateProfile) async {
+    try {
+      if (privateProfile) {
+        final response = await supabase.from('user_following').insert({
+          'follower_id': authService.getCurrentUserID(),
+          'followed_id': userId,
+          'created_at': DateTime.now().toIso8601String(),
+          'following': 'requested',
+        });
+
+        await notificationService.sendNotificationsCom("Follow-Request", userId);
+      } else {
+        final response = await supabase.from('user_following').insert({
+          'follower_id': authService.getCurrentUserID(),
+          'followed_id': userId,
+          'created_at': DateTime.now().toIso8601String(),
+          'following': 'following',
+        });
+        await notificationService.sendNotificationsCom("Follow", userId);
+      }
 
       return true;
     } catch (e) {
@@ -105,6 +128,8 @@ class FollowService {
     } catch (e) {
       print("Error fetching following: $e");
       return [];
+    }
+  }
 
     }
   }
@@ -116,13 +141,13 @@ class FollowService {
             .from('user_following')
             .update({'following': 'following'})
             .eq('follower_id', userId)
-            .eq('followed_id', authSevice.getCurrentUserID() ?? '');
+            .eq('followed_id', authService.getCurrentUserID() ?? '');
       } else {
         final response = await supabase
             .from('user_following')
             .delete()
             .eq('follower_id', userId)
-            .eq('followed_id', authSevice.getCurrentUserID() ?? '');
+            .eq('followed_id', authService.getCurrentUserID() ?? '');
       }
     } catch (e) {
       print(e);

@@ -1,22 +1,30 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/services/follow.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:solar_icons/solar_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationTile extends StatefulWidget {
   final String notificationId;
-  const NotificationTile({super.key, required this.notificationId});
+  final VoidCallback? onRemove;
+
+  const NotificationTile(
+      {super.key, required this.notificationId, this.onRemove});
 
   @override
   State<NotificationTile> createState() => _NotificationTileState();
 }
 
 class _NotificationTileState extends State<NotificationTile> {
+  final followService = FollowService();
   bool isLoading = false;
   String? notificationText;
   String time = 'Just now';
   String? profilePic;
   String? userName;
+  String? notificationTitle;
+  String? userId;
 
   @override
   void initState() {
@@ -43,11 +51,18 @@ class _NotificationTileState extends State<NotificationTile> {
 
     if (!mounted) return;
 
+    if (response['notification_title'] != null) {
+      setState(() {
+        notificationTitle = response['notification_title'];
+      });
+    }
+
     setState(() {
       notificationText = response['message'];
       time = formatTimeStamp(response['created_at']);
       userName = userResponse?['full_name'] ?? 'Unknown User';
       profilePic = userResponse?['profile_pic'];
+      userId = response['sender_id'];
       isLoading = false;
     });
   }
@@ -67,6 +82,30 @@ class _NotificationTileState extends State<NotificationTile> {
     }
   }
 
+  Future<void> handleRequest(bool accept) async {
+    if (accept) {
+      await followService.requestHandle(userId!, true);
+
+      final response =
+          await Supabase.instance.client.from('notification_table').update({
+        'created_at': DateTime.now().toIso8601String(),
+        'message': 'Started following you!',
+        'notification_title': 'Follow',
+      }).eq('id', widget.notificationId);
+
+      getNotificationDetails();
+    } else {
+      //await followService.requestHandle(userId!, false);
+
+      final response = await Supabase.instance.client
+          .from('notification_table')
+          .delete()
+          .eq('id', widget.notificationId);
+
+      widget.onRemove!();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -81,6 +120,10 @@ class _NotificationTileState extends State<NotificationTile> {
               ),
             )
           : ListTile(
+              contentPadding: EdgeInsets.only(
+                right: 15,
+                left: 15,
+              ),
               title: Text(userName ?? 'Unknown User'),
               subtitle: Text(notificationText ?? 'No notification'),
               leading: CircleAvatar(
@@ -90,10 +133,38 @@ class _NotificationTileState extends State<NotificationTile> {
                     : null,
                 child: profilePic == null ? Icon(Icons.person) : null,
               ),
-              trailing: Text(
-                time,
-                style: TextStyle(color: Colors.grey),
-              ),
+              trailing: notificationTitle == "Follow-Request"
+                  ? SizedBox(
+                      width: 70,
+                      // Adjust the width as needed
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: () => handleRequest(false),
+                                child: Icon(
+                                  SolarIconsOutline.closeSquare,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              SizedBox(width: 5),
+                              GestureDetector(
+                                onTap: () => handleRequest(true),
+                                child: Icon(
+                                  SolarIconsBold.checkSquare,
+                                  color: Colors.purple,
+                                  size: 32,
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
+                  : Text(time),
             ),
     );
   }

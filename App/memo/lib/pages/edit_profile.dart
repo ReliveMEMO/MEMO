@@ -7,7 +7,8 @@ class Achievement {
   final String emoji;
   final String description;
   final String position;
-  Achievement({required this.emoji, required this.description, required this.position});
+  Achievement(
+      {required this.emoji, required this.description, required this.position});
 }
 
 class EditProfile extends StatefulWidget {
@@ -18,18 +19,19 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  TextEditingController fullNameController = TextEditingController(text: "Sandinu Pinnawala");
-  TextEditingController birthDateController = TextEditingController(text: "04.08.2003");
-  TextEditingController aboutController = TextEditingController(text: "Blah Blah Blah");
+  TextEditingController fullNameController =
+      TextEditingController(text: "Sandinu Pinnawala");
+  TextEditingController birthDateController =
+      TextEditingController(text: "04.08.2003");
+  TextEditingController aboutController =
+      TextEditingController(text: "Blah Blah Blah");
   TextEditingController gpacontroller = TextEditingController(text: "3.5");
   TextEditingController agecontroller = TextEditingController(text: "21");
-  TextEditingController gradyearcontroller = TextEditingController(text: "2027");
+  TextEditingController gradyearcontroller =
+      TextEditingController(text: "2027");
 
   String? avatarUrl;
   File? _imageFile;
-  String? ageError;
-  String? gpaError;
-  String? gradYearError;
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {
@@ -51,48 +53,6 @@ class _EditProfileState extends State<EditProfile> {
 
     avatarUrl = url;
   }
-  void validateAge() {
-    final age = int.tryParse(agecontroller.text);
-    if (age == null || age < 0 || age > 120) {
-      setState(() {
-        ageError = "Please enter a valid age.";
-      });
-    } else {
-      setState(() {
-        ageError = null;
-      });
-    }
-  }
-
-  void validateGpa() {
-    final gpa = double.tryParse(gpacontroller.text);
-    if (gpa == null || gpa < 0 || gpa > 4) {
-      setState(() {
-        gpaError = "Please enter a valid gpa.";
-      });
-    } else {
-      setState(() {
-        gpaError = null;
-      });
-    }
-  }
-
-  void validateGradYear() {
-  final gradYear = int.tryParse(gradyearcontroller.text);
-  final currentYear = DateTime.now().year;
-
-  if (gradYear == null || gradYear < currentYear || gradYear > currentYear + 15) {
-    setState(() {
-      gradYearError = "Enter a valid graduation year ($currentYear - ${currentYear + 6}).";
-    });
-  } else {
-    setState(() {
-      gradYearError = null;
-    });
-  }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -112,24 +72,34 @@ class _EditProfileState extends State<EditProfile> {
                   });
                 },
               ),
-              CustomTextField(label: "Full Name", controller: fullNameController),
-              DatePickerTextField(label: "BirthDate", controller: birthDateController),
-              CustomTextField(label: "Age", controller: agecontroller, errorText: ageError, onChanged: (value) => validateAge()),
+              CustomTextField(
+                  label: "Full Name", controller: fullNameController),
+              DatePickerTextField(
+                  label: "BirthDate", controller: birthDateController),
+              CustomTextField(label: "Age", controller: agecontroller),
               CustomDropdown(
                 label: "Programme",
                 value: "Software Engineering",
-                items: ["Software Engineering", "Computer Science", "AI and Data Science", "Business Information Systems"],
+                items: [
+                  "Software Engineering",
+                  "Computer Science",
+                  "AI and Data Science",
+                  "Business Information Systems"
+                ],
               ),
               CustomDropdown(
                 label: "Student Status",
                 value: "Level 5",
-                items: ["Level 3", "Level 4", "Level 5", "Level 6",  "Alumni"],
+                items: ["Level 3", "Level 4", "Level 5", "Level 6", "Alumni"],
               ),
-              CustomTextField(label: "GPA", controller: gpacontroller, errorText: gpaError, onChanged: (value) => validateGpa()),
-              CustomTextField(label: "Graduation Year", controller: gradyearcontroller, errorText: gradYearError, onChanged: (value) => validateGradYear()),
-              CustomTextField(label: "About", controller: aboutController, maxLines: 3),
+              CustomTextField(label: "GPA", controller: gpacontroller),
+              CustomTextField(
+                  label: "Graduation Year", controller: gradyearcontroller),
+              CustomTextField(
+                  label: "About", controller: aboutController, maxLines: 3),
               SizedBox(height: 20),
-              Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Text("Achievements",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               SizedBox(height: 10),
               AchievementsSection(),
               SizedBox(height: 20),
@@ -138,9 +108,9 @@ class _EditProfileState extends State<EditProfile> {
                   // Handle update profile action
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple,
-                  foregroundColor: Colors.white // Button color
-                ),
+                    backgroundColor: Colors.purple,
+                    foregroundColor: Colors.white // Button color
+                    ),
                 child: const Text('Update Profile'),
               ),
             ],
@@ -155,10 +125,9 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final int maxLines;
-  final String? errorText;
-  final Function(String)? onChanged;
 
-  const CustomTextField({required this.label, required this.controller, this.maxLines = 1, this.errorText, this.onChanged});
+  const CustomTextField(
+      {required this.label, required this.controller, this.maxLines = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -174,10 +143,10 @@ class CustomTextField extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             filled: true,
             fillColor: Colors.grey.shade200,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: errorText != null ? BorderSide(color: Colors.red) : BorderSide.none),
-            errorText: errorText,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide.none),
           ),
-          onChanged: onChanged,
         ),
         SizedBox(height: 15),
       ],
@@ -219,7 +188,8 @@ class CustomDropdown extends StatelessWidget {
   final String value;
   final List<String> items;
 
-  const CustomDropdown({required this.label, required this.value, required this.items});
+  const CustomDropdown(
+      {required this.label, required this.value, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -230,12 +200,16 @@ class CustomDropdown extends StatelessWidget {
         SizedBox(height: 5),
         DropdownButtonFormField<String>(
           value: value,
-          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+          items: items
+              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+              .toList(),
           onChanged: (val) {},
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.grey.shade200,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide.none),
           ),
         ),
         SizedBox(height: 15),
@@ -268,16 +242,27 @@ class _AchievementsSectionState extends State<AchievementsSection> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: emojiController, decoration: const InputDecoration(labelText: "Emoji (e.g. 🔥)")),
-              TextField(controller: descriptionController, decoration: const InputDecoration(labelText: "Description")),
-              TextField(controller: positionController, decoration: const InputDecoration(labelText: "Position")),
+              TextField(
+                  controller: emojiController,
+                  decoration:
+                      const InputDecoration(labelText: "Emoji (e.g. 🔥)")),
+              TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(labelText: "Description")),
+              TextField(
+                  controller: positionController,
+                  decoration: const InputDecoration(labelText: "Position")),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Cancel")),
             TextButton(
               onPressed: () {
-                if (emojiController.text.isNotEmpty && descriptionController.text.isNotEmpty && positionController.text.isNotEmpty) {
+                if (emojiController.text.isNotEmpty &&
+                    descriptionController.text.isNotEmpty &&
+                    positionController.text.isNotEmpty) {
                   setState(() {
                     if (_achievements.length < _maxAchievements) {
                       _achievements.add(Achievement(
@@ -328,9 +313,14 @@ class _AchievementsSectionState extends State<AchievementsSection> {
               children: [
                 Text(achievement.emoji, style: const TextStyle(fontSize: 24)),
                 const SizedBox(height: 5),
-                Text(achievement.description, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                Text(achievement.description,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 3),
-                Text(achievement.position, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10)),
+                Text(achievement.position,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 10)),
               ],
             ),
           );
@@ -338,7 +328,9 @@ class _AchievementsSectionState extends State<AchievementsSection> {
           return GestureDetector(
             onTap: _addAchievement,
             child: Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(10)),
               child: const Icon(Icons.add, color: Colors.grey),
             ),
           );

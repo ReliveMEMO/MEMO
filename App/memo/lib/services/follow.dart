@@ -1,18 +1,11 @@
+import 'package:memo/pages/create_page.dart';
 import 'package:memo/services/auth_service.dart';
+import 'package:memo/services/notification.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FollowService {
   final supabase = Supabase.instance.client;
   final authService = AuthService();
-
-
-  Future<bool> handleFollow(String userId) async {
-    try {
-      final response = await supabase.from('user_following').insert({
-        'follower_id': authService.getCurrentUserID(),
-        'followed_id': userId,
-        'created_at': DateTime.now().toIso8601String()
-      });
   final notificationService = NotificationService();
 
   Future<bool> handleFollow(String userId, bool privateProfile) async {
@@ -25,7 +18,8 @@ class FollowService {
           'following': 'requested',
         });
 
-        await notificationService.sendNotificationsCom("Follow-Request", userId);
+        await notificationService.sendNotificationsCom(
+            "Follow-Request", userId);
       } else {
         final response = await supabase.from('user_following').insert({
           'follower_id': authService.getCurrentUserID(),
@@ -47,7 +41,7 @@ class FollowService {
       final response = await supabase
           .from('user_following')
           .select()
-          .eq('follower_id', authSevice.getCurrentUserID() ?? '')
+          .eq('follower_id', authService.getCurrentUserID() ?? '')
           .eq('followed_id', userId)
           .single();
 
@@ -131,9 +125,6 @@ class FollowService {
     }
   }
 
-    }
-  }
-
   Future<void> requestHandle(String userId, bool accept) async {
     try {
       if (accept) {
@@ -151,8 +142,6 @@ class FollowService {
       }
     } catch (e) {
       print(e);
-
     }
   }
 }
-  

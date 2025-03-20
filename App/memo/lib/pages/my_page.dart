@@ -26,8 +26,8 @@ class _myPageState extends State<myPage> {
   final Color colorDark = const Color(0xFF7f31c6);
 
   List pages = [
+    ProfilePage(),
     HomePage(),
-    SearchPage(),
     NewMemo(),
     ActivityPage(),
     ChatPage(),

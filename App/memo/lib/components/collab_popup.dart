@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memo/components/user_box.dart';
-import 'package:memo/services/auth_service.dart';
+//import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> showCustomPopup(BuildContext context, String timelineId) async {

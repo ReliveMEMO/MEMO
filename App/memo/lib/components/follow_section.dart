@@ -48,27 +48,21 @@ class _FollowSectionsState extends State<FollowSections> {
   }
 
   Future<void> handleFollow() async {
-    bool response = false;
-    if (widget.privateProfile == true) {
-      response =
-          await followService.handleFollow(userId!, widget.privateProfile!);
-      if (response) {
+    final response = await followService.handleFollow(userId!);
+
+    print('response');
+    print(response);
+    if (response) {
+      if (widget.privateProfile == true) {
         setState(() {
           following = "requested";
         });
-      }
-    } else {
-      response =
-          await followService.handleFollow(userId!, widget.privateProfile!);
-      if (response) {
+      } else {
         setState(() {
           following = "following";
         });
       }
     }
-
-    print('response');
-    print(response);
   }
 
   @override

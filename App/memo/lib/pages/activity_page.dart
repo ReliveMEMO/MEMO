@@ -224,14 +224,6 @@ class _ActivityPageState extends State<ActivityPage>
     });
   }
 
-  void removeNotification(String id) {
-    setState(() {
-      notificationList = notificationList!
-          .where((notification) => notification['id'] != id)
-          .toList();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -241,12 +233,10 @@ class _ActivityPageState extends State<ActivityPage>
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 70,
+        toolbarHeight: screenHeight * 0.05,
         automaticallyImplyLeading: false,
-        scrolledUnderElevation: 0,
-        backgroundColor: Colors.white30,
-        flexibleSpace: Container(
-          margin: EdgeInsets.only(top: 30),
+        flexibleSpace: Padding(
+          padding: EdgeInsets.only(top: screenHeight * 0.04),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -254,8 +244,8 @@ class _ActivityPageState extends State<ActivityPage>
                 padding: const EdgeInsets.only(left: 20.0),
                 child: Image.asset(
                   'assets/images/TextLogo.png',
-                  width: screenWidth * 0.25,
-                  height: screenWidth * 0.25,
+                  width: screenWidth * 0.2,
+                  height: screenWidth * 0.2,
                 ),
               ),
               Padding(
@@ -263,21 +253,19 @@ class _ActivityPageState extends State<ActivityPage>
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
+                        MaterialPageRoute(builder: (Context) {
                       return ProfilePage();
                     }));
                   },
                   child: CircleAvatar(
                     radius: 25,
                     child: ClipOval(
-                      child: userDetails?['profile_pic'] == null
-                          ? CircularProgressIndicator()
-                          : CachedNetworkImage(
-                              imageUrl: userDetails?['profile_pic'] ?? '',
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                            ),
+                      child: CachedNetworkImage(
+                        imageUrl: userDetails?['profile_pic'] as String? ?? '',
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
@@ -357,8 +345,7 @@ class _ActivityPageState extends State<ActivityPage>
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 10),
                     child: NotificationTile(
-                      notificationId: activityList![index]['id'],
-                    ),
+                        notificationId: activityList![index]['id']),
                   );
                 },
               ),
@@ -413,10 +400,7 @@ class _ActivityPageState extends State<ActivityPage>
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 10),
                     child: NotificationTile(
-                      notificationId: notificationList![index]['id'],
-                      onRemove: () =>
-                          removeNotification(notificationList![index]['id']),
-                    ),
+                        notificationId: notificationList![index]['id']),
                   );
                 },
               ),

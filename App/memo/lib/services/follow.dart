@@ -1,10 +1,18 @@
 import 'package:memo/services/auth_service.dart';
-import 'package:memo/services/notification.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FollowService {
   final supabase = Supabase.instance.client;
   final authService = AuthService();
+
+
+  Future<bool> handleFollow(String userId) async {
+    try {
+      final response = await supabase.from('user_following').insert({
+        'follower_id': authService.getCurrentUserID(),
+        'followed_id': userId,
+        'created_at': DateTime.now().toIso8601String()
+      });
   final notificationService = NotificationService();
 
   Future<bool> handleFollow(String userId, bool privateProfile) async {
@@ -39,7 +47,7 @@ class FollowService {
       final response = await supabase
           .from('user_following')
           .select()
-          .eq('follower_id', authService.getCurrentUserID() ?? '')
+          .eq('follower_id', authSevice.getCurrentUserID() ?? '')
           .eq('followed_id', userId)
           .single();
 
@@ -94,8 +102,7 @@ class FollowService {
           .eq('followed_id', userId)
           .eq('following', 'following');
 
-      print(
-          "######################################################################################################################Fetched Followers: $response");
+      print("Fetched Followers: $response");
 
       // Ensure the response is a list of maps
       return response.map((e) => e as Map<String, dynamic>).toList();
@@ -114,14 +121,16 @@ class FollowService {
           .eq('follower_id', userId)
           .eq('following', 'following');
 
-      print(
-          "##################################################################################################Fetched Following: $response");
+      print("Fetched Following: $response");
 
       // Ensure the response is a list of maps
       return response.map((e) => e as Map<String, dynamic>).toList();
     } catch (e) {
       print("Error fetching following: $e");
       return [];
+    }
+  }
+
     }
   }
 
@@ -142,6 +151,8 @@ class FollowService {
       }
     } catch (e) {
       print(e);
+
     }
   }
 }
+  

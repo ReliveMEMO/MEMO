@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
+import 'package:memo/components/dropDown.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -36,6 +37,8 @@ class _EditProfileState extends State<EditProfile> {
   String? gradYearError;
   bool isLoading = true;
    final authService = AuthService();
+  
+  String? selectedStatus;
 
   @override
   void initState() {
@@ -48,7 +51,7 @@ class _EditProfileState extends State<EditProfile> {
     final response = await Supabase.instance.client
         .from('User_Info')
         .select()
-        .eq('user_id', authService.getCurrentUserID() ?? '')
+        .eq('id', authService.getCurrentUserID() ?? '')
         .single();
 
     print("Fetched User Profile: $response"); // Debugging log
@@ -58,8 +61,9 @@ class _EditProfileState extends State<EditProfile> {
         fullNameController.text = response['full_name'] ?? '';
         birthDateController.text = response['birth_date'] ?? '';
         agecontroller.text = response['user_age']?.toString() ?? '';
+        
+        selectedStatus = response['user_level'] ?? 'Level 3';
         gpacontroller.text = response['user_gpa']?.toString() ?? '';
-        gradyearcontroller.text = response['user_grad_year']?.toString() ?? '';
         aboutController.text = response['user_about'] ?? '';
         avatarUrl = response['profile_pic'];
         isLoading = false;
@@ -91,6 +95,44 @@ class _EditProfileState extends State<EditProfile> {
     avatarUrl = url;
   }
 
+  Future<void> updateUserProfile() async {
+  try {
+    final updates = {
+      'full_name': fullNameController.text,
+      'birth_date': birthDateController.text,
+      'user_age': int.tryParse(agecontroller.text) ?? 0,
+      'user_gpa': double.tryParse(gpacontroller.text) ?? 0.0,
+      'user_grad_year': int.tryParse(gradyearcontroller.text) ?? 0,
+      'user_about': aboutController.text,
+      
+      'user_level': selectedStatus,
+      'profile_pic': avatarUrl,
+    };
+
+    final response = await Supabase.instance.client
+        .from('User_Info')
+        .update(updates)
+        .eq('id', authService.getCurrentUserID() ?? '');
+
+    if (response != null) {
+      print("Error updating user profile: ${response.error!.message}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to update profile: ${response.error!.message}")),
+      );
+    } else {
+      print("User profile updated successfully");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully!")),
+      );
+    }
+  } catch (e) {
+    print("Error updating user profile: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("An error occurred while updating profile.")),
+    );
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,6 +145,7 @@ class _EditProfileState extends State<EditProfile> {
           child: Column(
             children: [
               AvatarUpload(
+                
                 onImageSelected: (File? imageFile) {
                   setState(() {
                     _imageFile = imageFile;
@@ -114,21 +157,24 @@ class _EditProfileState extends State<EditProfile> {
               DatePickerTextField(
                   label: "BirthDate", controller: birthDateController),
               CustomTextField(label: "Age", controller: agecontroller),
-              CustomDropdown(
-                label: "Programme",
-                value: "Software Engineering",
-                items: [
-                  "Software Engineering",
-                  "Computer Science",
-                  "AI and Data Science",
-                  "Business Information Systems"
-                ],
-              ),
-              CustomDropdown(
-                label: "Student Status",
-                value: "Level 5",
-                items: ["Level 3", "Level 4", "Level 5", "Level 6", "Alumni"],
-              ),
+            
+              DropdownComponent(
+            hintText: ' Student Status',
+            items: const [
+              'Level 3',
+              'Level 4',
+              'Level 5',
+              'Level 6',
+              'Alumni'
+            ], // Dropdown options
+            onChanged: (value) {
+              setState(() {
+                selectedStatus = value;
+              });
+            },
+            selectedValue: selectedStatus,
+            
+          ),
               CustomTextField(label: "GPA", controller: gpacontroller),
               CustomTextField(
                   label: "Graduation Year", controller: gradyearcontroller),
@@ -142,6 +188,7 @@ class _EditProfileState extends State<EditProfile> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
+                  updateUserProfile();
                   // Handle update profile action
                 },
                 style: ElevatedButton.styleFrom(

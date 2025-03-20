@@ -1,3 +1,4 @@
+import 'package:memo/pages/create_page.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/notification.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,7 +9,6 @@ class FollowService {
   final notificationService = NotificationService();
   Future<bool> handleFollow(String userId, bool privateProfile) async {
     try {
-
       if (privateProfile) {
         final response = await supabase.from('user_following').insert({
           'follower_id': authSevice.getCurrentUserID(),
@@ -123,6 +123,8 @@ class FollowService {
     } catch (e) {
       print("Error fetching following: $e");
       return [];
+    }
+  }
 
   Future<void> requestHandle(String userId, bool accept) async {
     try {

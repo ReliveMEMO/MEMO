@@ -24,8 +24,8 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-      elevation: 1,
+      margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+      elevation: 3,
       color: Colors.grey[100],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),

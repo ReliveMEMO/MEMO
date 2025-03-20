@@ -1,3 +1,4 @@
+import 'package:memo/pages/create_page.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -131,8 +132,6 @@ class FollowService {
     }
   }
 
-    }
-  }
 
   Future<void> requestHandle(String userId, bool accept) async {
     try {

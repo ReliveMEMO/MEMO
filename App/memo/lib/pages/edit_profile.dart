@@ -1,14 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
+import 'package:memo/components/dropDown.dart';
+import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Achievement {
   final String emoji;
   final String description;
   final String position;
-  Achievement(
-      {required this.emoji, required this.description, required this.position});
+
+  Achievement({required this.emoji, required this.description, required this.position});
 }
 
 class EditProfile extends StatefulWidget {
@@ -19,47 +21,109 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  TextEditingController fullNameController =
-      TextEditingController(text: "Sandinu Pinnawala");
-  TextEditingController birthDateController =
-      TextEditingController(text: "04.08.2003");
-  TextEditingController aboutController =
-      TextEditingController(text: "Blah Blah Blah");
-  TextEditingController gpacontroller = TextEditingController(text: "3.5");
-  TextEditingController agecontroller = TextEditingController(text: "21");
-  TextEditingController gradyearcontroller =
-      TextEditingController(text: "2027");
+  TextEditingController fullNameController = TextEditingController();
+  TextEditingController birthDateController = TextEditingController();
+  TextEditingController aboutController = TextEditingController();
+  TextEditingController gpacontroller = TextEditingController();
+  TextEditingController agecontroller = TextEditingController();
+  TextEditingController gradyearcontroller = TextEditingController();
 
   String? avatarUrl;
   File? _imageFile;
+  bool isLoading = true;
+  final authService = AuthService();
+  List<String> statusOptions = ['Level 3', 'Level 4', 'Level 5', 'Level 6', 'Alumni'];
+  String? selectedStatus;
 
-  Future<void> uploadImage() async {
-    if (_imageFile == null) {
-      avatarUrl =
-          'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/default.jpg';
-      return;
+  @override
+  void initState() {
+    super.initState();
+    fetchUserProfile();
+  }
+
+  Future<void> fetchUserProfile() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('User_Info')
+          .select()
+          .eq('id', authService.getCurrentUserID() ?? '')
+          .single();
+
+      String fetchedStatus = response['user_level'] ?? 'Level 3';
+      if (!statusOptions.contains(fetchedStatus)) {
+        fetchedStatus = 'Level 3';
+      }
+
+      setState(() {
+        fullNameController.text = response['full_name'] ?? '';
+        birthDateController.text = response['birth_date'] ?? '';
+        agecontroller.text = response['user_age']?.toString() ?? '';
+        selectedStatus = fetchedStatus;
+        gpacontroller.text = response['user_gpa']?.toString() ?? '';
+        aboutController.text = response['user_about'] ?? '';
+        avatarUrl = response['profile_pic'];
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching user profile: $e");
     }
+  }
 
-    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    final path = 'uploads/$fileName';
+  Future<void> updateUserProfile() async {
+    try {
+      int? age = int.tryParse(agecontroller.text);
+      double? gpa = double.tryParse(gpacontroller.text);
+      int? graduationYear = int.tryParse(gradyearcontroller.text);
+      int currentYear = DateTime.now().year;
 
-    await Supabase.instance.client.storage
-        .from('profile-pictures')
-        .upload(path, _imageFile!);
+      if (age == null || age < 10 || age > 120) {
+        showError("Age must be a number between 10 and 120.");
+        return;
+      }
+      if (gpa == null || gpa < 0.0 || gpa > 4.0) {
+        showError("GPA must be between 0.0 and 4.0.");
+        return;
+      }
+      if (graduationYear == null || graduationYear > currentYear + 6) {
+        showError("Graduation year cannot be more than 6 years from now.");
+        return;
+      }
 
-    final url = await Supabase.instance.client.storage
-        .from('profile-pictures')
-        .getPublicUrl(path);
+      final updates = {
+        'full_name': fullNameController.text,
+        'birth_date': birthDateController.text,
+        'user_age': age,
+        'user_gpa': gpa,
+        'user_grad_year': graduationYear,
+        'user_about': aboutController.text,
+        'user_level': selectedStatus,
+        'profile_pic': avatarUrl,
+      };
 
-    avatarUrl = url;
+      await Supabase.instance.client
+          .from('User_Info')
+          .update(updates)
+          .eq('id', authService.getCurrentUserID() ?? '');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully!")),
+      );
+    } catch (e) {
+      print("Error updating user profile: $e");
+      showError("An error occurred while updating profile.");
+    }
+  }
+
+  void showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message, style: const TextStyle(color: Colors.red))),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-      ),
+      appBar: AppBar(title: const Text('Edit Profile')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -72,45 +136,33 @@ class _EditProfileState extends State<EditProfile> {
                   });
                 },
               ),
-              CustomTextField(
-                  label: "Full Name", controller: fullNameController),
-              DatePickerTextField(
-                  label: "BirthDate", controller: birthDateController),
+              CustomTextField(label: "Full Name", controller: fullNameController),
+              DatePickerTextField(label: "BirthDate", controller: birthDateController),
               CustomTextField(label: "Age", controller: agecontroller),
-              CustomDropdown(
-                label: "Programme",
-                value: "Software Engineering",
-                items: [
-                  "Software Engineering",
-                  "Computer Science",
-                  "AI and Data Science",
-                  "Business Information Systems"
-                ],
-              ),
-              CustomDropdown(
-                label: "Student Status",
-                value: "Level 5",
-                items: ["Level 3", "Level 4", "Level 5", "Level 6", "Alumni"],
+              DropdownComponent(
+                hintText: 'Student Status',
+                items: statusOptions,
+                onChanged: (value) {
+                  setState(() {
+                    selectedStatus = value;
+                  });
+                },
+                selectedValue: selectedStatus,
               ),
               CustomTextField(label: "GPA", controller: gpacontroller),
-              CustomTextField(
-                  label: "Graduation Year", controller: gradyearcontroller),
-              CustomTextField(
-                  label: "About", controller: aboutController, maxLines: 3),
-              SizedBox(height: 20),
-              Text("Achievements",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              SizedBox(height: 10),
+              CustomTextField(label: "Graduation Year", controller: gradyearcontroller),
+              CustomTextField(label: "About", controller: aboutController, maxLines: 3),
+              const SizedBox(height: 20),
+              const Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const SizedBox(height: 10),
               AchievementsSection(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // Handle update profile action
-                },
+                onPressed: updateUserProfile,
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
-                    foregroundColor: Colors.white // Button color
-                    ),
+                  backgroundColor: Colors.purple,
+                  foregroundColor: Colors.white,
+                ),
                 child: const Text('Update Profile'),
               ),
             ],
@@ -120,6 +172,7 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 }
+
 
 class CustomTextField extends StatelessWidget {
   final String label;

@@ -32,7 +32,6 @@ class _EditProfileState extends State<EditProfile> {
   File? _imageFile;
   bool isLoading = true;
   final authService = AuthService();
-
   List<String> statusOptions = ['Level 3', 'Level 4', 'Level 5', 'Level 6', 'Alumni'];
   String? selectedStatus;
 
@@ -72,12 +71,30 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> updateUserProfile() async {
     try {
+      int? age = int.tryParse(agecontroller.text);
+      double? gpa = double.tryParse(gpacontroller.text);
+      int? graduationYear = int.tryParse(gradyearcontroller.text);
+      int currentYear = DateTime.now().year;
+
+      if (age == null || age < 10 || age > 120) {
+        showError("Age must be a number between 10 and 120.");
+        return;
+      }
+      if (gpa == null || gpa < 0.0 || gpa > 4.0) {
+        showError("GPA must be between 0.0 and 4.0.");
+        return;
+      }
+      if (graduationYear == null || graduationYear > currentYear + 6) {
+        showError("Graduation year cannot be more than 6 years from now.");
+        return;
+      }
+
       final updates = {
         'full_name': fullNameController.text,
         'birth_date': birthDateController.text,
-        'user_age': int.tryParse(agecontroller.text) ?? 0,
-        'user_gpa': double.tryParse(gpacontroller.text) ?? 0.0,
-        'user_grad_year': int.tryParse(gradyearcontroller.text) ?? 0,
+        'user_age': age,
+        'user_gpa': gpa,
+        'user_grad_year': graduationYear,
         'user_about': aboutController.text,
         'user_level': selectedStatus,
         'profile_pic': avatarUrl,
@@ -93,10 +110,14 @@ class _EditProfileState extends State<EditProfile> {
       );
     } catch (e) {
       print("Error updating user profile: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("An error occurred while updating profile.")),
-      );
+      showError("An error occurred while updating profile.");
     }
+  }
+
+  void showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message, style: const TextStyle(color: Colors.red))),
+    );
   }
 
   @override

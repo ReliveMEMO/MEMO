@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
+import 'package:memo/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Achievement {
   final String emoji;
   final String description;
   final String position;
+
+  
   Achievement({required this.emoji, required this.description, required this.position});
 }
 
@@ -18,15 +21,54 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  TextEditingController fullNameController = TextEditingController(text: "Sandinu Pinnawala");
-  TextEditingController birthDateController = TextEditingController(text: "04.08.2003");
-  TextEditingController aboutController = TextEditingController(text: "Blah Blah Blah");
-  TextEditingController gpacontroller = TextEditingController(text: "3.5");
-  TextEditingController agecontroller = TextEditingController(text: "21");
-  TextEditingController gradyearcontroller = TextEditingController(text: "2027");
+
+  TextEditingController fullNameController = TextEditingController();
+  TextEditingController birthDateController = TextEditingController();
+  TextEditingController aboutController = TextEditingController();
+  TextEditingController gpacontroller = TextEditingController();
+  TextEditingController agecontroller = TextEditingController();
+  TextEditingController gradyearcontroller = TextEditingController();
 
   String? avatarUrl;
   File? _imageFile;
+  String? ageError;
+  String? gpaError;
+  String? gradYearError;
+  bool isLoading = true;
+   final authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserProfile();
+  }
+
+  Future<void> fetchUserProfile() async {
+  try {
+    final response = await Supabase.instance.client
+        .from('User_Info')
+        .select()
+        .eq('user_id', authService.getCurrentUserID() ?? '')
+        .single();
+
+    print("Fetched User Profile: $response"); // Debugging log
+
+    //if (response == null) {
+      setState(() {
+        fullNameController.text = response['full_name'] ?? '';
+        birthDateController.text = response['birth_date'] ?? '';
+        agecontroller.text = response['user_age']?.toString() ?? '';
+        gpacontroller.text = response['user_gpa']?.toString() ?? '';
+        gradyearcontroller.text = response['user_grad_year']?.toString() ?? '';
+        aboutController.text = response['user_about'] ?? '';
+        avatarUrl = response['profile_pic'];
+        isLoading = false;
+      });
+    //}
+  } catch (e) {
+    print("Error fetching user profile: $e"); 
+  }
+}
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {
@@ -67,24 +109,34 @@ class _EditProfileState extends State<EditProfile> {
                   });
                 },
               ),
-              CustomTextField(label: "Full Name", controller: fullNameController),
-              DatePickerTextField(label: "BirthDate", controller: birthDateController),
+              CustomTextField(
+                  label: "Full Name", controller: fullNameController),
+              DatePickerTextField(
+                  label: "BirthDate", controller: birthDateController),
               CustomTextField(label: "Age", controller: agecontroller),
               CustomDropdown(
                 label: "Programme",
                 value: "Software Engineering",
-                items: ["Software Engineering", "Computer Science", "AI and Data Science", "Business Information Systems"],
+                items: [
+                  "Software Engineering",
+                  "Computer Science",
+                  "AI and Data Science",
+                  "Business Information Systems"
+                ],
               ),
               CustomDropdown(
                 label: "Student Status",
                 value: "Level 5",
-                items: ["Level 3", "Level 4", "Level 5", "Level 6",  "Alumni"],
+                items: ["Level 3", "Level 4", "Level 5", "Level 6", "Alumni"],
               ),
               CustomTextField(label: "GPA", controller: gpacontroller),
-              CustomTextField(label: "Graduation Year", controller: gradyearcontroller),
-              CustomTextField(label: "About", controller: aboutController, maxLines: 3),
+              CustomTextField(
+                  label: "Graduation Year", controller: gradyearcontroller),
+              CustomTextField(
+                  label: "About", controller: aboutController, maxLines: 3),
               SizedBox(height: 20),
-              Text("Achievements", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Text("Achievements",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               SizedBox(height: 10),
               AchievementsSection(),
               SizedBox(height: 20),
@@ -93,9 +145,9 @@ class _EditProfileState extends State<EditProfile> {
                   // Handle update profile action
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple,
-                  foregroundColor: Colors.white // Button color
-                ),
+                    backgroundColor: Colors.purple,
+                    foregroundColor: Colors.white // Button color
+                    ),
                 child: const Text('Update Profile'),
               ),
             ],
@@ -111,7 +163,8 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final int maxLines;
 
-  const CustomTextField({required this.label, required this.controller, this.maxLines = 1});
+  const CustomTextField(
+      {required this.label, required this.controller, this.maxLines = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +180,9 @@ class CustomTextField extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             filled: true,
             fillColor: Colors.grey.shade200,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide.none),
           ),
         ),
         SizedBox(height: 15),
@@ -170,7 +225,8 @@ class CustomDropdown extends StatelessWidget {
   final String value;
   final List<String> items;
 
-  const CustomDropdown({required this.label, required this.value, required this.items});
+  const CustomDropdown(
+      {required this.label, required this.value, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -181,12 +237,16 @@ class CustomDropdown extends StatelessWidget {
         SizedBox(height: 5),
         DropdownButtonFormField<String>(
           value: value,
-          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+          items: items
+              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+              .toList(),
           onChanged: (val) {},
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.grey.shade200,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide.none),
           ),
         ),
         SizedBox(height: 15),
@@ -219,16 +279,27 @@ class _AchievementsSectionState extends State<AchievementsSection> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: emojiController, decoration: const InputDecoration(labelText: "Emoji (e.g. 🔥)")),
-              TextField(controller: descriptionController, decoration: const InputDecoration(labelText: "Description")),
-              TextField(controller: positionController, decoration: const InputDecoration(labelText: "Position")),
+              TextField(
+                  controller: emojiController,
+                  decoration:
+                      const InputDecoration(labelText: "Emoji (e.g. 🔥)")),
+              TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(labelText: "Description")),
+              TextField(
+                  controller: positionController,
+                  decoration: const InputDecoration(labelText: "Position")),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Cancel")),
             TextButton(
               onPressed: () {
-                if (emojiController.text.isNotEmpty && descriptionController.text.isNotEmpty && positionController.text.isNotEmpty) {
+                if (emojiController.text.isNotEmpty &&
+                    descriptionController.text.isNotEmpty &&
+                    positionController.text.isNotEmpty) {
                   setState(() {
                     if (_achievements.length < _maxAchievements) {
                       _achievements.add(Achievement(
@@ -279,9 +350,14 @@ class _AchievementsSectionState extends State<AchievementsSection> {
               children: [
                 Text(achievement.emoji, style: const TextStyle(fontSize: 24)),
                 const SizedBox(height: 5),
-                Text(achievement.description, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                Text(achievement.description,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 3),
-                Text(achievement.position, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10)),
+                Text(achievement.position,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 10)),
               ],
             ),
           );
@@ -289,7 +365,9 @@ class _AchievementsSectionState extends State<AchievementsSection> {
           return GestureDetector(
             onTap: _addAchievement,
             child: Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(10)),
               child: const Icon(Icons.add, color: Colors.grey),
             ),
           );

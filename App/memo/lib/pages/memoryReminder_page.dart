@@ -15,7 +15,12 @@ class MemoryReminderPage extends StatelessWidget {
     required this.memoryText,
     required this.heading,
     required this.collaborators,
-    required this.onClose, required String postImage, required String memoryDate, required String postHeading, required List collaboratorAvatars, required List collaboratorNames,
+    required this.onClose,
+    required String postImage,
+    required String memoryDate,
+    required String postHeading,
+    required List collaboratorAvatars,
+    required List collaboratorNames,
   });
 
   @override
@@ -31,13 +36,7 @@ class MemoryReminderPage extends StatelessWidget {
             height: double.infinity,
           ),
         ),
-
-    
       ],
     );
   }
 }
-
-
-
-

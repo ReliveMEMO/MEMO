@@ -1,6 +1,3 @@
-
-
-
 // import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:flutter/material.dart';
 // import 'package:memo/providers/user_provider.dart';
@@ -163,30 +160,76 @@
 //   }
 // }
 
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/components/notification_tile.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
+import 'package:memo/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ActivityPage extends StatefulWidget {
   @override
   _ActivityPageState createState() => _ActivityPageState();
 }
 
-class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderStateMixin {
+class _ActivityPageState extends State<ActivityPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final authService = AuthService();
+  bool isLoading = false;
+  PostgrestList? activityList;
+  PostgrestList? notificationList;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    fetchActivity();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> fetchActivity() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final activityResponse = await Supabase.instance.client
+        .from('notification_table')
+        .select('id')
+        .eq('receiver_id', authService.getCurrentUserID() ?? "")
+        .eq('notification_type', 'activity')
+        .order('created_at', ascending: false);
+    ;
+
+    final notificationResponse = await Supabase.instance.client
+        .from('notification_table')
+        .select('id')
+        .eq('receiver_id', authService.getCurrentUserID() ?? "")
+        .eq('notification_type', 'notification')
+        .order('created_at', ascending: false);
+    ;
+
+    setState(() {
+      activityList = activityResponse;
+      notificationList = notificationResponse;
+      isLoading = false;
+    });
+  }
+
+  void removeNotification(String id) {
+    setState(() {
+      notificationList = notificationList!
+          .where((notification) => notification['id'] != id)
+          .toList();
+    });
   }
 
   @override
@@ -198,10 +241,12 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: screenHeight * 0.05,
+        toolbarHeight: 70,
         automaticallyImplyLeading: false,
-        flexibleSpace: Padding(
-          padding: EdgeInsets.only(top: screenHeight * 0.04),
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.white30,
+        flexibleSpace: Container(
+          margin: EdgeInsets.only(top: 30),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -209,20 +254,30 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
                 padding: const EdgeInsets.only(left: 20.0),
                 child: Image.asset(
                   'assets/images/TextLogo.png',
-                  width: screenWidth * 0.2,
-                  height: screenWidth * 0.2,
+                  width: screenWidth * 0.25,
+                  height: screenWidth * 0.25,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 15),
-                child: CircleAvatar(
-                  radius: 25,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: userDetails?['profile_pic'] as String? ?? '',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return ProfilePage();
+                    }));
+                  },
+                  child: CircleAvatar(
+                    radius: 25,
+                    child: ClipOval(
+                      child: userDetails?['profile_pic'] == null
+                          ? CircularProgressIndicator()
+                          : CachedNetworkImage(
+                              imageUrl: userDetails?['profile_pic'] ?? '',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                 ),
@@ -241,12 +296,15 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildActivityList(),
-          _buildNotificationList(),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildActivityList(),
+            _buildNotificationList(),
+          ],
+        ),
       ),
     );
   }
@@ -271,17 +329,39 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
 
     return ScrollbarTheme(
       data: ScrollbarThemeData(
-        thumbColor: MaterialStateProperty.all(Colors.purple),  // Set the thumb color to purple
-        radius: Radius.circular(10),  // Set the corners to be rounded
+        thumbColor: MaterialStateProperty.all(
+            Colors.purple), // Set the thumb color to purple
+        radius: Radius.circular(10), // Set the corners to be rounded
         //thickness: MaterialStateProperty.all(8),  // Keeping default thickness (no change)
       ),
       child: Scrollbar(
-        child: ListView.builder(
-          itemCount: activities.length,
-          itemBuilder: (context, index) {
-            return _buildActivityItem(activities[index]);
-          },
-        ),
+        child: isLoading
+            ? ListView.builder(
+                itemCount: 10,
+                itemBuilder: (context, index) {
+                  return Skeletonizer(
+                      child: ListTile(
+                    title:
+                        Container(width: 100, height: 20, color: Colors.grey),
+                    subtitle:
+                        Container(width: 150, height: 20, color: Colors.grey),
+                    leading:
+                        CircleAvatar(radius: 22, backgroundColor: Colors.grey),
+                  ));
+                },
+              )
+            : ListView.builder(
+                itemCount: activityList!.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 10),
+                    child: NotificationTile(
+                      notificationId: activityList![index]['id'],
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }
@@ -306,16 +386,40 @@ class _ActivityPageState extends State<ActivityPage> with SingleTickerProviderSt
 
     return ScrollbarTheme(
       data: ScrollbarThemeData(
-        thumbColor: MaterialStateProperty.all(Colors.purple),  // Set the thumb color to purple
-        radius: Radius.circular(10),  // Set the corners to be rounded
+        thumbColor: MaterialStateProperty.all(
+            Colors.purple), // Set the thumb color to purple
+        radius: Radius.circular(10), // Set the corners to be rounded
       ),
       child: Scrollbar(
-        child: ListView.builder(
-          itemCount: notifications.length,
-          itemBuilder: (context, index) {
-            return _buildNotificationItem(notifications[index]);
-          },
-        ),
+        child: isLoading
+            ? ListView.builder(
+                itemCount: 10,
+                itemBuilder: (context, index) {
+                  return Skeletonizer(
+                      child: ListTile(
+                    title:
+                        Container(width: 100, height: 20, color: Colors.grey),
+                    subtitle:
+                        Container(width: 150, height: 20, color: Colors.grey),
+                    leading:
+                        CircleAvatar(radius: 22, backgroundColor: Colors.grey),
+                  ));
+                },
+              )
+            : ListView.builder(
+                itemCount: notificationList!.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 10),
+                    child: NotificationTile(
+                      notificationId: notificationList![index]['id'],
+                      onRemove: () =>
+                          removeNotification(notificationList![index]['id']),
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

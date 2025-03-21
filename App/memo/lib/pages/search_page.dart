@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/user_tile.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/search_service.dart';
 import 'package:provider/provider.dart';
@@ -19,11 +20,13 @@ class _SearchPageState extends State<SearchPage> {
   var searchResults = [];
   bool isSearching = false;
   final searchService = SearchService();
+  List<String> recentSearches = [];
 
   @override
   void initState() {
     super.initState();
     searchController.addListener(_onSearchChanged);
+    loadRecentSearch();
   }
 
   void _onSearchChanged() {
@@ -54,6 +57,20 @@ class _SearchPageState extends State<SearchPage> {
       recentSearches.insert(0, userID);
       await prefs.setStringList('recentSearches', recentSearches);
     }
+    print('======================================');
+    print(recentSearches);
+    loadRecentSearch();
+  }
+
+  Future<void> loadRecentSearch() async {
+    print('==========loading=========');
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      isLoading = true;
+      recentSearches = prefs.getStringList('recentSearches') ?? [];
+      isLoading = false;
+    });
   }
 
   Future<void> _searchUsers(String query) async {
@@ -84,10 +101,12 @@ class _SearchPageState extends State<SearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: screenHeight * 0.06,
+        toolbarHeight: 70,
         automaticallyImplyLeading: false,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.white30,
         flexibleSpace: Container(
-          margin: EdgeInsets.only(top: screenHeight * 0.06),
+          margin: EdgeInsets.only(top: 40),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -95,20 +114,30 @@ class _SearchPageState extends State<SearchPage> {
                 padding: const EdgeInsets.only(left: 20.0),
                 child: Image.asset(
                   'assets/images/TextLogo.png',
-                  width: screenWidth * 0.2,
-                  height: screenWidth * 0.2,
+                  width: screenWidth * 0.25,
+                  height: screenWidth * 0.25,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 15),
-                child: CircleAvatar(
-                  radius: 25,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: userDetails?['profile_pic'] as String? ?? '',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return ProfilePage();
+                    }));
+                  },
+                  child: CircleAvatar(
+                    radius: 25,
+                    child: ClipOval(
+                      child: userDetails?['profile_pic'] == null
+                          ? CircularProgressIndicator()
+                          : CachedNetworkImage(
+                              imageUrl: userDetails?['profile_pic'] ?? '',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                 ),
@@ -142,7 +171,7 @@ class _SearchPageState extends State<SearchPage> {
           //     ),
           //   ],
           // ),
-          SizedBox(height: 15),
+          SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(
               color: Colors.black12,
@@ -184,27 +213,61 @@ class _SearchPageState extends State<SearchPage> {
                     ],
                   ),
                   Expanded(
-                    child: TabBarView(
-                      children: [
-                        isSearching
-                            ? isLoading
-                                ? Center(child: CircularProgressIndicator())
-                                : ListView.builder(
-                                    itemCount: searchResults.length,
-                                    itemBuilder: (context, index) {
-                                      final user = searchResults[index];
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20.0, vertical: 4),
-                                        child: UserTile(userId: user['id']),
-                                      );
-                                    },
-                                  )
-                            : Center(child: Text('Search for accounts')),
-                        Center(
-                            child:
-                                Text('Events section is blank')), // Events tab
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TabBarView(
+                        children: [
+                          isSearching
+                              ? isLoading
+                                  ? Center(child: CircularProgressIndicator())
+                                  : ListView.builder(
+                                      itemCount: searchResults.length,
+                                      itemBuilder: (context, index) {
+                                        final user = searchResults[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 4),
+                                          child: UserTile(
+                                              userId: user['id'],
+                                              onTap: () {
+                                                saveRecentSearch(user['id']);
+                                              }),
+                                        );
+                                      },
+                                    )
+                              : recentSearches.isEmpty
+                                  ? Center(
+                                      child:
+                                          Text('You have no recent searches'))
+                                  : ListView.builder(
+                                      itemCount: recentSearches.length,
+                                      itemBuilder: (context, index) {
+                                        final user = recentSearches[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 4),
+                                          child: UserTile(
+                                            userId: user,
+                                            // onTap: () {
+                                            //   Navigator.push(
+                                            //       context,
+                                            //       MaterialPageRoute(
+                                            //           builder: (context) =>
+                                            //               ProfilePage(
+                                            //                 userId:
+                                            //                     recentSearches[
+                                            //                         index],
+                                            //               )));
+                                            // },
+                                          ),
+                                        );
+                                      },
+                                    ), // Accounts tab
+                          Center(
+                              child: Text(
+                                  'Events section is blank')), // Events tab
+                        ],
+                      ),
                     ),
                   ),
                 ],

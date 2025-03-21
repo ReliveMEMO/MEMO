@@ -1,6 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:memo/pages/create_page.dart';
+import 'package:memo/pages/full_post.dart';
+import 'package:memo/services/like_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:solar_icons/solar_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -18,12 +22,34 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
-  bool liked = true;
+  bool liked = false;
+  final likeService = LikeService();
+  late int likes;
+
+  @override
+  void initState() {
+    super.initState();
+    setTheStates();
+  }
+
+  void setTheStates() async {
+    setState(() {
+      likes = widget.post['likes'] as int;
+    });
+
+    final likedList = widget.post['liked_by'] as List;
+
+    if (likedList.contains(authService.getCurrentUserID())) {
+      setState(() {
+        liked = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+      margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
       elevation: 1,
       color: Colors.grey[100],
       child: Padding(
@@ -40,19 +66,27 @@ class _PostCardState extends State<PostCard> {
                     fontWeight: FontWeight.w500,
                     color: Colors.purple)),
             SizedBox(height: 15),
-            CachedNetworkImage(
-              imageUrl: widget.post['image_url'],
-              placeholder: (context, url) => Container(
-                width: 300,
-                height: 300,
-                color: Colors.grey[300],
-                child: Center(
-                  child: Skeletonizer(
-                    child: SizedBox(width: 300, height: 300),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FullPost(post: widget.post)));
+              },
+              child: CachedNetworkImage(
+                imageUrl: widget.post['image_url'],
+                placeholder: (context, url) => Container(
+                  width: 300,
+                  height: 300,
+                  color: Colors.grey[300],
+                  child: Center(
+                    child: Skeletonizer(
+                      child: Center(child: SizedBox(width: 300, height: 300)),
+                    ),
                   ),
                 ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
             SizedBox(height: 15),
             Padding(
@@ -74,18 +108,47 @@ class _PostCardState extends State<PostCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   liked
-                      ? Icon(
-                          SolarIconsBold.like,
-                          color: Colors.purple,
-                          size: 22,
+                      ? GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              liked = !liked;
+                              likes--;
+                            });
+
+                            likeService.handleUnLike(
+                                widget.post["post_id"],
+                                widget.post["owner_id"],
+                                likes,
+                                widget.post["liked_by"] as List);
+                          },
+                          child: Icon(
+                            SolarIconsBold.like,
+                            color: Colors.purple,
+                            size: 22,
+                          ),
                         )
-                      : Icon(
-                          SolarIconsOutline.like,
-                          size: 19,
+                      : GestureDetector(
+                          onTap: () async {
+                            setState(() {
+                              liked = !liked;
+                              likes++;
+                            });
+
+                            final response = await likeService.handleLike(
+                                widget.post["post_id"],
+                                widget.post["owner_id"],
+                                likes,
+                                widget.post["liked_by"] as List);
+                            print(response);
+                          },
+                          child: Icon(
+                            SolarIconsOutline.like,
+                            size: 19,
+                          ),
                         ),
                   SizedBox(width: 5),
                   Text(
-                    "${100}",
+                    likes.toString(),
                     style: TextStyle(color: Colors.black45),
                   ),
                   SizedBox(width: 15),

@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/chat_tile.dart';
 import 'package:memo/components/user_tile.dart';
 import 'package:memo/main.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/search_service.dart';
@@ -163,14 +164,21 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 15),
-            child: CircleAvatar(
-              radius: 25,
-              child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: userProvider.userDetails['profile_pic'] as String,
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.cover,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (Context) {
+                  return ProfilePage();
+                }));
+              },
+              child: CircleAvatar(
+                radius: 25,
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: userProvider.userDetails['profile_pic'] as String,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -187,7 +195,7 @@ class _ChatPageState extends State<ChatPage> with RouteAware {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20.0, vertical: 4),
-                      child: UserTile(userId: user['id']),
+                      child: UserTile(userId: user['id'], isChat: true),
                     );
                   },
                 )

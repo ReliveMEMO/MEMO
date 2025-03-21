@@ -77,6 +77,15 @@ class _PostBoxState extends State<PostBox> {
     });
   }
 
+  Future<void> _saveClickedMemo(String memoId) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> clickedMemos = prefs.getStringList('clicked_memos') ?? [];
+    if (!clickedMemos.contains(memoId)) {
+      clickedMemos.add(memoId);
+      prefs.setStringList('clicked_memos', clickedMemos);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -177,30 +186,22 @@ class _PostBoxState extends State<PostBox> {
                     color: Colors.grey)),
           ),
           SizedBox(height: 10),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => FullPost(post: widget.post)));
-            },
-            child: CachedNetworkImage(
-              imageUrl: widget.post['image_url'],
-              placeholder: (context, url) => Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.width,
-                color: Colors.grey[300],
-                child: Center(
-                  child: Skeletonizer(
-                    child: Center(
-                        child: SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.width)),
-                  ),
+          CachedNetworkImage(
+            imageUrl: widget.post['image_url'],
+            placeholder: (context, url) => Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width,
+              color: Colors.grey[300],
+              child: Center(
+                child: Skeletonizer(
+                  child: Center(
+                      child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width)),
                 ),
               ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
+            errorWidget: (context, url, error) => Icon(Icons.error),
           ),
           SizedBox(height: 15),
           Padding(
@@ -247,6 +248,8 @@ class _PostBoxState extends State<PostBox> {
                             liked = !liked;
                             likes--;
                           });
+
+                          _saveClickedMemo(widget.post['post_id']);
 
                           likeService.handleUnLike(
                               widget.post["post_id"],

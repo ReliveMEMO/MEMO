@@ -61,7 +61,23 @@ class _SignupPageState extends State<SignupPage> {
 
             const SizedBox(height: 10),
 
-            const Googlelog(),
+            /*const*/
+            Googlelog(),
+
+            // Additional Google Sign-Up Button
+            Authbutton(
+              buttonText: "Sign in with Google",
+              onTap: () async {
+                try {
+                  await authService.signInWithGoogle();
+                  Navigator.pushNamed(context, '/create-profile');
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(e.toString())),
+                  );
+                }
+              },
+            ),
 
             const SizedBox(
               height: 20,
@@ -103,11 +119,13 @@ class _SignupPageState extends State<SignupPage> {
               hintText: "Email",
               obscureText: false,
               controller: emailController,
+              // borderRadius: 10,
             ),
             TextFieldComponent(
               hintText: "Username",
               obscureText: false,
               controller: usernameController,
+              // borderRadius: 10,
             ),
 
             //Password textfield
@@ -115,6 +133,7 @@ class _SignupPageState extends State<SignupPage> {
               hintText: "Password",
               obscureText: true,
               controller: passwordController,
+              // borderRadius: 10,
             ),
 
             //Login button

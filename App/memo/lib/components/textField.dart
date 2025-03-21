@@ -8,6 +8,7 @@ class TextFieldComponent extends StatelessWidget {
   final Color colorDark = const Color(0xFF7f31c6);
   final String? errorText;
   final VoidCallback? clearErrorText;
+  final int maxLines;
 
   const TextFieldComponent(
       {super.key,
@@ -15,7 +16,8 @@ class TextFieldComponent extends StatelessWidget {
       required this.obscureText,
       required this.controller,
       this.errorText,
-      this.clearErrorText});
+      this.clearErrorText,
+      this.maxLines = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class TextFieldComponent extends StatelessWidget {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        maxLines: maxLines,
         onChanged: (text) {
           if (text.isNotEmpty && clearErrorText != null) {
             clearErrorText!();

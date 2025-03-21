@@ -1,0 +1,2 @@
+C:/Users/Malsha Jayasinghe/Documents/GitHub/new/MEMO/App/memo/android/app/.cxx/Debug/476d4m4j/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Malsha Jayasinghe/Documents/GitHub/new/MEMO/App/memo/android/app/.cxx/Debug/476d4m4j/x86_64/CMakeFiles/rebuild_cache.dir

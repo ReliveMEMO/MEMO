@@ -85,6 +85,11 @@ class AuthService {
   }
 
   Future<String?> getDisplayPicture(String userId) async {
+    if (userId.isEmpty) {
+      print('Error: userId is empty');
+      return null;
+    }
+
     final response = await _supabase
         .from('User_Info')
         .select('profile_pic')
@@ -100,6 +105,11 @@ class AuthService {
   }
 
   Future<String?> getDisplayName(String userId) async {
+    if (userId.isEmpty) {
+      print('Error: userId is empty');
+      return null;
+    }
+
     final response = await _supabase
         .from('User_Info')
         .select('full_name')

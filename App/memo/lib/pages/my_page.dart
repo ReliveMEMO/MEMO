@@ -28,6 +28,8 @@ class _myPageState extends State<myPage> {
     ProfilePage(),
     SearchPage(),
     NewMemo(),
+    //MemoryReminderPopup(),
+    //EventPage(), 
     ActivityPage(),
     ChatPage(),
   ];

@@ -92,7 +92,7 @@ class MyApp extends StatelessWidget {
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
-        'memoryReminder': (context) => MemoryReminderPopup(),
+        '/memoryReminder': (context) => MemoryReminderPopup(),
 
         '/create-page': (context) => CreatePage(),
 

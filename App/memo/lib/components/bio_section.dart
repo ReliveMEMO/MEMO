@@ -1,355 +1,187 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:memo/services/auth_service.dart';
 
-class bio_section extends StatelessWidget {
-  const bio_section({
-    super.key,
-  });
+class bio_section extends StatefulWidget {
+  const bio_section({super.key});
+
+  @override
+  _BioSectionState createState() => _BioSectionState();
+}
+
+class _BioSectionState extends State<bio_section> {
+  String major = "";
+  String gradYear = "";
+  String age = "";
+  String gpa = "";
+  String about = "";
+  List<Map<String, String>> achievements = [];
+
+  final authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserBio();
+  }
+
+  Future<void> fetchUserBio() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('User_Info')
+          .select()
+          .eq('id', authService.getCurrentUserID() ?? '')
+          .single();
+
+      setState(() {
+        major = response['user_major'] ?? "BEng. Software Engineering";
+        gradYear = response['user_grad_year']?.toString() ?? "2027";
+        age = response['user_age']?.toString() ?? "21";
+        gpa = response['user_gpa']?.toString() ?? "3.0";
+        about = response['user_about'] ?? "blah blah blah blah";
+        
+      });
+    } catch (e) {
+      print("Error fetching bio: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // Adjust alignment of the entire column
       children: [
-        SizedBox(height: 20),
-        Center(
-          child: Column(
-            children: [
-              // Major Section
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.withOpacity(0.4)),
-                    ),
-                    child: Text(
-                      "BEng. Software Engineering",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: -12,
-                    left: 130,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      color: Colors.white,
-                      child: Text(
-                        "Major",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+        const SizedBox(height: 20),
+        Align(
+          alignment: Alignment.center, // Center align the major text box
+          child: _buildStackedTextBox("Major", major, width: 320),
+        ),
+        const SizedBox(height: 30),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Adjust alignment of row items
+          children: [
+            _buildStackedTextBox("Grad Year", gradYear),
+            _buildStackedTextBox("Age", age),
+            _buildStackedTextBox("GPA", gpa),
+          ],
+        ),
+        const SizedBox(height: 30),
+        Align(
+          alignment: Alignment.center, // Center align the about text box
+          child: _buildStackedTextBox("About", about, width: 320, height: 50),
+        ),
+        const SizedBox(height: 30),
+        Align(
+          alignment: Alignment.center, // Center align the achievements section
+          child: _buildAchievementsSection(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStackedTextBox(String label, String value, {double width = 90, double? height}) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: width,
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: height ?? 18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.grey.withOpacity(0.4)),
+          ),
+            child: Padding(
+            padding: const EdgeInsets.only(top: 5), // Adjust the top padding as needed
+            child: Align(
+              alignment: Alignment.center, // Adjust alignment if necessary
+              child: Text(
+              value,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 30),
-              // Grad Year, Age, GPA Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Grad Year
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: 90,
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey.withOpacity(0.4)),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "2027",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: -12,
-                        left: 15,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          color: Colors.white,
-                          child: Text(
-                            "Grad Year",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Age
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: 90,
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey.withOpacity(0.4)),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "21",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: -12,
-                        left: 25,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          color: Colors.white,
-                          child: Text(
-                            "Age",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // GPA
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: 90,
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey.withOpacity(0.4)),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "3.0",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: -12,
-                        left: 30,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          color: Colors.white,
-                          child: Text(
-                            "GPA",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              // About Section
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 320,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: Colors.grey.withOpacity(0.4)),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          "blah blah blah blah\nblah blah blah blah",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    top: -12,
-                    left: 130,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      color: Colors.white,
-                      child: Text(
-                        "About",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              // Achievements Section
-              AchievementsSection(),
-            ],
+            ),
+            ),
+          ),
+        Positioned(
+          top: -12,
+          left: width / 4,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            color: Colors.white,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
+            ),
           ),
         ),
       ],
     );
   }
-}
 
-class AchievementsSection extends StatefulWidget {
-  const AchievementsSection({Key? key}) : super(key: key);
-
-  @override
-  _AchievementsSectionState createState() => _AchievementsSectionState();
-}
-
-class _AchievementsSectionState extends State<AchievementsSection> {
-  final List<Achievement> _achievements = [];
-  final int _maxAchievements = 6;
-
-  void _addAchievement() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final emojiController = TextEditingController();
-        final descriptionController = TextEditingController();
-        final positionController = TextEditingController();
-
-        return AlertDialog(
-          title: const Text("Add Achievement"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: emojiController, decoration: const InputDecoration(labelText: "Emoji (e.g. 🔥)")),
-              TextField(controller: descriptionController, decoration: const InputDecoration(labelText: "Description")),
-              TextField(controller: positionController, decoration: const InputDecoration(labelText: "Position")),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
-            TextButton(
-              onPressed: () {
-                if (emojiController.text.isNotEmpty && descriptionController.text.isNotEmpty && positionController.text.isNotEmpty) {
-                  setState(() {
-                    if (_achievements.length < _maxAchievements) {
-                      _achievements.add(Achievement(
-                        emoji: emojiController.text,
-                        description: descriptionController.text,
-                        position: positionController.text,
-                      ));
-                    }
-                  });
-                  Navigator.of(context).pop();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("All fields are required!")),
-                  );
-                }
-              },
-              child: const Text("Add"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 1,
-      ),
-      itemCount: _achievements.length + 1,
-      itemBuilder: (context, index) {
-        if (index < _achievements.length) {
-          final achievement = _achievements[index];
-          return Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(achievement.emoji, style: const TextStyle(fontSize: 24)),
-                const SizedBox(height: 5),
-                Text(achievement.description, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 3),
-                Text(achievement.position, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10)),
-              ],
-            ),
-          );
-        } else if (_achievements.length < _maxAchievements) {
-          return GestureDetector(
-            onTap: _addAchievement,
+  Widget _buildAchievementsSection() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            top: -15,
+            left: 120,
             child: Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(10)),
-              child: const Icon(Icons.add, color: Colors.grey),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              color: Colors.white,
+              child: const Text("Achievements",
+                  style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500)),
             ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
+          ),
+          Container(
+            width: 340,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: Colors.grey.withOpacity(0.4)),
+            ),
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 0.9,
+                mainAxisSpacing: 20,
+                crossAxisSpacing: 20,
+              ),
+              itemCount: achievements.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.grey.withOpacity(0.4)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        achievements[index]["emoji"]!,
+                        style: const TextStyle(fontSize: 30),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        achievements[index]["description"]!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
-}
-
-class Achievement {
-  final String emoji;
-  final String description;
-  final String position;
-
-  Achievement({
-    required this.emoji,
-    required this.description,
-    required this.position,
-  });
 }

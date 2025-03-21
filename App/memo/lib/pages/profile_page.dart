@@ -6,6 +6,7 @@ import 'package:memo/components/bio_section.dart';
 import 'package:memo/components/follow_section.dart';
 import 'package:memo/components/timeline_card.dart';
 import 'package:memo/pages/following_follower_page.dart';
+import 'package:memo/pages/settings_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/follow.dart';
@@ -129,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
       personalProfile = true;
     }
   }
-// test for commenting code
+
   @override
   Widget build(BuildContext context) {
     final userLoggedIn = userDetails?['display_name'];
@@ -138,12 +139,18 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: Colors.white, // Set the entire background to white
       appBar: AppBar(
         backgroundColor: Colors.white,
+        automaticallyImplyLeading: true,
         elevation: 0,
         actions: [
           personalProfile == true
               ? IconButton(
                   icon: const Icon(Icons.settings, color: Colors.black),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (Context) {
+                      return SettingsPage();
+                    }));
+                  },
                 )
               : Container(),
         ],
@@ -206,11 +213,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           bottom: 1,
                                           right: 10),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue,
+                                        color: userDetails != null &&
+                                                userDetails!['status']
+                                                    .toString()
+                                                    .contains("Level")
+                                            ? Colors.blue
+                                            : Colors.purple,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        "LEVEL 05",
+                                        userDetails?['status'] ?? 'Active',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
@@ -273,7 +285,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (Context) {
                                         return FollowingFollowerPage(
-                                          userId: widget.userId ?? '',
                                           selectedTab: 0,
                                         );
                                       }));
@@ -303,7 +314,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (Context) {
                                         return FollowingFollowerPage(
-                                          userId: widget.userId ?? '',
                                           selectedTab: 1,
                                         );
                                       }));

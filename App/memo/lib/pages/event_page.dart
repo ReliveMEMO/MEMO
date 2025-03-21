@@ -11,7 +11,7 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   bool isAttending = false; // Track attendance
   int attendeeCount = 12; // Initial attendee count
-   
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +111,7 @@ class _EventPageState extends State<EventPage> {
               onTap: () {
                 setState(() {
                   isAttending = !isAttending;
-                  isAttending ? attendeeCount++ : attendeeCount--; 
+                  isAttending ? attendeeCount++ : attendeeCount--;
                 });
               },
               child: Container(
@@ -161,10 +161,9 @@ class _EventPageState extends State<EventPage> {
                   backgroundImage: CachedNetworkImageProvider(
                       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SGvshARHJ5GYSH_Kig8-cYNw5rO3nWn7mA&s'), // club logo
                 ),
-                
                 const SizedBox(width: 5),
                 Text("$attendeeCount Attending",
-                 style: TextStyle(color: Colors.grey, fontSize: 14)),
+                    style: TextStyle(color: Colors.grey, fontSize: 14)),
               ],
             ),
           ],
@@ -188,4 +187,3 @@ class _EventPageState extends State<EventPage> {
     );
   }
 }
-

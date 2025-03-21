@@ -7,10 +7,9 @@ import 'package:memo/services/follow.dart';
 import 'package:memo/pages/profile_page.dart';
 
 class FollowingFollowerPage extends StatefulWidget {
-  final String userId; // Add userId parameter
   final int selectedTab;
 
-  FollowingFollowerPage({required this.userId, required this.selectedTab});
+  FollowingFollowerPage({required this.selectedTab});
 
   @override
   _FollowingFollowerPageState createState() => _FollowingFollowerPageState();
@@ -19,12 +18,11 @@ class FollowingFollowerPage extends StatefulWidget {
 class _FollowingFollowerPageState extends State<FollowingFollowerPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final authService = AuthService();
   final FollowService _followService = FollowService();
   List<Map<String, dynamic>> _followers = [];
   List<Map<String, dynamic>> _following = [];
   bool _isLoading = true;
-  final AuthService authService = AuthService();
-  String _profileName = '';
 
   @override
   void initState() {
@@ -35,17 +33,10 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
   }
 
   Future<void> _fetchData() async {
-    final userId;
-    if (widget.userId.isNotEmpty) {
-      userId =
-          widget.userId; // Use the userId passed to the FollowingFollowerPage
-    } else {
-      userId = authService.getCurrentUserID();
-    }
-    if (userId.isNotEmpty) {
+    final userId = AuthService().getCurrentUserID();
+    if (userId != null) {
       final followersData = await _followService.getFollowers(userId);
       final followingData = await _followService.getFollowing(userId);
-      final profileName = await authService.getDisplayName(userId);
 
       print("Followers Data: $followersData");
       print("Following Data: $followingData");
@@ -54,7 +45,6 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
         _followers = followersData;
         _following = followingData;
         _isLoading = false;
-        _profileName = profileName ?? '';
       });
     } else {
       setState(() {
@@ -81,7 +71,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
         automaticallyImplyLeading: true,
         centerTitle: true,
         title: Text(
-          '@${_profileName}',
+          '@${authService.getCurrentUser()}',
           style: TextStyle(fontSize: 18),
         ),
         bottom: TabBar(

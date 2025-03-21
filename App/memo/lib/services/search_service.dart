@@ -12,4 +12,13 @@ class SearchService {
 
     return response as List<Map<String, dynamic>>;
   }
+
+  Future<List<Map<String, dynamic>>> searchPages(String query) async {
+    final response = await supabase
+        .from('page_table')
+        .select()
+        .ilike('page_name', '%$query%');
+
+    return response as List<Map<String, dynamic>>;
+  }
 }

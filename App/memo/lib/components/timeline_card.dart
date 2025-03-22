@@ -1,12 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/pages/create_event.dart';
 import 'package:memo/pages/timeLine_page.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TimelineCard extends StatefulWidget {
   final String timelineId;
-  const TimelineCard({Key? key, required this.timelineId}) : super(key: key);
+  final VoidCallback? onDelete; // Callback to notify parent
+
+  const TimelineCard({Key? key, required this.timelineId, this.onDelete})
+      : super(key: key);
 
   @override
   State<TimelineCard> createState() => _TimelineCardState();
@@ -72,6 +76,44 @@ class _TimelineCardState extends State<TimelineCard> {
     });
   }
 
+  Future<void> deleteTimeLine(String timelineId) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete Timeline"),
+          content: Text("Are you sure you want to delete this timeline?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User cancels
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirms
+              },
+              child: Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await Supabase.instance.client
+          .from('Timeline_Table')
+          .delete()
+          .eq('id', timelineId);
+
+      // Refresh the user data after deletion
+      if (widget.onDelete != null) {
+        widget.onDelete!();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String imagePath = isLoading
@@ -98,6 +140,11 @@ class _TimelineCardState extends State<TimelineCard> {
                     timelinename: timeLines?['timeline_name'],
                   )),
         );
+      },
+      onLongPress: () {
+        if (timeLines?['admin'] == authService.getCurrentUserID()) {
+          deleteTimeLine(widget.timelineId);
+        }
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

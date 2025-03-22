@@ -12,6 +12,7 @@ import 'package:solar_icons/solar_icons.dart';
 import 'package:memo/pages/activity_page.dart';
 
 import 'package:memo/pages/search_page.dart';
+import 'package:memo/pages/home_page.dart';
 
 class myPage extends StatefulWidget {
   final int? index;
@@ -25,7 +26,7 @@ class _myPageState extends State<myPage> {
   final Color colorDark = const Color(0xFF7f31c6);
 
   List pages = [
-    ProfilePage(),
+    HomePage(),
     SearchPage(),
     NewMemo(),
     //MemoryReminderPopup(),

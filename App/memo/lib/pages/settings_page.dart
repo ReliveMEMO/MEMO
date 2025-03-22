@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memo/pages/account_privacy_page.dart';
 import 'package:memo/pages/about_us_page.dart';
 import 'package:memo/pages/contact_us_page.dart';
+import 'package:memo/pages/create_page.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -50,6 +51,8 @@ class _SettingsPageState extends State<SettingsPage> {
               child: ListView(
                 children: [
                   _buildPrivacyOption(),
+                  Divider(),
+                  _createPage(),
                   Divider(),
                   _buildAboutUsOption(),
                   Divider(),
@@ -108,6 +111,16 @@ class _SettingsPageState extends State<SettingsPage> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => AboutUsPage()),
+        ),
+      );
+
+  Widget _createPage() => ListTile(
+        leading: Icon(Icons.pages_outlined, color: Colors.black),
+        title: Text("Create Page", style: TextStyle(fontSize: 16)),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CreatePage()),
         ),
       );
 

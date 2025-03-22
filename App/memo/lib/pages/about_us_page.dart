@@ -119,9 +119,11 @@ class AboutUsPage extends StatelessWidget {
 
   Widget _buildTeamMember({required String name, required String linkedinUrl}) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-      elevation: 3.5,
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      elevation: 0,
+      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 4),
       color: const Color.fromARGB(230, 255, 255, 255),
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),

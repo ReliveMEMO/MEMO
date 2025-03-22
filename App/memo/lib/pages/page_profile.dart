@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:memo/components/bio_section.dart';
+import 'package:memo/components/event_card.dart';
 import 'package:memo/components/follow_section.dart';
 import 'package:memo/components/timeline_card.dart';
 import 'package:memo/pages/create_event.dart';
@@ -39,6 +40,7 @@ class _PageProfileState extends State<PageProfile> {
   String isFollowing = 'not-following';
   int followers = 0;
   int following = 0;
+  List<String>? eventList;
 
   @override
   void initState() {
@@ -83,6 +85,18 @@ class _PageProfileState extends State<PageProfile> {
     setState(() {
       userDetails = response;
     });
+
+    final events = await Supabase.instance.client
+        .from('events')
+        .select('id')
+        .eq('admin', widget.userId!);
+
+    if (events != null) {
+      setState(() {
+        eventList =
+            (events as List<dynamic>).map((e) => e['id'] as String).toList();
+      });
+    }
 
     setState(() {
       adminPage = userDetails?['admin'] == authService.getCurrentUserID();
@@ -293,10 +307,10 @@ class _PageProfileState extends State<PageProfile> {
                           shrinkWrap: true,
                           // Disable scrolling for GridView
                           children: [
-                            GridTile(child: Text("Event1")),
-                            GridTile(child: Text("Event1")),
-                            GridTile(child: Text("Event1")),
-                            GridTile(child: Text("Event1")),
+                            GridTile(
+                                child: EventCard(
+                                    eventId:
+                                        "b4990b1e-6db2-4c1f-a22e-6e2018fafadb"))
                           ],
                         ),
                         // Bio Section

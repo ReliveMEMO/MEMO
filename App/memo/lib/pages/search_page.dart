@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:memo/components/event_tile.dart';
 import 'package:memo/components/page_tile.dart';
 import 'package:memo/components/user_tile.dart';
 import 'package:memo/pages/profile_page.dart';
@@ -23,6 +24,7 @@ class _SearchPageState extends State<SearchPage> {
   final searchService = SearchService();
   List<String> recentSearches = [];
   List<String> recentPageSearches = [];
+  List<String> recentEventSearches = [];
   int selectedTab = 0;
 
   @override
@@ -44,6 +46,8 @@ class _SearchPageState extends State<SearchPage> {
           _searchUsers(searchValue);
         } else if (selectedTab == 1) {
           _searchPages(searchValue);
+        } else {
+          _searchEvents(searchValue);
         }
       }
     });
@@ -64,6 +68,19 @@ class _SearchPageState extends State<SearchPage> {
         recentSearches.remove(userID);
         recentSearches.insert(0, userID);
         await prefs.setStringList('recentSearches', recentSearches);
+      }
+    } else if (type == 'event') {
+      if (!recentEventSearches.contains(userID)) {
+        recentEventSearches.insert(0, userID);
+        if (recentEventSearches.length > 5) {
+          recentEventSearches.removeLast();
+        }
+        await prefs.setStringList('recentEventSearches', recentEventSearches);
+      }
+      if (recentEventSearches.contains(userID)) {
+        recentEventSearches.remove(userID);
+        recentEventSearches.insert(0, userID);
+        await prefs.setStringList('recentEventSearches', recentEventSearches);
       }
     } else {
       if (!recentPageSearches.contains(userID)) {
@@ -89,6 +106,7 @@ class _SearchPageState extends State<SearchPage> {
       isLoading = true;
       recentSearches = prefs.getStringList('recentSearches') ?? [];
       recentPageSearches = prefs.getStringList('recentPageSearches') ?? [];
+      recentEventSearches = prefs.getStringList('recentEventSearches') ?? [];
       isLoading = false;
     });
   }
@@ -119,6 +137,25 @@ class _SearchPageState extends State<SearchPage> {
 
     try {
       final results = await searchService.searchPages(query);
+      setState(() {
+        searchResults = results;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error Searching users: $e');
+    }
+  }
+
+  Future<void> _searchEvents(String query) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final results = await searchService.searchEvents(query);
       setState(() {
         searchResults = results;
         isLoading = false;
@@ -356,9 +393,58 @@ class _SearchPageState extends State<SearchPage> {
                                         );
                                       },
                                     ), // Accounts tab
-                          Center(
-                              child: Text(
-                                  'Events section is blank')), // Events tab
+                          Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 20),
+                              child: isSearching
+                                  ? isLoading
+                                      ? Center(
+                                          child: CircularProgressIndicator())
+                                      : GridView.builder(
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount:
+                                                2, // 2 tiles in a row
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 10,
+                                            childAspectRatio:
+                                                0.7, // Adjust this to your preference
+                                          ),
+                                          itemCount: searchResults.length,
+                                          itemBuilder: (context, index) {
+                                            return EventTile(
+                                              eventId: searchResults[index]
+                                                  ['id'],
+                                              onTap: () {
+                                                saveRecentSearch(
+                                                    searchResults[index]['id'],
+                                                    'event');
+                                              },
+                                            );
+                                          },
+                                        )
+                                  : recentEventSearches.isEmpty
+                                      ? Center(
+                                          child: Text(
+                                              'You have no recent searches'))
+                                      : GridView.builder(
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount:
+                                                2, // 2 tiles in a row
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 10,
+                                            childAspectRatio:
+                                                0.7, // Adjust this to your preference
+                                          ),
+                                          itemCount: recentEventSearches.length,
+                                          itemBuilder: (context, index) {
+                                            return EventTile(
+                                              eventId:
+                                                  recentEventSearches[index],
+                                            );
+                                          },
+                                        ))
                         ],
                       ),
                     ),

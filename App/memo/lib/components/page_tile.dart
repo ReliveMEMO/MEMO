@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:memo/pages/page_profile.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
@@ -101,7 +102,7 @@ class _PageTileState extends State<PageTile> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ProfilePage(
+                              builder: (context) => PageProfile(
                                     userId: cId,
                                   )));
                     },

@@ -28,7 +28,7 @@ class _myPageState extends State<myPage> {
   List pages = [
     HomePage(),
     SearchPage(),
-    NewMemo(),
+    EventPage(),
     ActivityPage(),
     ChatPage(),
   ];

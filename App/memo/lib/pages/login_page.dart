@@ -235,22 +235,20 @@ class _LoginPageState extends State<LoginPage> {
             ),
 
             // Google Sign-In button
-            Authbutton(
-              buttonText: "Sign in with Google",
-              onTap: () async {
-                try {
-                  await authService.signInWithGoogle();
-                  Navigator.pushNamed(context, '/profile');
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString())),
-                  );
-                }
-              },
-            ),
 
             /*const*/
-            Googlelog(),
+            GestureDetector(
+                onTap: () async {
+                  try {
+                    await authService.signInWithGoogle();
+                    Navigator.pushNamed(context, '/profile');
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.toString())),
+                    );
+                  }
+                },
+                child: Googlelog()),
             //Signup link
 
             const SizedBox(

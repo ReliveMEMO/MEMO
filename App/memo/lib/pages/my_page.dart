@@ -28,7 +28,9 @@ class _myPageState extends State<myPage> {
   List pages = [
     HomePage(),
     SearchPage(),
-    EventPage(),
+    EventPage(
+      eventId: "b4990b1e-6db2-4c1f-a22e-6e2018fafadb",
+    ),
     ActivityPage(),
     ChatPage(),
   ];

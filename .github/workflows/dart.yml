@@ -53,7 +53,30 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Get pull request reviews
+        id: pr_reviews
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          REVIEWER_USERNAME="specific_user"  # Replace with the GitHub username of the reviewer you want
+          APPROVED=false
+
+          # Get the list of reviews for the PR
+          REVIEWS=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/reviews")
+
+          # Check if the specific user has approved the PR
+          echo "$REVIEWS" | jq -e ".[] | select(.user.login == \"$REVIEWER_USERNAME\" and .state == \"APPROVED\")" > /dev/null
+
+          if [[ $? -eq 0 ]]; then
+            APPROVED=true
+          fi
+
+          echo "Approved: $APPROVED"
+          echo "::set-output name=approved::$APPROVED"
+
       - name: Attempt to merge PR branch into DevTest
+        if: steps.pr_reviews.outputs.approved == 'true'
         run: |
           git fetch origin
           git checkout ${{ env.TEST_BRANCH }}
@@ -61,6 +84,12 @@ jobs:
           git push origin ${{ env.TEST_BRANCH }}
         working-directory: ${{ env.ROOT_DIR }}
         continue-on-error: true
+
+      - name: PR Not Approved - Exit
+        if: steps.pr_reviews.outputs.approved == 'false'
+        run: |
+          echo "The PR has not been approved by the required user. Merge will not occur."
+          exit 1
 
   auto-merge-to-other:
     runs-on: ubuntu-latest

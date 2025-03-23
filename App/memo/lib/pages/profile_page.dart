@@ -6,6 +6,7 @@ import 'package:memo/components/bio_section.dart';
 import 'package:memo/components/follow_section.dart';
 import 'package:memo/components/timeline_card.dart';
 import 'package:memo/pages/following_follower_page.dart';
+import 'package:memo/pages/settings_page.dart';
 import 'package:memo/providers/user_provider.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/follow.dart';
@@ -69,6 +70,10 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       isLoading = true;
     });
+
+    if (timelineIds.isNotEmpty) {
+      timelineIds.clear();
+    }
 
     final response = await Supabase.instance.client
         .from('User_Info')
@@ -144,7 +149,12 @@ class _ProfilePageState extends State<ProfilePage> {
           personalProfile == true
               ? IconButton(
                   icon: const Icon(Icons.settings, color: Colors.black),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (Context) {
+                      return SettingsPage();
+                    }));
+                  },
                 )
               : Container(),
         ],
@@ -441,7 +451,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                     NeverScrollableScrollPhysics(), // Disable scrolling for GridView
                                 children: [
                                   ...timelineIds.map((id) {
-                                    return TimelineCard(timelineId: id);
+                                    return TimelineCard(
+                                      timelineId: id,
+                                      onDelete: getUser,
+                                    );
                                   }).toList()
                                 ],
                               ),

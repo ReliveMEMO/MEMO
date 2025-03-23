@@ -62,23 +62,20 @@ class _SignupPageState extends State<SignupPage> {
             const SizedBox(height: 10),
 
             /*const*/
-            Googlelog(),
+            GestureDetector(
+                onTap: () async {
+                  try {
+                    await authService.signInWithGoogle();
+                    Navigator.pushNamed(context, '/profile');
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.toString())),
+                    );
+                  }
+                },
+                child: Googlelog()),
 
             // Additional Google Sign-Up Button
-            Authbutton(
-              buttonText: "Sign in with Google",
-              onTap: () async {
-                try {
-                  await authService.signInWithGoogle();
-                  Navigator.pushNamed(context, '/create-profile');
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString())),
-                  );
-                }
-              },
-            ),
-
             const SizedBox(
               height: 20,
             ),

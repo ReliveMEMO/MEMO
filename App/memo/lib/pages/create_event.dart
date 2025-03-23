@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:memo/components/avatar_upload.dart';
 import 'package:memo/components/textField.dart';
 import 'package:memo/pages/my_page.dart';
+import 'package:memo/pages/page_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:memo/services/auth_service.dart';
 
@@ -16,18 +17,20 @@ String? pageNameErrorText;
 String? yearErrorText;
 String? aboutUsErrorText;
 
-class CreatePage extends StatefulWidget {
-  const CreatePage({super.key});
+class CreateEvent extends StatefulWidget {
+  final String pageId;
+  const CreateEvent({super.key, required this.pageId});
 
   @override
-  State<CreatePage> createState() => _CreatePageState();
+  State<CreateEvent> createState() => _CreateEventState();
 }
 
-class _CreatePageState extends State<CreatePage> {
+class _CreateEventState extends State<CreateEvent> {
   // Controllers for text fields
   final TextEditingController pageNameController = TextEditingController();
   final TextEditingController yearController = TextEditingController();
   final TextEditingController aboutUsController = TextEditingController();
+  DateTime? selectedDate;
 
   // Styling Colors
   final Color colorLight = const Color.fromARGB(255, 248, 240, 255);
@@ -36,79 +39,6 @@ class _CreatePageState extends State<CreatePage> {
   final authService = AuthService();
 
   // Year Picker Function - Custom Year Selector
-  Future<void> _selectYear(BuildContext context) async {
-    int selectedYear = DateTime.now().year;
-    int startYear = 1950;
-    int endYear = 2025;
-
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Select Year',
-            style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-          ),
-          backgroundColor: const Color.fromARGB(255, 224, 224, 224),
-          content: Container(
-            width: double.maxFinite,
-            height: 300,
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // 3 columns for grid
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 20,
-                childAspectRatio: 2,
-              ),
-              itemCount: endYear - startYear + 1,
-              itemBuilder: (BuildContext context, int index) {
-                int year = startYear + index;
-                bool isSelected = year.toString() == yearController.text;
-
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      yearController.text = year.toString();
-                      yearErrorText = null;
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color.fromARGB(255, 131, 67, 195)
-                          : const Color.fromARGB(0, 255, 255, 255),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      year.toString(),
-                      style: TextStyle(
-                        color: isSelected
-                            ? colorLight
-                            : const Color.fromARGB(255, 0, 0, 0),
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text('Cancel',
-                  style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0))),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   Future<void> uploadImage() async {
     if (_imageFile == null) {
@@ -152,7 +82,7 @@ class _CreatePageState extends State<CreatePage> {
     });
   }
 
-  Future<void> createPage() async {
+  Future<void> createEvent() async {
     // Get Current User ID
     final userId = authService.getCurrentUserID();
 
@@ -166,19 +96,17 @@ class _CreatePageState extends State<CreatePage> {
         await uploadImage();
 
         // Insert Page Data into Supabase
-        final response =
-            await Supabase.instance.client.from('page_table').insert({
-          'admin': authService.getCurrentUserID(),
-          'page_name': pageNameController.text,
-          'year': yearController.text,
-          'about_us': aboutUsController.text,
-          'image_url': avatarUrl,
-          'created_at': DateTime.now().toIso8601String(),
+        final response = await Supabase.instance.client.from('events').insert({
+          'admin': widget.pageId,
+          'event_name': pageNameController.text,
+          'Date': selectedDate?.toIso8601String(),
+          'caption': aboutUsController.text,
+          'cover': avatarUrl,
         });
 
         if (response == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Page Created Successfully!')),
+            SnackBar(content: Text('Event Created Successfully!')),
           );
 
           // Clear Fields after Successful Submission
@@ -190,9 +118,14 @@ class _CreatePageState extends State<CreatePage> {
           // });
 
           // Navigate to Profile or Home Screen
-          Navigator.pushNamed(context, '/my-page');
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PageProfile(
+                        userId: widget.pageId,
+                      )));
         } else {
-          print('Error: ${response.error!.message}');
+          print('Error: ${response?.message}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: ${response.error!.message}')),
           );
@@ -206,15 +139,54 @@ class _CreatePageState extends State<CreatePage> {
     }
   }
 
+  void selectDateTime(BuildContext context) async {
+    // Select Date
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2030),
+    );
+
+    if (pickedDate != null) {
+      // Select Time
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (pickedTime != null) {
+        // Combine Date and Time
+        final DateTime pickedDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        setState(() {
+          selectedDate = pickedDateTime;
+          yearController.text =
+              "${pickedDateTime.year}/${pickedDateTime.month}/${pickedDateTime.day} | ${pickedDateTime.hour}:${pickedDateTime.minute}"; // Update with full DateTime
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text("Create Event"),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // Avatar Upload Component
+            SizedBox(height: 20),
             AvatarUpload(
               onImageSelected: (File? imageFile) {
                 setState(() {
@@ -224,7 +196,7 @@ class _CreatePageState extends State<CreatePage> {
             ),
             // Page Name Field
             TextFieldComponent(
-              hintText: "Page Name",
+              hintText: "Event Name",
               obscureText: false,
               controller: pageNameController,
               errorText: pageNameErrorText,
@@ -237,7 +209,7 @@ class _CreatePageState extends State<CreatePage> {
 
             // Year Picker Field
             GestureDetector(
-              onTap: () => _selectYear(context),
+              onTap: () => selectDateTime(context),
               child: Container(
                 margin:
                     const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
@@ -295,7 +267,7 @@ class _CreatePageState extends State<CreatePage> {
             ),
             // Create Page Button
             GestureDetector(
-              onTap: createPage,
+              onTap: createEvent,
               child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   decoration: BoxDecoration(
@@ -309,7 +281,7 @@ class _CreatePageState extends State<CreatePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Create Page',
+                          'Create Event',
                           style: TextStyle(color: Colors.white, fontSize: 17),
                         ),
                         SizedBox(

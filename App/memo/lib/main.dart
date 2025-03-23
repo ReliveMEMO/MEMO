@@ -82,7 +82,6 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color: Colors.white)),
       routes: {
-        '/event': (context) => EventPage(),
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),

@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:memo/components/event_tile.dart';
+import 'package:memo/components/page_tile.dart';
 import 'package:memo/components/user_tile.dart';
 import 'package:memo/pages/profile_page.dart';
 import 'package:memo/providers/user_provider.dart';
@@ -21,6 +23,9 @@ class _SearchPageState extends State<SearchPage> {
   bool isSearching = false;
   final searchService = SearchService();
   List<String> recentSearches = [];
+  List<String> recentPageSearches = [];
+  List<String> recentEventSearches = [];
+  int selectedTab = 0;
 
   @override
   void initState() {
@@ -37,29 +42,60 @@ class _SearchPageState extends State<SearchPage> {
         searchResults = [];
       } else {
         isSearching = true;
-        _searchUsers(searchValue);
+        if (selectedTab == 0) {
+          _searchUsers(searchValue);
+        } else if (selectedTab == 1) {
+          _searchPages(searchValue);
+        } else {
+          _searchEvents(searchValue);
+        }
       }
     });
   }
 
-  Future<void> saveRecentSearch(String userID) async {
+  Future<void> saveRecentSearch(String userID, String type) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> recentSearches = prefs.getStringList('recentSearches') ?? [];
-    if (!recentSearches.contains(userID)) {
-      recentSearches.insert(0, userID);
-      if (recentSearches.length > 5) {
-        recentSearches.removeLast();
+    if (type == 'user') {
+      if (!recentSearches.contains(userID)) {
+        recentSearches.insert(0, userID);
+        if (recentSearches.length > 5) {
+          recentSearches.removeLast();
+        }
+        await prefs.setStringList('recentSearches', recentSearches);
       }
-      await prefs.setStringList('recentSearches', recentSearches);
+      if (recentSearches.contains(userID)) {
+        recentSearches.remove(userID);
+        recentSearches.insert(0, userID);
+        await prefs.setStringList('recentSearches', recentSearches);
+      }
+    } else if (type == 'event') {
+      if (!recentEventSearches.contains(userID)) {
+        recentEventSearches.insert(0, userID);
+        if (recentEventSearches.length > 5) {
+          recentEventSearches.removeLast();
+        }
+        await prefs.setStringList('recentEventSearches', recentEventSearches);
+      }
+      if (recentEventSearches.contains(userID)) {
+        recentEventSearches.remove(userID);
+        recentEventSearches.insert(0, userID);
+        await prefs.setStringList('recentEventSearches', recentEventSearches);
+      }
+    } else {
+      if (!recentPageSearches.contains(userID)) {
+        recentPageSearches.insert(0, userID);
+        if (recentPageSearches.length > 5) {
+          recentPageSearches.removeLast();
+        }
+        await prefs.setStringList('recentPageSearches', recentPageSearches);
+      }
+      if (recentPageSearches.contains(userID)) {
+        recentPageSearches.remove(userID);
+        recentPageSearches.insert(0, userID);
+        await prefs.setStringList('recentPageSearches', recentPageSearches);
+      }
     }
-    if (recentSearches.contains(userID)) {
-      recentSearches.remove(userID);
-      recentSearches.insert(0, userID);
-      await prefs.setStringList('recentSearches', recentSearches);
-    }
-    print('======================================');
-    print(recentSearches);
-    loadRecentSearch();
   }
 
   Future<void> loadRecentSearch() async {
@@ -69,6 +105,8 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       isLoading = true;
       recentSearches = prefs.getStringList('recentSearches') ?? [];
+      recentPageSearches = prefs.getStringList('recentPageSearches') ?? [];
+      recentEventSearches = prefs.getStringList('recentEventSearches') ?? [];
       isLoading = false;
     });
   }
@@ -80,6 +118,44 @@ class _SearchPageState extends State<SearchPage> {
 
     try {
       final results = await searchService.searchUsers(query);
+      setState(() {
+        searchResults = results;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error Searching users: $e');
+    }
+  }
+
+  Future<void> _searchPages(String query) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final results = await searchService.searchPages(query);
+      setState(() {
+        searchResults = results;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error Searching users: $e');
+    }
+  }
+
+  Future<void> _searchEvents(String query) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final results = await searchService.searchEvents(query);
       setState(() {
         searchResults = results;
         isLoading = false;
@@ -200,15 +276,21 @@ class _SearchPageState extends State<SearchPage> {
           SizedBox(height: 10),
           Expanded(
             child: DefaultTabController(
-              length: 2,
+              length: 3,
               child: Column(
                 children: [
                   TabBar(
                     labelColor: Color.fromRGBO(156, 39, 176, 1),
                     unselectedLabelColor: Colors.grey,
                     indicatorColor: Color.fromRGBO(156, 39, 176, 1),
+                    onTap: (index) {
+                      setState(() {
+                        selectedTab = index;
+                      });
+                    },
                     tabs: [
                       Tab(text: 'Accounts'),
+                      Tab(text: 'Pages'),
                       Tab(text: 'Events'),
                     ],
                   ),
@@ -230,7 +312,8 @@ class _SearchPageState extends State<SearchPage> {
                                           child: UserTile(
                                               userId: user['id'],
                                               onTap: () {
-                                                saveRecentSearch(user['id']);
+                                                saveRecentSearch(
+                                                    user['id'], 'user');
                                               }),
                                         );
                                       },
@@ -262,10 +345,106 @@ class _SearchPageState extends State<SearchPage> {
                                           ),
                                         );
                                       },
+                                    ),
+                          isSearching
+                              ? isLoading
+                                  ? Center(child: CircularProgressIndicator())
+                                  : ListView.builder(
+                                      itemCount: searchResults.length,
+                                      itemBuilder: (context, index) {
+                                        final page = searchResults[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 4),
+                                          child: PageTile(
+                                              pageId: page['id'],
+                                              onTap: () {
+                                                saveRecentSearch(
+                                                    page['id'], 'page');
+                                              }),
+                                        );
+                                      },
+                                    )
+                              : recentPageSearches.isEmpty
+                                  ? Center(
+                                      child:
+                                          Text('You have no recent searches'))
+                                  : ListView.builder(
+                                      itemCount: recentPageSearches.length,
+                                      itemBuilder: (context, index) {
+                                        final user = recentPageSearches[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 4),
+                                          child: PageTile(
+                                            pageId: user,
+                                            // onTap: () {
+                                            //   Navigator.push(
+                                            //       context,
+                                            //       MaterialPageRoute(
+                                            //           builder: (context) =>
+                                            //               ProfilePage(
+                                            //                 userId:
+                                            //                     recentSearches[
+                                            //                         index],
+                                            //               )));
+                                            // },
+                                          ),
+                                        );
+                                      },
                                     ), // Accounts tab
-                          Center(
-                              child: Text(
-                                  'Events section is blank')), // Events tab
+                          Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 20),
+                              child: isSearching
+                                  ? isLoading
+                                      ? Center(
+                                          child: CircularProgressIndicator())
+                                      : GridView.builder(
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount:
+                                                2, // 2 tiles in a row
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 10,
+                                            childAspectRatio:
+                                                0.7, // Adjust this to your preference
+                                          ),
+                                          itemCount: searchResults.length,
+                                          itemBuilder: (context, index) {
+                                            return EventTile(
+                                              eventId: searchResults[index]
+                                                  ['id'],
+                                              onTap: () {
+                                                saveRecentSearch(
+                                                    searchResults[index]['id'],
+                                                    'event');
+                                              },
+                                            );
+                                          },
+                                        )
+                                  : recentEventSearches.isEmpty
+                                      ? Center(
+                                          child: Text(
+                                              'You have no recent searches'))
+                                      : GridView.builder(
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount:
+                                                2, // 2 tiles in a row
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 10,
+                                            childAspectRatio:
+                                                0.7, // Adjust this to your preference
+                                          ),
+                                          itemCount: recentEventSearches.length,
+                                          itemBuilder: (context, index) {
+                                            return EventTile(
+                                              eventId:
+                                                  recentEventSearches[index],
+                                            );
+                                          },
+                                        ))
                         ],
                       ),
                     ),

@@ -1,5 +1,7 @@
 // Account Privacy Page
 import 'package:flutter/material.dart';
+import 'package:memo/pages/create_event.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AccountPrivacyPage extends StatefulWidget {
   final bool initialIsPrivate;
@@ -11,16 +13,28 @@ class AccountPrivacyPage extends StatefulWidget {
 }
 
 class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
-  late bool isPrivate;
+  late bool isPrivate = false;
 
   @override
   void initState() {
     super.initState();
-    isPrivate = widget.initialIsPrivate;
+    checkStatus();
   }
 
-  Future<void> _showConfirmationDialog(bool newValue) async {
-    final previousValue = isPrivate;
+  Future<void> checkStatus() async {
+    final response = await Supabase.instance.client
+        .from('User_Info')
+        .select()
+        .eq('id', authService.getCurrentUserID()!);
+    if (response != null) {
+      setState(() {
+        isPrivate = response[0]['private_profile'];
+      });
+      print(isPrivate);
+    }
+  }
+
+  Future<bool> _showConfirmationDialog(bool newValue) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -41,9 +55,7 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
       ),
     );
 
-    if (confirmed != true) {
-      setState(() => isPrivate = previousValue);
-    }
+    return confirmed ?? false; // Return false if the dialog is dismissed
   }
 
   @override
@@ -85,11 +97,17 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
               ),
               Switch(
                 value: isPrivate,
-                onChanged: (newValue) {
-                  setState(() => isPrivate = newValue);
-                  _showConfirmationDialog(newValue);
+                onChanged: (newValue) async {
+                  final confirmed = await _showConfirmationDialog(newValue);
+                  if (confirmed == true) {
+                    setState(() => isPrivate = newValue);
+                    final response = await Supabase.instance.client
+                        .from('User_Info')
+                        .update({'private_profile': isPrivate}).eq(
+                            'id', authService.getCurrentUserID()!);
+                  }
                 },
-              ),
+              )
             ],
           ),
         ),

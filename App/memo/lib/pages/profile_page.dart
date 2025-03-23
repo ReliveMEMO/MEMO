@@ -71,6 +71,10 @@ class _ProfilePageState extends State<ProfilePage> {
       isLoading = true;
     });
 
+    if (timelineIds.isNotEmpty) {
+      timelineIds.clear();
+    }
+
     final response = await Supabase.instance.client
         .from('User_Info')
         .select()
@@ -447,7 +451,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                     NeverScrollableScrollPhysics(), // Disable scrolling for GridView
                                 children: [
                                   ...timelineIds.map((id) {
-                                    return TimelineCard(timelineId: id);
+                                    return TimelineCard(
+                                      timelineId: id,
+                                      onDelete: getUser,
+                                    );
                                   }).toList()
                                 ],
                               ),

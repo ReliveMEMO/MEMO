@@ -139,7 +139,10 @@ class _TimelinePageState extends State<TimelinePage> {
                         return Padding(
                           padding: const EdgeInsets.only(
                               left: 15.0, top: 5, right: 5),
-                          child: PostCard(post: post),
+                          child: PostCard(
+                            post: post,
+                            onDelete: fetchTimelineData,
+                          ),
                         );
                       },
                     ),

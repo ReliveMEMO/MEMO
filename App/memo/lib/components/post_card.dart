@@ -13,9 +13,11 @@ class PostCard extends StatefulWidget {
   const PostCard({
     super.key,
     required this.post,
+    required this.onDelete, // Add this callback
   });
 
   final PostgrestMap post;
+  final VoidCallback onDelete; // Callback to notify parent
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -46,12 +48,60 @@ class _PostCardState extends State<PostCard> {
     }
   }
 
+  Future<void> deleteMemo() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete Memo"),
+          content: Text("Are you sure you want to delete this memo?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User cancels
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirms
+              },
+              child: Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      final response = await Supabase.instance.client
+          .from('Post_Table')
+          .delete()
+          .eq('post_id', widget.post['post_id']);
+
+      if (response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to delete memo"),
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Memo deleted"),
+        ));
+
+        // Refresh the screen by updating the state
+        widget.onDelete();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
       elevation: 1,
-      color: Colors.grey[100],
+      color: widget.post['owner_id'] == authService.getCurrentUserID()
+          ? Colors.grey[100]
+          : Colors.grey[200],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
         child: Column(
@@ -72,6 +122,11 @@ class _PostCardState extends State<PostCard> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => FullPost(post: widget.post)));
+              },
+              onLongPress: () {
+                if (widget.post['owner_id'] == authService.getCurrentUserID()) {
+                  deleteMemo();
+                }
               },
               child: CachedNetworkImage(
                 imageUrl: widget.post['image_url'],

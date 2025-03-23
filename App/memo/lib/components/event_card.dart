@@ -1,24 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:memo/pages/create_event.dart';
+import 'package:memo/pages/event_page.dart';
 import 'package:memo/pages/timeLine_page.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class TimelineCard extends StatefulWidget {
-  final String timelineId;
-  final VoidCallback? onDelete; // Callback to notify parent
-
-  const TimelineCard({Key? key, required this.timelineId, this.onDelete})
-      : super(key: key);
+class EventCard extends StatefulWidget {
+  final String eventId;
+  const EventCard({Key? key, required this.eventId}) : super(key: key);
 
   @override
-  State<TimelineCard> createState() => _TimelineCardState();
+  State<EventCard> createState() => _EventCardState();
 }
 
-class _TimelineCardState extends State<TimelineCard> {
+class _EventCardState extends State<EventCard> {
   bool isLoading = false;
-  PostgrestMap? timeLines;
+  PostgrestMap? eventDetails;
   List<String> avatarPaths = [];
   List<String> avatars = [];
 
@@ -34,20 +31,20 @@ class _TimelineCardState extends State<TimelineCard> {
     });
 
     final response = await Supabase.instance.client
-        .from('Timeline_Table')
+        .from('events')
         .select()
-        .eq('id', widget.timelineId)
+        .eq('id', widget.eventId)
         .single();
 
     if (!mounted) return;
 
     setState(() {
-      timeLines = response;
+      eventDetails = response;
     });
 
-    if (response['collaborators'] != null) {
-      List<dynamic> collaborators = response['collaborators'] as List<dynamic>;
-      List<dynamic> firstThreeCollaborators = collaborators.take(3).toList();
+    if (eventDetails?["attendance"] != null) {
+      List<dynamic> firstThreeCollaborators =
+          eventDetails?["attendance"].take(3).toList();
 
       List<String> fetchedAvatarPaths = [];
       for (var collaboratorId in firstThreeCollaborators) {
@@ -76,78 +73,30 @@ class _TimelineCardState extends State<TimelineCard> {
     });
   }
 
-  Future<void> deleteTimeLine(String timelineId) async {
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Delete Timeline"),
-          content: Text("Are you sure you want to delete this timeline?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false); // User cancels
-              },
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true); // User confirms
-              },
-              child: Text("Delete"),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldDelete == true) {
-      await Supabase.instance.client
-          .from('Timeline_Table')
-          .delete()
-          .eq('id', timelineId);
-
-      // Refresh the user data after deletion
-      if (widget.onDelete != null) {
-        widget.onDelete!();
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    String imagePath = isLoading
-        ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhx68IGxg0VnyJCL2mSl8RHokKA3G6N8vvtw&s'
-        : timeLines?['timeline_Cover'] ??
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhx68IGxg0VnyJCL2mSl8RHokKA3G6N8vvtw&s';
     String title =
-        isLoading ? 'Loading...' : timeLines?['timeline_name'] ?? 'No Title';
+        isLoading ? 'Loading...' : eventDetails?['event_name'] ?? 'No Title';
     // List<String> avatarPaths = [
     //   'assets/images/avatar1.jpg',
     //   'assets/images/avatar2.jpg',
     //   'assets/images/avatar3.jpg',
     // ];
     List<String> avatarPaths =
-        (timeLines?['collaborators'] as List<dynamic>?)?.cast<String>() ?? [];
+        (eventDetails?['attendance'] as List<dynamic>?)?.cast<String>() ?? [];
 
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => TimelinePage(
-                    timelineId: widget.timelineId,
-                    timelinename: timeLines?['timeline_name'],
-                  )),
+              builder: (context) => EventPage(eventId: widget.eventId)),
         );
       },
-      onLongPress: () {
-        if (timeLines?['admin'] == authService.getCurrentUserID()) {
-          deleteTimeLine(widget.timelineId);
-        }
-      },
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
         elevation: 1,
         child: Stack(
           children: [
@@ -163,7 +112,11 @@ class _TimelineCardState extends State<TimelineCard> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ))
-                  : CachedNetworkImage(imageUrl: imagePath),
+                  : CachedNetworkImage(
+                      imageUrl: eventDetails?['cover'],
+                      height: 150,
+                      fit: BoxFit.cover,
+                    ),
             ),
             Positioned(
               top: 8,

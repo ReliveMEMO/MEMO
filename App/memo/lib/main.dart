@@ -82,7 +82,6 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color: Colors.white)),
       routes: {
-        '/event': (context) => EventPage(),
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(),
@@ -92,6 +91,9 @@ class MyApp extends StatelessWidget {
         '/my-page': (context) => myPage(),
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
+
+        //'/memoryReminder': (context) => MemoryReminderPopup(),
+
 
         '/create-page': (context) => CreatePage(),
 

@@ -179,46 +179,50 @@ class _NewMemoState extends State<NewMemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(40.0),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: Text(
-            "New MEMO",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
+        preferredSize: Size.fromHeight(50.0),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 10.0),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: Text(
+              "New MEMO",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+              ),
             ),
-          ),
-          centerTitle: true,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-              child: ElevatedButton(
-                onPressed: timeLineName == "Timeline Name"
-                    ? showError
-                    : () {
-                        postMemo();
-                      },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF7D17BA),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+            centerTitle: true,
+            actions: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+                child: ElevatedButton(
+                  onPressed: timeLineName == "Timeline Name"
+                      ? showError
+                      : () {
+                          postMemo();
+                        },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF7D17BA),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 25, vertical: 0),
+                      elevation: 0 // Reduced vertical padding
+                      ),
+                  child: const Text(
+                    "Post",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
                     ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
-                    elevation: 0 // Reduced vertical padding
-                    ),
-                child: const Text(
-                  "Post",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       body: Padding(

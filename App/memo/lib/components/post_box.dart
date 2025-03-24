@@ -295,11 +295,11 @@ class _PostBoxState extends State<PostBox> {
                 ),
                 SizedBox(width: 5),
                 Text(
-                  "${100}",
+                  "${0}",
                   style: TextStyle(color: Colors.black45),
                 ),
                 SizedBox(
-                  width: 150,
+                  width: 180,
                 ),
                 Icon(
                   SolarIconsBold.mapArrowSquare,

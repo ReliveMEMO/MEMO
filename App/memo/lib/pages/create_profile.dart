@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:memo/components/avatar_upload.dart';
 import 'package:memo/components/dropDown.dart';
 // import 'package:memo/components/nav_bar.dart';
@@ -32,6 +34,7 @@ class _CreateProfileState extends State<CreateProfile> {
   String? dateErrorText;
   String? programmeErrorText;
   String? statusErrorText;
+  File? _selectedImage;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -104,8 +107,38 @@ class _CreateProfileState extends State<CreateProfile> {
     });
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      final File imageFile = File(pickedImage.path);
+      final img.Image image = img.decodeImage(imageFile.readAsBytesSync())!;
+
+      if (image != null) {
+        final int cropSize =
+            image.width < image.height ? image.width : image.height;
+        final int offsetX = (image.width - cropSize) ~/ 2;
+        final int offsetY = (image.height - cropSize) ~/ 2;
+        final img.Image croppedImage = img.copyCrop(image,
+            x: offsetX, y: offsetY, width: cropSize, height: cropSize);
+
+        // Resize the cropped image to 500x500
+        final img.Image resizedImage =
+            img.copyResize(croppedImage, width: 1000, height: 1000);
+        final File compressedImage = File(pickedImage.path)
+          ..writeAsBytesSync(img.encodeJpg(resizedImage));
+
+        setState(() {
+          _selectedImage = compressedImage;
+        });
+      }
+    }
+  }
+
   Future<void> uploadImage() async {
-    if (_imageFile == null) {
+    if (_selectedImage == null) {
       avatarUrl =
           'https://qbqwbeppyliavvfzryze.supabase.co/storage/v1/object/public/profile-pictures/uploads/default.jpg';
       return;
@@ -116,7 +149,7 @@ class _CreateProfileState extends State<CreateProfile> {
 
     await Supabase.instance.client.storage
         .from('profile-pictures')
-        .upload(path, _imageFile!);
+        .upload(path, _selectedImage!);
 
     final url = await Supabase.instance.client.storage
         .from('profile-pictures')
@@ -135,12 +168,24 @@ class _CreateProfileState extends State<CreateProfile> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          AvatarUpload(
-            onImageSelected: (File? imageFile) {
-              setState(() {
-                _imageFile = imageFile;
-              });
-            },
+          CircleAvatar(
+            radius: 80,
+            backgroundColor: colorDark,
+            backgroundImage:
+                _selectedImage != null ? FileImage(_selectedImage!) : null,
+            child: _selectedImage == null
+                ? GestureDetector(
+                    onTap: _pickImage,
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  )
+                : null,
+          ),
+          SizedBox(
+            height: 10,
           ),
           TextFieldComponent(
             hintText: "Full Name",

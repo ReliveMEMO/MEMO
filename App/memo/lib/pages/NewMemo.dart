@@ -52,7 +52,7 @@ class _NewMemoState extends State<NewMemo> {
 
         // Resize the cropped image to 500x500
         final img.Image resizedImage =
-            img.copyResize(croppedImage, width: 500, height: 500);
+            img.copyResize(croppedImage, width: 1000, height: 1000);
         final File compressedImage = File(pickedImage.path)
           ..writeAsBytesSync(img.encodeJpg(resizedImage));
 

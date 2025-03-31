@@ -459,7 +459,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ],
                               ),
                         // Bio Section
-                        bio_section(),
+                        bio_section(
+                          userDetails: userDetails,
+                        ),
                       ],
                     ),
                   ),

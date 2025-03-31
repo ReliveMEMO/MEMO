@@ -30,7 +30,7 @@ class _myPageState extends State<myPage> {
     SearchPage(),
     NewMemo(),
     //MemoryReminderPopup(),
-    //EventPage(), 
+    //EventPage(),
     ActivityPage(),
     ChatPage(),
   ];

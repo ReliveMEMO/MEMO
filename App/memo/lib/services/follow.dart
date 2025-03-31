@@ -36,6 +36,20 @@ class FollowService {
     }
   }
 
+  Future<bool> handleUnfollow(String userId) async {
+    try {
+      final response = await supabase
+          .from('user_following')
+          .delete()
+          .eq('follower_id', authService.getCurrentUserID() ?? '')
+          .eq('followed_id', userId);
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<String> checkFollow(String userId) async {
     try {
       final response = await supabase

@@ -131,7 +131,7 @@ class _PageProfileState extends State<PageProfile> {
         ],
       ),
       body: DefaultTabController(
-        length: 2,
+        length: 1,
         child: SingleChildScrollView(
           // Wrap the entire content in SingleChildScrollView
           child: Column(
@@ -274,15 +274,15 @@ class _PageProfileState extends State<PageProfile> {
                           ),
                           SizedBox(height: 5),
                           // TabBar for Bio and Timelines
-                          const TabBar(
-                            labelColor: Colors.purple,
-                            unselectedLabelColor: Colors.grey,
-                            indicatorColor: Colors.purple,
-                            tabs: [
-                              Tab(text: "Events"),
-                              Tab(text: "Bio"),
-                            ],
-                          ),
+                          // const TabBar(
+                          //   labelColor: Colors.purple,
+                          //   unselectedLabelColor: Colors.grey,
+                          //   indicatorColor: Colors.purple,
+                          //   tabs: [
+                          //     Tab(text: "Events"),
+                          //     //Tab(text: "Bio"),
+                          //   ],
+                          // ),
                         ],
                       ),
                     ),
@@ -314,7 +314,7 @@ class _PageProfileState extends State<PageProfile> {
                           ],
                         ),
                         // Bio Section
-                        bio_section(),
+                        //bio_section(),
                       ],
                     ),
                   ),

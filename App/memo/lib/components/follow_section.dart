@@ -71,6 +71,15 @@ class _FollowSectionsState extends State<FollowSections> {
     print(response);
   }
 
+  Future<void> handleUnfollow() async {
+    bool response = await followService.handleUnfollow(userId!);
+    if (response) {
+      setState(() {
+        following = "not-following";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -111,7 +120,7 @@ class _FollowSectionsState extends State<FollowSections> {
             )
           : following == 'following'
               ? ElevatedButton(
-                  onPressed: handleFollow,
+                  onPressed: handleUnfollow,
                   child: Text(
                     'Following',
                     style: TextStyle(color: Colors.purple),

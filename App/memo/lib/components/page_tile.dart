@@ -113,7 +113,7 @@ class _PageTileState extends State<PageTile> {
                   leading: CircleAvatar(
                     radius: 22,
                     child: ClipOval(
-                        child: recieverDetails?['profile_pic'] != null
+                        child: recieverDetails?['image_url'] != null
                             ? CachedNetworkImage(
                                 imageUrl:
                                     recieverDetails?['image_url'] as String,

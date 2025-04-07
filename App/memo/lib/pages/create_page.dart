@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:image/image.dart' as img;
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:memo/components/avatar_upload.dart';
 import 'package:memo/components/textField.dart';
 import 'package:memo/pages/my_page.dart';
@@ -34,6 +36,7 @@ class _CreatePageState extends State<CreatePage> {
   final Color colorDark = const Color(0xFF7f31c6);
 
   final authService = AuthService();
+  File? _selectedImage;
 
   // Year Picker Function - Custom Year Selector
   Future<void> _selectYear(BuildContext context) async {
@@ -110,8 +113,38 @@ class _CreatePageState extends State<CreatePage> {
     );
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      final File imageFile = File(pickedImage.path);
+      final img.Image image = img.decodeImage(imageFile.readAsBytesSync())!;
+
+      if (image != null) {
+        final int cropSize =
+            image.width < image.height ? image.width : image.height;
+        final int offsetX = (image.width - cropSize) ~/ 2;
+        final int offsetY = (image.height - cropSize) ~/ 2;
+        final img.Image croppedImage = img.copyCrop(image,
+            x: offsetX, y: offsetY, width: cropSize, height: cropSize);
+
+        // Resize the cropped image to 500x500
+        final img.Image resizedImage =
+            img.copyResize(croppedImage, width: 1000, height: 1000);
+        final File compressedImage = File(pickedImage.path)
+          ..writeAsBytesSync(img.encodeJpg(resizedImage));
+
+        setState(() {
+          _selectedImage = compressedImage;
+        });
+      }
+    }
+  }
+
   Future<void> uploadImage() async {
-    if (_imageFile == null) {
+    if (_selectedImage == null) {
       return;
     }
 
@@ -122,7 +155,7 @@ class _CreatePageState extends State<CreatePage> {
       // Upload Image to Supabase Storage
       await Supabase.instance.client.storage
           .from('page-images')
-          .upload(path, _imageFile!);
+          .upload(path, _selectedImage!);
 
       // Get Public URL of the Uploaded Image
       final url = Supabase.instance.client.storage
@@ -215,12 +248,24 @@ class _CreatePageState extends State<CreatePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // Avatar Upload Component
-            AvatarUpload(
-              onImageSelected: (File? imageFile) {
-                setState(() {
-                  _imageFile = imageFile;
-                });
-              },
+            CircleAvatar(
+              radius: 80,
+              backgroundColor: colorDark,
+              backgroundImage:
+                  _selectedImage != null ? FileImage(_selectedImage!) : null,
+              child: _selectedImage == null
+                  ? GestureDetector(
+                      onTap: _pickImage,
+                      child: Icon(
+                        Icons.camera_alt,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                    )
+                  : null,
+            ),
+            SizedBox(
+              height: 10,
             ),
             // Page Name Field
             TextFieldComponent(

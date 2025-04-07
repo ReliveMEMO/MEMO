@@ -92,6 +92,9 @@ class MyApp extends StatelessWidget {
         '/new-memo': (context) => NewMemo(),
         '/create-timeline': (context) => CreateTimeline(),
 
+        //'/memoryReminder': (context) => MemoryReminderPopup(),
+
+
         '/create-page': (context) => CreatePage(),
 
         //Testing the CI pipeline xoxo

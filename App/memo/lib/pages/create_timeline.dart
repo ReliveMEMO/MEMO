@@ -38,8 +38,16 @@ class _CreateTimelineState extends State<CreateTimeline> {
       final img.Image image = img.decodeImage(imageFile.readAsBytesSync())!;
 
       if (image != null) {
+        final int cropSize =
+            image.width < image.height ? image.width : image.height;
+        final int offsetX = (image.width - cropSize) ~/ 2;
+        final int offsetY = (image.height - cropSize) ~/ 2;
+        final img.Image croppedImage = img.copyCrop(image,
+            x: offsetX, y: offsetY, width: cropSize, height: cropSize);
+
+        // Resize the cropped image to 500x500
         final img.Image resizedImage =
-            img.copyResize(image, width: 500, height: 500);
+            img.copyResize(croppedImage, width: 1000, height: 1000);
         final File compressedImage = File(pickedImage.path)
           ..writeAsBytesSync(img.encodeJpg(resizedImage));
 
@@ -115,7 +123,10 @@ class _CreateTimelineState extends State<CreateTimeline> {
         return UserSearch(
           onUsersSelected: (selectedUsers) {
             setState(() {
-              collaborators = selectedUsers;
+              collaborators = [
+                ...selectedUsers,
+                authService.getCurrentUserID()!
+              ];
             });
           },
         );

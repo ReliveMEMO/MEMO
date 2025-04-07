@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memo/pages/event_page.dart';
+import 'package:memo/pages/profile_page.dart';
 import 'package:memo/services/follow.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:solar_icons/solar_icons.dart';
@@ -25,6 +27,8 @@ class _NotificationTileState extends State<NotificationTile> {
   String? userName;
   String? notificationTitle;
   String? userId;
+  String? eventId;
+  PostgrestMap? eventDetails;
 
   @override
   void initState() {
@@ -54,9 +58,13 @@ class _NotificationTileState extends State<NotificationTile> {
     if (response['notification_title'] != null) {
       setState(() {
         notificationTitle = response['notification_title'];
+        eventId = response['eventId'];
       });
     }
 
+    if (notificationTitle == "Event") {
+      await getEventDetails();
+    }
     setState(() {
       notificationText = response['message'];
       time = formatTimeStamp(response['created_at']);
@@ -65,6 +73,20 @@ class _NotificationTileState extends State<NotificationTile> {
       userId = response['sender_id'];
       isLoading = false;
     });
+  }
+
+  Future<void> getEventDetails() async {
+    final response = await Supabase.instance.client
+        .from('events')
+        .select()
+        .eq('id', eventId ?? '')
+        .maybeSingle();
+
+    setState(() {
+      eventDetails = response;
+    });
+
+    print('Event Details: $eventDetails');
   }
 
   String formatTimeStamp(String timeStamp) {
@@ -108,64 +130,97 @@ class _NotificationTileState extends State<NotificationTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.grey[100], borderRadius: BorderRadius.circular(20)),
-      child: isLoading
-          ? Skeletonizer(
-              child: ListTile(
-                title: Container(width: 100, height: 20, color: Colors.grey),
-                subtitle: Container(width: 150, height: 20, color: Colors.grey),
-                leading: CircleAvatar(radius: 22, backgroundColor: Colors.grey),
-              ),
-            )
-          : ListTile(
-              contentPadding: EdgeInsets.only(
-                right: 15,
-                left: 15,
-              ),
-              title: Text(userName ?? 'Unknown User'),
-              subtitle: Text(notificationText ?? 'No notification'),
-              leading: CircleAvatar(
-                radius: 22,
-                backgroundImage: profilePic != null
-                    ? CachedNetworkImageProvider(profilePic!)
-                    : null,
-                child: profilePic == null ? Icon(Icons.person) : null,
-              ),
-              trailing: notificationTitle == "Follow-Request"
-                  ? SizedBox(
-                      width: 70,
-                      // Adjust the width as needed
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                onTap: () => handleRequest(false),
-                                child: Icon(
-                                  SolarIconsOutline.closeSquare,
+    return GestureDetector(
+      onTap: () {
+        notificationTitle == "Event"
+            ? Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => EventPage(eventId: eventId!)))
+            : Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ProfilePage(userId: userId!)));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.grey[100], borderRadius: BorderRadius.circular(20)),
+        child: isLoading
+            ? Skeletonizer(
+                child: ListTile(
+                  title: Container(width: 100, height: 20, color: Colors.grey),
+                  subtitle:
+                      Container(width: 150, height: 20, color: Colors.grey),
+                  leading:
+                      CircleAvatar(radius: 22, backgroundColor: Colors.grey),
+                ),
+              )
+            : ListTile(
+                contentPadding: EdgeInsets.only(
+                  right: 15,
+                  left: 15,
+                ),
+                title: Text(userName ?? 'Unknown User'),
+                subtitle: Text(notificationText ?? 'No notification'),
+                leading: CircleAvatar(
+                  radius: 22,
+                  backgroundImage: profilePic != null
+                      ? CachedNetworkImageProvider(profilePic!)
+                      : null,
+                  child: profilePic == null ? Icon(Icons.person) : null,
+                ),
+                trailing: notificationTitle == "Follow-Request"
+                    ? SizedBox(
+                        width: 70,
+                        // Adjust the width as needed
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => handleRequest(false),
+                                  child: Icon(
+                                    SolarIconsOutline.closeSquare,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                SizedBox(width: 5),
+                                GestureDetector(
+                                  onTap: () => handleRequest(true),
+                                  child: Icon(
+                                    SolarIconsBold.checkSquare,
+                                    color: Colors.purple,
+                                    size: 32,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    : notificationTitle == "Event"
+                        ? isLoading
+                            ? Skeletonizer(
+                                child: Container(
+                                  width: 50,
+                                  height: 20,
                                   color: Colors.grey,
                                 ),
-                              ),
-                              SizedBox(width: 5),
-                              GestureDetector(
-                                onTap: () => handleRequest(true),
-                                child: Icon(
-                                  SolarIconsBold.checkSquare,
-                                  color: Colors.purple,
-                                  size: 32,
-                                ),
                               )
-                            ],
-                          ),
-                        ],
-                      ),
-                    )
-                  : Text(time),
-            ),
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                // Adjust the border radius as needed
+                                child: CachedNetworkImage(
+                                    imageUrl: eventDetails!['cover'],
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover),
+                              )
+                        : Text(time),
+              ),
+      ),
     );
   }
 }

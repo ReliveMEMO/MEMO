@@ -7,9 +7,10 @@ import 'package:memo/services/follow.dart';
 import 'package:memo/pages/profile_page.dart';
 
 class FollowingFollowerPage extends StatefulWidget {
+  final String userId; // Add userId parameter
   final int selectedTab;
 
-  FollowingFollowerPage({required this.selectedTab});
+  FollowingFollowerPage({required this.userId, required this.selectedTab});
 
   @override
   _FollowingFollowerPageState createState() => _FollowingFollowerPageState();
@@ -18,11 +19,12 @@ class FollowingFollowerPage extends StatefulWidget {
 class _FollowingFollowerPageState extends State<FollowingFollowerPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final authService = AuthService();
   final FollowService _followService = FollowService();
   List<Map<String, dynamic>> _followers = [];
   List<Map<String, dynamic>> _following = [];
   bool _isLoading = true;
+  final AuthService authService = AuthService();
+  String _profileName = '';
 
   @override
   void initState() {
@@ -33,10 +35,17 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
   }
 
   Future<void> _fetchData() async {
-    final userId = AuthService().getCurrentUserID();
-    if (userId != null) {
+    final userId;
+    if (widget.userId.isNotEmpty) {
+      userId =
+          widget.userId; // Use the userId passed to the FollowingFollowerPage
+    } else {
+      userId = authService.getCurrentUserID();
+    }
+    if (userId.isNotEmpty) {
       final followersData = await _followService.getFollowers(userId);
       final followingData = await _followService.getFollowing(userId);
+      final profileName = await authService.getDisplayName(userId);
 
       print("Followers Data: $followersData");
       print("Following Data: $followingData");
@@ -45,6 +54,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
         _followers = followersData;
         _following = followingData;
         _isLoading = false;
+        _profileName = profileName ?? '';
       });
     } else {
       setState(() {
@@ -71,7 +81,7 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
         automaticallyImplyLeading: true,
         centerTitle: true,
         title: Text(
-          '@${authService.getCurrentUser()}',
+          '${_profileName}',
           style: TextStyle(fontSize: 18),
         ),
         bottom: TabBar(
@@ -103,21 +113,28 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
         thumbColor: MaterialStateProperty.all(Colors.purple),
         radius: Radius.circular(10),
       ),
-      child: Scrollbar(
-        child: ListView.builder(
-          itemCount: _followers.length,
-          itemBuilder: (context, index) {
-            final user = _followers[index];
-            print("Building follower: ${user}");
-            return _buildUserItem(
-              user['User_Info']?['id'] ?? '',
-              user['User_Info']?['full_name'] ?? 'Unknown',
-              user['User_Info']?['profile_pic'],
-              isFollowing: false,
-            );
-          },
-        ),
-      ),
+      child: _followers.isEmpty
+          ? Center(
+              child: Text(
+                'No followers found.',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
+          : Scrollbar(
+              child: ListView.builder(
+                itemCount: _followers.length,
+                itemBuilder: (context, index) {
+                  final user = _followers[index];
+                  print("Building follower: ${user}");
+                  return _buildUserItem(
+                    user['User_Info']?['id'] ?? '',
+                    user['User_Info']?['full_name'] ?? 'Unknown',
+                    user['User_Info']?['profile_pic'],
+                    isFollowing: false,
+                  );
+                },
+              ),
+            ),
     );
   }
 
@@ -127,21 +144,28 @@ class _FollowingFollowerPageState extends State<FollowingFollowerPage>
         thumbColor: MaterialStateProperty.all(Colors.purple),
         radius: Radius.circular(10),
       ),
-      child: Scrollbar(
-        child: ListView.builder(
-          itemCount: _following.length,
-          itemBuilder: (context, index) {
-            final user = _following[index];
-            print("Building following: ${user}");
-            return _buildUserItem(
-              user['User_Info']?['id'],
-              user['User_Info']?['full_name'] ?? 'Unknown',
-              user['User_Info']?['profile_pic'],
-              isFollowing: true,
-            );
-          },
-        ),
-      ),
+      child: _following.isEmpty
+          ? Center(
+              child: Text(
+                'No following found.',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
+          : Scrollbar(
+              child: ListView.builder(
+                itemCount: _following.length,
+                itemBuilder: (context, index) {
+                  final user = _following[index];
+                  print("Building following: ${user}");
+                  return _buildUserItem(
+                    user['User_Info']?['id'],
+                    user['User_Info']?['full_name'] ?? 'Unknown',
+                    user['User_Info']?['profile_pic'],
+                    isFollowing: true,
+                  );
+                },
+              ),
+            ),
     );
   }
 

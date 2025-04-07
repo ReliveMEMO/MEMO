@@ -151,7 +151,7 @@ class _convoPageState extends State<convoPage> {
 
       final response = await Supabase.instance.client
           .from('ind_message_table')
-          .select('sender_id, message, time_stamp')
+          .select('msg_id,sender_id, message, time_stamp')
           .eq('chat_id', chatId)
           .order('time_stamp', ascending: false)
           .range(
@@ -161,6 +161,7 @@ class _convoPageState extends State<convoPage> {
         setState(() {
           messages.addAll(response
               .map((msg) => {
+                    'message_id': msg['msg_id'],
                     'sender_id': msg['sender_id'],
                     'message': msg['message'],
                     'time_stamp': msg['time_stamp'],
@@ -249,6 +250,59 @@ class _convoPageState extends State<convoPage> {
       }
     } catch (e) {
       print("Error sending message: $e");
+    }
+  }
+
+  Future<void> deleteMessage(String messageId) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Message"),
+          content: const Text("Are you sure you want to delete this message?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // Cancel deletion
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // Confirm deletion
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      try {
+        final response = await Supabase.instance.client
+            .from('ind_message_table')
+            .update({'message': "This message has been deleted"}).eq(
+                'msg_id', messageId);
+
+        if (response != null) {
+          print("Error deleting message: ${response.error!.message}");
+        } else {
+          print("Message deleted successfully");
+
+          // Update the message in the local list
+          setState(() {
+            final index = messages
+                .indexWhere((message) => message['message_id'] == messageId);
+            if (index != -1) {
+              messages[index]['message'] = "This message has been deleted";
+              messages[index]['isEncrypted'] = false;
+            }
+          });
+        }
+      } catch (e) {
+        print("Error deleting message: $e");
+      }
     }
   }
 
@@ -346,104 +400,121 @@ class _convoPageState extends State<convoPage> {
                         showDateHeader = formattedDate != nextFormattedDate;
                       }
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          if (showDateHeader)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Center(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 15),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    formattedDate,
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey[700]),
+                      return GestureDetector(
+                        onLongPress: () {
+                          if (isSender) {
+                            deleteMessage(message['message_id']);
+                            print(message);
+                          }
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (showDateHeader)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Center(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 15),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      formattedDate,
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[700]),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          Align(
-                            alignment: isSender
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 10),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              decoration: BoxDecoration(
-                                color: isSender
-                                    ? Colors.blue[100]
-                                    : Colors.grey[300],
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  if (message['imageUrl'] != null)
-                                    CachedNetworkImage(
-                                      imageUrl: message['imageUrl'] as String,
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                    )
-                                  else
-                                    Builder(
-                                      builder: (context) {
-                                        final decryptedMessage =
-                                            message.containsKey('isEncrypted')
-                                                ? message['message']
-                                                : msgEncryption.decrypt(
-                                                        message['message']) ??
-                                                    'Decryption failed';
+                            Align(
+                              alignment: isSender
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 10),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                decoration: BoxDecoration(
+                                  color: isSender
+                                      ? Colors.blue[100]
+                                      : Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    if (message['imageUrl'] != null)
+                                      CachedNetworkImage(
+                                        imageUrl: message['imageUrl'] as String,
+                                        placeholder: (context, url) =>
+                                            const CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                      )
+                                    else
+                                      Builder(
+                                        builder: (context) {
+                                          final decryptedMessage = message
+                                                  .containsKey('isEncrypted')
+                                              ? msgEncryption.decrypt(
+                                                      message['message']) ??
+                                                  'Decryption failed'
+                                              : message['message'] ==
+                                                      "This message has been deleted"
+                                                  ? 'This message has been deleted'
+                                                  : msgEncryption.decrypt(
+                                                          message['message']) ??
+                                                      'Decryption failed';
 
-                                        // Check if the decrypted message is a single emoji
-                                        final isSingleEmoji = RegExp(
-                                                r'^[\u{1F1E6}-\u{1F1FF}' + // Regional indicator symbols (flags)
-                                                    r'\u{1F300}-\u{1F5FF}' + // Miscellaneous Symbols and Pictographs
-                                                    r'\u{1F600}-\u{1F64F}' + // Emoticons
-                                                    r'\u{1F680}-\u{1F6FF}' + // Transport and Map Symbols
-                                                    r'\u{1F700}-\u{1F77F}' + // Alchemical Symbols
-                                                    r'\u{1F780}-\u{1F7FF}' + // Geometric Shapes Extended
-                                                    r'\u{1F800}-\u{1F8FF}' + // Supplemental Arrows-C
-                                                    r'\u{1F900}-\u{1F9FF}' + // Supplemental Symbols and Pictographs
-                                                    r'\u{1FA00}-\u{1FA6F}' + // Chess Symbols
-                                                    r'\u{1FA70}-\u{1FAFF}' + // Symbols and Pictographs Extended-A
-                                                    r'\u{2600}-\u{26FF}' + // Miscellaneous Symbols
-                                                    r'\u{2700}-\u{27BF}' + // Dingbats
-                                                    r'\u{FE0F}' + // Variation Selector-16 (emoji variation)
-                                                    r']$',
-                                                unicode: true)
-                                            .hasMatch(decryptedMessage.trim());
+                                          // Check if the decrypted message is a single emoji
+                                          final isSingleEmoji = RegExp(
+                                                  r'^[\u{1F1E6}-\u{1F1FF}' + // Regional indicator symbols (flags)
+                                                      r'\u{1F300}-\u{1F5FF}' + // Miscellaneous Symbols and Pictographs
+                                                      r'\u{1F600}-\u{1F64F}' + // Emoticons
+                                                      r'\u{1F680}-\u{1F6FF}' + // Transport and Map Symbols
+                                                      r'\u{1F700}-\u{1F77F}' + // Alchemical Symbols
+                                                      r'\u{1F780}-\u{1F7FF}' + // Geometric Shapes Extended
+                                                      r'\u{1F800}-\u{1F8FF}' + // Supplemental Arrows-C
+                                                      r'\u{1F900}-\u{1F9FF}' + // Supplemental Symbols and Pictographs
+                                                      r'\u{1FA00}-\u{1FA6F}' + // Chess Symbols
+                                                      r'\u{1FA70}-\u{1FAFF}' + // Symbols and Pictographs Extended-A
+                                                      r'\u{2600}-\u{26FF}' + // Miscellaneous Symbols
+                                                      r'\u{2700}-\u{27BF}' + // Dingbats
+                                                      r'\u{FE0F}' + // Variation Selector-16 (emoji variation)
+                                                      r']$',
+                                                  unicode: true)
+                                              .hasMatch(
+                                                  decryptedMessage.trim());
 
-                                        return Text(
-                                          decryptedMessage,
-                                          style: TextStyle(
-                                            fontSize: isSingleEmoji
-                                                ? 48
-                                                : 16, // Larger font size for single emoji
-                                          ),
-                                        );
-                                      },
+                                          return Text(
+                                            decryptedMessage,
+                                            style: TextStyle(
+                                              fontSize: isSingleEmoji
+                                                  ? 48
+                                                  : 16, // Larger font size for single emoji
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      formattedTime,
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600]),
                                     ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    formattedTime,
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey[600]),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       );
                     },
                   ),

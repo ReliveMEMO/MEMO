@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:memo/pages/create_event.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class EventPage extends StatefulWidget {
   final String eventId;
@@ -72,6 +74,7 @@ class _EventPageState extends State<EventPage> {
     } else {
       // Otherwise, add the user to the attendance list
       currentAttendance.add(userId);
+      await sendNotificationToFollowed();
     }
 
     // Update the attendance array in the database
@@ -121,6 +124,30 @@ class _EventPageState extends State<EventPage> {
     setState(() {
       attendeeCount = eventDetails?["attendance"]?.length.toString() ?? "0";
     });
+  }
+
+  Future<void> sendNotificationToFollowed() async {
+    final url = Uri.parse(
+        'https://memo-backend-9b73024f3215.herokuapp.com/api/send-notification-to-followed'); // Replace with your API URL
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'sender_id': authService.getCurrentUserID(),
+        'notification_type': "Event",
+        'message': "going to ${eventDetails?["event_name"]}",
+        "eventId": widget.eventId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Notification sent successfully: ${response.body}');
+    } else {
+      print('Failed to send notification: ${response.body}');
+    }
   }
 
   @override
@@ -241,7 +268,7 @@ class _EventPageState extends State<EventPage> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Text(
-                        isAttending ? "ATTENDING" : "ATTENDING",
+                        isAttending ? "ATTENDING" : "WILL ATTEND",
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             color: Colors.white,

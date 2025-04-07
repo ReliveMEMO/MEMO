@@ -121,10 +121,10 @@ class NotificationService {
     String message;
 
     if (type == "Follow") {
-      notificationType = "follow";
+      notificationType = "Follow";
       message = "Started Following You!";
     } else if (type == "Like") {
-      notificationType = "like";
+      notificationType = "Like";
       message = "Liked your memo!";
     } else if (type == "Follow-Request") {
       notificationType = "Follow-Request";

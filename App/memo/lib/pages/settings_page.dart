@@ -66,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
               padding: const EdgeInsets.only(bottom: 16),
               child: Center(
                 child: Text(
-                  "© 2024 MEMO. All Rights Reserved",
+                  "©2025 MEMO. All Rights Reserved",
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 12,

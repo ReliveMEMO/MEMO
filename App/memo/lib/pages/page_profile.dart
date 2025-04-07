@@ -183,6 +183,7 @@ class _PageProfileState extends State<PageProfile> {
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (Context) {
                                         return FollowingFollowerPage(
+                                          userId: (widget.userId)!,
                                           selectedTab: 0,
                                         );
                                       }));
@@ -212,6 +213,7 @@ class _PageProfileState extends State<PageProfile> {
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (Context) {
                                         return FollowingFollowerPage(
+                                          userId: (widget.userId)!,
                                           selectedTab: 1,
                                         );
                                       }));
@@ -294,25 +296,31 @@ class _PageProfileState extends State<PageProfile> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: SizedBox(
-                    height: MediaQuery.of(context)
-                        .size
-                        .height, // Set height to screen height
+                    height: MediaQuery.of(context).size.height /
+                        2, // Set height to screen height
                     child: TabBarView(
                       children: [
-                        GridView.count(
-                          crossAxisCount: 2,
-                          semanticChildCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          shrinkWrap: true,
-                          // Disable scrolling for GridView
-                          children: [
-                            GridTile(
-                                child: EventCard(
-                                    eventId:
-                                        "b4990b1e-6db2-4c1f-a22e-6e2018fafadb"))
-                          ],
-                        ),
+                        eventList != null && eventList!.isNotEmpty
+                            ? GridView.count(
+                                crossAxisCount: 2,
+                                semanticChildCount: eventList?.length ?? 0,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                shrinkWrap: true,
+                                // Disable scrolling for GridView
+                                children: eventList!.map((eventId) {
+                                  return EventCard(
+                                    eventId: eventId,
+                                  );
+                                }).toList(),
+                              )
+                            : Center(
+                                child: Text(
+                                  'No events available',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+
                         // Bio Section
                         //bio_section(),
                       ],

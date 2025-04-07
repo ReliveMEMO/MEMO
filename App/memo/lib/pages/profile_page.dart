@@ -289,6 +289,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (Context) {
                                         return FollowingFollowerPage(
+                                          userId: (widget.userId ??
+                                              authService.getCurrentUserID())!,
                                           selectedTab: 0,
                                         );
                                       }));
@@ -318,6 +320,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (Context) {
                                         return FollowingFollowerPage(
+                                          userId: (widget.userId ??
+                                              authService.getCurrentUserID())!,
                                           selectedTab: 1,
                                         );
                                       }));

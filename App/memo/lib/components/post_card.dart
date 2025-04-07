@@ -214,7 +214,7 @@ class _PostCardState extends State<PostCard> {
                   ),
                   SizedBox(width: 5),
                   Text(
-                    "${100}",
+                    "${0}",
                     style: TextStyle(color: Colors.black45),
                   ),
                   SizedBox(

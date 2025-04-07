@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Achievement {
   final String emoji;
   final String description;
   final String position;
+  final String id;
 
   Achievement(
-      {required this.emoji, required this.description, required this.position});
+      {required this.emoji,
+      required this.description,
+      required this.position,
+      this.id = ''});
 }
 
 class AchievementsSection extends StatefulWidget {
-  const AchievementsSection({Key? key, required List<String> achievements})
+  final bool editable;
+  final String userId;
+  const AchievementsSection(
+      {Key? key, required this.userId, this.editable = false})
       : super(key: key);
 
   @override
@@ -20,15 +28,78 @@ class AchievementsSection extends StatefulWidget {
 class _AchievementsSectionState extends State<AchievementsSection> {
   final List<Achievement> _achievements = [];
   final int _maxAchievements = 6;
+  final emojiController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final positionController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAchievements();
+  }
+
+  Future<void> fetchAchievements() async {
+    final response = await Supabase.instance.client
+        .from('achievements')
+        .select()
+        .eq('user_id', widget.userId)
+        .order('created_at', ascending: false)
+        .limit(6);
+
+    if (response != null) {
+      setState(() {
+        _achievements.clear();
+        for (var row in response) {
+          _achievements.add(Achievement(
+            id: row['id'] as String,
+            emoji: row['emoji'] as String,
+            description: row['description'] as String,
+            position: row['position'] as String,
+          ));
+        }
+      });
+    }
+  }
+
+  Future<void> insertAchievement() async {
+    final response =
+        await Supabase.instance.client.from('achievements').insert([
+      {
+        'user_id': widget.userId,
+        'emoji': emojiController.text,
+        'description': descriptionController.text,
+        'position': positionController.text,
+      },
+    ]);
+
+    if (response != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.error!.message)),
+      );
+    } else {
+      fetchAchievements();
+    }
+  }
+
+  Future<void> deleteAchievements(String acID) async {
+    final response = await Supabase.instance.client
+        .from('achievements')
+        .delete()
+        .eq('id', acID);
+
+    if (response != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.error!.message)),
+      );
+    } else {
+      fetchAchievements();
+    }
+  }
 
   void _addAchievement() {
     showDialog(
       context: context,
       builder: (context) {
-        final emojiController = TextEditingController();
-        final descriptionController = TextEditingController();
-        final positionController = TextEditingController();
-
         return AlertDialog(
           title: const Text("Add Achievement"),
           content: Column(
@@ -67,6 +138,7 @@ class _AchievementsSectionState extends State<AchievementsSection> {
                         description: descriptionController.text,
                         position: positionController.text,
                       ));
+                      insertAchievement();
                     }
                   });
                   Navigator.of(context).pop();
@@ -105,33 +177,37 @@ class _AchievementsSectionState extends State<AchievementsSection> {
               final achievement = _achievements[index];
               return GestureDetector(
                 onLongPress: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Delete Achievement"),
-                        content: const Text(
-                            "Are you sure you want to delete this achievement?"),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Cancel"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _achievements.removeAt(index);
-                              });
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Delete"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  if (widget.editable) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Delete Achievement"),
+                          content: const Text(
+                              "Are you sure you want to delete this achievement?"),
+                          backgroundColor: Colors.white,
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _achievements.removeAt(index);
+                                });
+                                Navigator.of(context).pop();
+                                deleteAchievements(achievement.id);
+                              },
+                              child: const Text("Delete"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -161,7 +237,8 @@ class _AchievementsSectionState extends State<AchievementsSection> {
                   ),
                 ),
               );
-            } else if (_achievements.length < _maxAchievements) {
+            } else if (_achievements.length < _maxAchievements &&
+                widget.editable) {
               return GestureDetector(
                 onTap: _addAchievement,
                 child: Container(

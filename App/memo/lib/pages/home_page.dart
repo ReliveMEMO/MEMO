@@ -48,8 +48,6 @@ class _HomePageState extends State<HomePage> {
       userDetails = response;
     });
 
-    PostgrestList? timelines;
-
     setState(() {
       isLoading = false;
     });

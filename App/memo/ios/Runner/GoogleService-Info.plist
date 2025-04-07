@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.memo</string>
+	<string>com.relivememo.app</string>
 	<key>PROJECT_ID</key>
 	<string>memo-ab7e1</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:265915000000:ios:962375034a8c163b20b925</string>
+	<string>1:265915000000:ios:0fd57425ac7e4ad020b925</string>
 </dict>
 </plist>

@@ -57,7 +57,7 @@ jobs:
         id: pr_reviews
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
-          REVIEWER_USERNAME="specific_user"  # Replace with the GitHub username of the reviewer you want
+          REVIEWER_USERNAME="Sandinu"  # Replace with the GitHub username of the reviewer you want
           APPROVED=false
 
           # Get the list of reviews for the PR

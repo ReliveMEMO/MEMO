@@ -403,7 +403,9 @@ class _convoPageState extends State<convoPage> {
                       return GestureDetector(
                         onLongPress: () {
                           if (isSender) {
-                            deleteMessage(message['message_id']);
+                            if (message['message_id'] != null) {
+                              deleteMessage(message['message_id']);
+                            }
                             print(message);
                           }
                         },
@@ -462,9 +464,7 @@ class _convoPageState extends State<convoPage> {
                                         builder: (context) {
                                           final decryptedMessage = message
                                                   .containsKey('isEncrypted')
-                                              ? msgEncryption.decrypt(
-                                                      message['message']) ??
-                                                  'Decryption failed'
+                                              ? message['message']
                                               : message['message'] ==
                                                       "This message has been deleted"
                                                   ? 'This message has been deleted'

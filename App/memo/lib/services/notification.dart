@@ -128,7 +128,7 @@ class NotificationService {
       message = "Liked your memo!";
     } else if (type == "Follow-Request") {
       notificationType = "Follow-Request";
-      message = "${authService.getCurrentUser()} requested to follow you!";
+      message = "requested to follow you!";
     } else {
       notificationType = "comment";
       message = "You have a new comment!";

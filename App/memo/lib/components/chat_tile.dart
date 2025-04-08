@@ -79,7 +79,8 @@ class _ChatTileState extends State<ChatTile> {
     if (!mounted) return;
 
     setState(() {
-      recentMsg = msgEncryption.decrypt(messageResponse['message']);
+      recentMsg =
+          msgEncryption.decrypt(messageResponse['message'] ?? 'Sent an Image');
       time = formatTimeStamp(messageResponse['time_stamp']);
       isSeen = messageResponse['is_seen'];
       senderId = messageResponse['sender_id'];

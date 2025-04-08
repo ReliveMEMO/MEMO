@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
@@ -33,6 +35,10 @@ class _convoPageState extends State<convoPage> {
   final TextEditingController textMessageController = TextEditingController();
   final ValueNotifier<IconData> iconNotifier = ValueNotifier(Icons.mic);
   final ScrollController _scrollController = ScrollController();
+  File? _imageFile;
+  File? _selectedImage;
+  bool imageSelected = false;
+  String? imageUrl; // Define imageUrl variable
 
   @override
   void initState() {
@@ -163,7 +169,8 @@ class _convoPageState extends State<convoPage> {
               .map((msg) => {
                     'message_id': msg['msg_id'],
                     'sender_id': msg['sender_id'],
-                    'message': msg['message'],
+                    if (msg['message'] != null) 'message': msg['message'],
+                    if (msg['image_url'] != null) 'image_url': msg['image_url'],
                     'time_stamp': msg['time_stamp'],
                   })
               .toList());
@@ -303,6 +310,157 @@ class _convoPageState extends State<convoPage> {
       } catch (e) {
         print("Error deleting message: $e");
       }
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      _selectedImage = pickedImage != null ? File(pickedImage.path) : null;
+      imageSelected = _selectedImage != null;
+    });
+
+    if (imageSelected) {
+      _showImagePreviewDialog();
+    }
+  }
+
+  void _showImagePreviewDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Set your desired radius
+          ),
+          child: Stack(children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_selectedImage != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      _selectedImage!,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+              ],
+            ),
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: Colors.purple, // Background color
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: ValueListenableBuilder<IconData>(
+                    valueListenable: iconNotifier,
+                    builder: (context, value, child) {
+                      return Icon(
+                        Icons.send,
+                        color: Colors.white,
+                        size: 20,
+                      );
+                    },
+                  ),
+                  onPressed: () {
+                    if (imageSelected) {
+                      // Logic for sending a message
+                      _sendImageMessage();
+                      print("Message sent: ${textMessageController.text}");
+
+                      setState(() {
+                        imageSelected = false;
+                        _selectedImage = null; // Clear the selected image
+                        imageUrl = null; // Clear the image URL
+                      });
+                    }
+                  },
+                ),
+              ),
+            )
+          ]),
+        );
+      },
+    );
+  }
+
+  Future<void> uploadImage() async {
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final path = 'uploads/$fileName';
+
+    await Supabase.instance.client.storage
+        .from('message-media')
+        .upload(path, _selectedImage!);
+
+    final url = await Supabase.instance.client.storage
+        .from('message-media')
+        .getPublicUrl(path);
+
+    imageUrl = url;
+  }
+
+  Future<void> _sendImageMessage() async {
+    if (!imageSelected) return;
+
+    await uploadImage(); // Upload the image and get the URL
+
+    try {
+      final String? senderId = authService.getCurrentUserID();
+      final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
+      final recieverDetails = arguments['recieverDetails'];
+      print(recieverDetails);
+      final String recieverId =
+          recieverDetails['id']; // Adjust key as per actual argument
+
+      print(recieverId);
+
+      // Create a message object to append to the UI
+      final newMessage = {
+        'sender_id': senderId,
+        'image_url': imageUrl,
+        'time_stamp': DateTime.now().toIso8601String(),
+      };
+
+      // Append to the messages list immediately
+      setState(() {
+        messages.insert(0, newMessage);
+      });
+
+      // Send the message via WebSocket
+      final messagePayload = jsonEncode({
+        "type": "sendImage",
+        "senderId": senderId,
+        "receiverId": recieverId,
+        "image_url": imageUrl,
+      });
+
+      final String chatId = arguments['chatId'];
+      print(chatId + " chatId");
+      final response = await Supabase.instance.client
+          .from('ind_chat_table')
+          .update({
+        'last_accessed': DateTime.now().toUtc().toIso8601String()
+      }).eq('chat_id', chatId);
+
+      messagingChannel.sink.add(messagePayload);
+      print("Sent message payload: $messagePayload"); // Log the sent message
+
+      if (response.error != null) {
+        print("Error updating last_accessed: ${response.error!.message}");
+      } else {
+        print("last_accessed updated successfully");
+      }
+    } catch (e) {
+      print("Error sending message: $e");
     }
   }
 
@@ -451,57 +609,63 @@ class _convoPageState extends State<convoPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    if (message['imageUrl'] != null)
-                                      CachedNetworkImage(
-                                        imageUrl: message['imageUrl'] as String,
-                                        placeholder: (context, url) =>
-                                            const CircularProgressIndicator(),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
-                                      )
-                                    else
-                                      Builder(
-                                        builder: (context) {
-                                          final decryptedMessage = message
-                                                  .containsKey('isEncrypted')
-                                              ? message['message']
-                                              : message['message'] ==
-                                                      "This message has been deleted"
-                                                  ? 'This message has been deleted'
-                                                  : msgEncryption.decrypt(
-                                                          message['message']) ??
-                                                      'Decryption failed';
+                                    message['image_url'] != null
+                                        ? CachedNetworkImage(
+                                            imageUrl:
+                                                message['image_url'] as String,
+                                            placeholder: (context, url) =>
+                                                const CircularProgressIndicator(),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.error),
+                                          )
+                                        : Builder(
+                                            builder: (context) {
+                                              final decryptedMessage = message[
+                                                          "message"] !=
+                                                      null
+                                                  ? (message.containsKey(
+                                                          'isEncrypted')
+                                                      ? message['message']
+                                                      : (message['message'] ==
+                                                              "This message has been deleted"
+                                                          ? 'This message has been deleted'
+                                                          : msgEncryption.decrypt(
+                                                                  message[
+                                                                      'message']) ??
+                                                              'Decryption failed'))
+                                                  : '';
 
-                                          // Check if the decrypted message is a single emoji
-                                          final isSingleEmoji = RegExp(
-                                                  r'^[\u{1F1E6}-\u{1F1FF}' + // Regional indicator symbols (flags)
-                                                      r'\u{1F300}-\u{1F5FF}' + // Miscellaneous Symbols and Pictographs
-                                                      r'\u{1F600}-\u{1F64F}' + // Emoticons
-                                                      r'\u{1F680}-\u{1F6FF}' + // Transport and Map Symbols
-                                                      r'\u{1F700}-\u{1F77F}' + // Alchemical Symbols
-                                                      r'\u{1F780}-\u{1F7FF}' + // Geometric Shapes Extended
-                                                      r'\u{1F800}-\u{1F8FF}' + // Supplemental Arrows-C
-                                                      r'\u{1F900}-\u{1F9FF}' + // Supplemental Symbols and Pictographs
-                                                      r'\u{1FA00}-\u{1FA6F}' + // Chess Symbols
-                                                      r'\u{1FA70}-\u{1FAFF}' + // Symbols and Pictographs Extended-A
-                                                      r'\u{2600}-\u{26FF}' + // Miscellaneous Symbols
-                                                      r'\u{2700}-\u{27BF}' + // Dingbats
-                                                      r'\u{FE0F}' + // Variation Selector-16 (emoji variation)
-                                                      r']$',
-                                                  unicode: true)
-                                              .hasMatch(
-                                                  decryptedMessage.trim());
+                                              // Check if the decrypted message is a single emoji
+                                              final isSingleEmoji = RegExp(
+                                                      r'^[\u{1F1E6}-\u{1F1FF}' + // Regional indicator symbols (flags)
+                                                          r'\u{1F300}-\u{1F5FF}' + // Miscellaneous Symbols and Pictographs
+                                                          r'\u{1F600}-\u{1F64F}' + // Emoticons
+                                                          r'\u{1F680}-\u{1F6FF}' + // Transport and Map Symbols
+                                                          r'\u{1F700}-\u{1F77F}' + // Alchemical Symbols
+                                                          r'\u{1F780}-\u{1F7FF}' + // Geometric Shapes Extended
+                                                          r'\u{1F800}-\u{1F8FF}' + // Supplemental Arrows-C
+                                                          r'\u{1F900}-\u{1F9FF}' + // Supplemental Symbols and Pictographs
+                                                          r'\u{1FA00}-\u{1FA6F}' + // Chess Symbols
+                                                          r'\u{1FA70}-\u{1FAFF}' + // Symbols and Pictographs Extended-A
+                                                          r'\u{2600}-\u{26FF}' + // Miscellaneous Symbols
+                                                          r'\u{2700}-\u{27BF}' + // Dingbats
+                                                          r'\u{FE0F}' + // Variation Selector-16 (emoji variation)
+                                                          r']$',
+                                                      unicode: true)
+                                                  .hasMatch(
+                                                      decryptedMessage.trim());
 
-                                          return Text(
-                                            decryptedMessage,
-                                            style: TextStyle(
-                                              fontSize: isSingleEmoji
-                                                  ? 48
-                                                  : 16, // Larger font size for single emoji
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                              return Text(
+                                                decryptedMessage,
+                                                style: TextStyle(
+                                                  fontSize: isSingleEmoji
+                                                      ? 48
+                                                      : 16, // Larger font size for single emoji
+                                                ),
+                                              );
+                                            },
+                                          ),
                                     const SizedBox(height: 5),
                                     Text(
                                       formattedTime,
@@ -542,6 +706,7 @@ class _convoPageState extends State<convoPage> {
                     const Icon(Icons.camera_alt, color: Colors.white, size: 20),
                 onPressed: () {
                   // Add logic for camera
+                  _pickImage();
                 },
               ),
             ),

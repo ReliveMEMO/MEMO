@@ -31,10 +31,18 @@ class _BioSectionState extends State<bio_section> {
   void updateStats() {
     setState(() {
       major = widget.userDetails!["programme"] as String;
-      gradYear = widget.userDetails!["user_grad_year"].toString();
-      age = widget.userDetails!["user_age"].toString();
-      gpa = widget.userDetails!["user_gpa"].toString();
-      about = widget.userDetails!["user_about"] as String;
+      gradYear = widget.userDetails!["user_grad_year"] != null
+          ? widget.userDetails!["user_grad_year"].toString()
+          : "-";
+      age = widget.userDetails!["user_age"] != null
+          ? widget.userDetails!["user_age"].toString()
+          : "-";
+      gpa = widget.userDetails!["user_gpa"] != null
+          ? widget.userDetails!["user_gpa"].toString()
+          : "-";
+      about = widget.userDetails!["user_about"] != null
+          ? widget.userDetails!["user_about"] as String
+          : "-";
     });
   }
 

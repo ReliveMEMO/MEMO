@@ -72,6 +72,10 @@ class _convoPageState extends State<convoPage> {
         Uri.parse(
             'wss://memo-backend-9b73024f3215.herokuapp.com/messaging'), // Use the messaging WebSocket server URL
       );
+      // messagingChannel = WebSocketChannel.connect(
+      //   Uri.parse(
+      //       'ws://192.168.1.5:3000/messaging'), // Use the messaging WebSocket server URL
+      // );
 
       // Register the receiver
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -142,6 +146,19 @@ class _convoPageState extends State<convoPage> {
         });
         print("New real-time message added: $newMessage");
       }
+      if (data['type'] == 'receiveImgMessage') {
+        final newMessage = {
+          'sender_id': data['senderId'],
+          'image_url': data['image_url'],
+          'time_stamp': data['timestamp'],
+        };
+
+        // Update the state to append the new message
+        setState(() {
+          messages.insert(0, newMessage); // Add the new message to the top
+        });
+        print("New real-time message added: $newMessage");
+      }
     } catch (e) {
       print("Error handling incoming message: $e");
     }
@@ -157,7 +174,7 @@ class _convoPageState extends State<convoPage> {
 
       final response = await Supabase.instance.client
           .from('ind_message_table')
-          .select('msg_id,sender_id, message, time_stamp')
+          .select('msg_id,sender_id, message, time_stamp, image_url')
           .eq('chat_id', chatId)
           .order('time_stamp', ascending: false)
           .range(
@@ -174,6 +191,8 @@ class _convoPageState extends State<convoPage> {
                     'time_stamp': msg['time_stamp'],
                   })
               .toList());
+
+          print(messages);
           _currentBatch++;
           _loading = false;
         });
@@ -289,8 +308,10 @@ class _convoPageState extends State<convoPage> {
       try {
         final response = await Supabase.instance.client
             .from('ind_message_table')
-            .update({'message': "This message has been deleted"}).eq(
-                'msg_id', messageId);
+            .update({
+          'message': "This message has been deleted",
+          'image_url': null
+        }).eq('msg_id', messageId);
 
         if (response != null) {
           print("Error deleting message: ${response.error!.message}");
@@ -304,6 +325,7 @@ class _convoPageState extends State<convoPage> {
             if (index != -1) {
               messages[index]['message'] = "This message has been deleted";
               messages[index]['isEncrypted'] = false;
+              messages[index]['image_url'] = null; // Clear image URL if any
             }
           });
         }
@@ -610,14 +632,51 @@ class _convoPageState extends State<convoPage> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     message['image_url'] != null
-                                        ? CachedNetworkImage(
-                                            imageUrl:
-                                                message['image_url'] as String,
-                                            placeholder: (context, url) =>
-                                                const CircularProgressIndicator(),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                barrierColor:
+                                                    const Color.fromARGB(
+                                                        221, 0, 0, 0),
+                                                builder: (context) {
+                                                  return Dialog(
+                                                    child: CachedNetworkImage(
+                                                      imageUrl:
+                                                          message['image_url']
+                                                              as String,
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .width,
+                                                      placeholder: (context,
+                                                              url) =>
+                                                          const CircularProgressIndicator(),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          const Icon(
+                                                              Icons.error),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: CachedNetworkImage(
+                                              imageUrl: message['image_url']
+                                                  as String,
+                                              placeholder: (context, url) =>
+                                                  SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child:
+                                                    const CircularProgressIndicator(),
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      const Icon(Icons.error),
+                                              width: 300,
+                                              height: 200,
+                                            ),
                                           )
                                         : Builder(
                                             builder: (context) {

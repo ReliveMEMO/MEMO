@@ -72,6 +72,31 @@ class _LoginPageState extends State<LoginPage> {
     return false;
   }
 
+  Future<void> handleForgotPassword() async {
+    final email = usernameController.text;
+    if (email.isEmpty) {
+      setState(() {
+        emailError = 'Email is required';
+      });
+      return;
+    }
+
+    try {
+      await authService.forgotPassword(email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password reset link sent to your email'),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -181,16 +206,19 @@ class _LoginPageState extends State<LoginPage> {
 
             //Forgot password
 
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    "Forgot Password?",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 86, 174, 247),
-                      fontSize: 14,
+                  GestureDetector(
+                    onTap: handleForgotPassword,
+                    child: Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 86, 174, 247),
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ],

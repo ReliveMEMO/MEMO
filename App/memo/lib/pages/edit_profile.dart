@@ -98,15 +98,15 @@ class _EditProfileState extends State<EditProfile> {
         await uploadImage();
       }
 
-      if (age == null || age < 10 || age > 120) {
+      if (age! < 10 || age > 120) {
         showError("Age must be a number between 10 and 120.");
         return;
       }
-      if (gpa == null || gpa < 0.0 || gpa > 4.0) {
+      if (gpa! < 0.0 || gpa > 4.0) {
         showError("GPA must be between 0.0 and 4.0.");
         return;
       }
-      if (graduationYear == null || graduationYear > currentYear + 6) {
+      if (graduationYear! > currentYear + 6) {
         showError("Graduation year cannot be more than 6 years from now.");
         return;
       }
@@ -118,10 +118,10 @@ class _EditProfileState extends State<EditProfile> {
           'full_name': fullNameController.text,
           'birth_date': birthDateController.text,
           'user_age': age,
-          'user_gpa': gpa,
-          'user_grad_year': graduationYear,
-          'user_about': aboutController.text,
-          'user_level': selectedStatus,
+          if (gpa != null) 'user_gpa': gpa,
+          if (graduationYear != null) 'user_grad_year': graduationYear,
+          if (aboutController.text != null) 'user_about': aboutController.text,
+          if (selectedStatus != null) 'user_level': selectedStatus,
           'profile_pic': avatarUrl,
         };
       } else {
@@ -129,10 +129,10 @@ class _EditProfileState extends State<EditProfile> {
           'full_name': fullNameController.text,
           'birth_date': birthDateController.text,
           'user_age': age,
-          'user_gpa': gpa,
-          'user_grad_year': graduationYear,
-          'user_about': aboutController.text,
-          'user_level': selectedStatus,
+          if (gpa != null) 'user_gpa': gpa,
+          if (graduationYear != null) 'user_grad_year': graduationYear,
+          if (aboutController.text != null) 'user_about': aboutController.text,
+          if (selectedStatus != null) 'user_level': selectedStatus,
         };
       }
 

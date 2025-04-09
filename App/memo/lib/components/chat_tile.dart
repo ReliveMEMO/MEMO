@@ -70,7 +70,7 @@ class _ChatTileState extends State<ChatTile> {
 
     final messageResponse = await Supabase.instance.client
         .from('ind_message_table')
-        .select('message , time_stamp, is_seen, sender_id')
+        .select('message , time_stamp, is_seen, sender_id, image_url')
         .eq('chat_id', cId)
         .order('time_stamp', ascending: false)
         .limit(1)
@@ -79,7 +79,10 @@ class _ChatTileState extends State<ChatTile> {
     if (!mounted) return;
 
     setState(() {
-      recentMsg = msgEncryption.decrypt(messageResponse['message']);
+      recentMsg = messageResponse['message'] != null &&
+              messageResponse['image_url'] == null
+          ? msgEncryption.decrypt(messageResponse['message'])
+          : "Sent an image";
       time = formatTimeStamp(messageResponse['time_stamp']);
       isSeen = messageResponse['is_seen'];
       senderId = messageResponse['sender_id'];

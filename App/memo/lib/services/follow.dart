@@ -32,6 +32,7 @@ class FollowService {
 
       return true;
     } catch (e) {
+      print("Error following user: $e");
       return false;
     }
   }

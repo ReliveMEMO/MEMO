@@ -123,4 +123,8 @@ class AuthService {
 
     return response['full_name'] as String?;
   }
+
+  Future<void> forgotPassword(String email) async {
+    await _supabase.auth.resetPasswordForEmail(email);
+  }
 }

@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:memo/providers/backend.dart';
 import 'package:memo/services/auth_service.dart';
 
 class NotificationService {
@@ -50,10 +51,11 @@ class NotificationService {
   }
 
   static Future<void> sendTokenToServer(String? token, String userId) async {
+    final backendURL = Backend.backendUrl;
+
     if (token == null) return;
 
-    final url = Uri.parse(
-        'https://memo-backend-9b73024f3215.herokuapp.com/api/fcm-token');
+    final url = Uri.parse('$backendURL/api/fcm-token');
     final body = jsonEncode({
       'userId': userId,
       'fcmToken': token,
@@ -112,8 +114,8 @@ class NotificationService {
   }
 
   Future<void> sendNotificationsCom(String type, String recieverId) async {
-    const String apiUrl =
-        "https://memo-backend-9b73024f3215.herokuapp.com/api/send-com-notification";
+    final backendUrl = Backend.backendUrl;
+    String apiUrl = "$backendUrl/api/send-com-notification";
     // const String apiUrl =
     //     "http://10.0.2.2:3000/api/send-com-notification"; // Use this for Android Emulator
 

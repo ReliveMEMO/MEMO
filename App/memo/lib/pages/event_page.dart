@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memo/pages/create_event.dart';
+import 'package:memo/providers/backend.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:convert';
@@ -127,8 +128,9 @@ class _EventPageState extends State<EventPage> {
   }
 
   Future<void> sendNotificationToFollowed() async {
+    final backendUrl = Backend.backendUrl;
     final url = Uri.parse(
-        'https://memo-backend-9b73024f3215.herokuapp.com/api/send-notification-to-followed'); // Replace with your API URL
+        '$backendUrl/api/send-notification-to-followed'); // Replace with your API URL
 
     final response = await http.post(
       url,

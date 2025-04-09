@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:memo/providers/backend.dart';
 import 'package:memo/services/auth_service.dart';
 import 'package:memo/services/msg_encryption.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -29,6 +31,8 @@ class _convoPageState extends State<convoPage> {
   bool _loading = false;
   int _currentBatch = 0;
   double bottomInsets = 0;
+  final backendURl = Backend.backendUrl;
+  final backendWebSocketURL = Backend.websocketURL;
 
   late WebSocketChannel messagingChannel; // WebSocket for messaging
 
@@ -70,7 +74,7 @@ class _convoPageState extends State<convoPage> {
     try {
       messagingChannel = WebSocketChannel.connect(
         Uri.parse(
-            'wss://memo-backend-9b73024f3215.herokuapp.com/messaging'), // Use the messaging WebSocket server URL
+            '$backendWebSocketURL/messaging'), // Use the messaging WebSocket server URL
       );
       // messagingChannel = WebSocketChannel.connect(
       //   Uri.parse(
@@ -151,13 +155,14 @@ class _convoPageState extends State<convoPage> {
           'sender_id': data['senderId'],
           'image_url': data['image_url'],
           'time_stamp': data['timestamp'],
+          'message': null,
         };
 
         // Update the state to append the new message
         setState(() {
           messages.insert(0, newMessage); // Add the new message to the top
         });
-        print("New real-time message added: $newMessage");
+        print("New real-time img message added: $newMessage");
       }
     } catch (e) {
       print("Error handling incoming message: $e");
@@ -404,6 +409,7 @@ class _convoPageState extends State<convoPage> {
                         _selectedImage = null; // Clear the selected image
                         imageUrl = null; // Clear the image URL
                       });
+                      Navigator.of(context).pop();
                     }
                   },
                 ),
@@ -444,6 +450,11 @@ class _convoPageState extends State<convoPage> {
           recieverDetails['id']; // Adjust key as per actual argument
 
       print(recieverId);
+
+      if (imageUrl == null) {
+        await Future.delayed(
+            const Duration(seconds: 1)); // Add a 2-second delay
+      }
 
       // Create a message object to append to the UI
       final newMessage = {
@@ -661,21 +672,28 @@ class _convoPageState extends State<convoPage> {
                                                 },
                                               );
                                             },
-                                            child: CachedNetworkImage(
-                                              imageUrl: message['image_url']
-                                                  as String,
-                                              placeholder: (context, url) =>
-                                                  SizedBox(
-                                                width: 20,
-                                                height: 20,
-                                                child:
-                                                    const CircularProgressIndicator(),
+                                            child: ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxWidth: 250,
+                                                maxHeight: 250,
                                               ),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      const Icon(Icons.error),
-                                              width: 300,
-                                              height: 200,
+                                              child: CachedNetworkImage(
+                                                imageUrl: message['image_url']
+                                                    as String,
+                                                placeholder: (context, url) =>
+                                                    SizedBox(
+                                                  width: 20,
+                                                  height: 20,
+                                                  child: const Center(
+                                                      child: SpinKitPulse(
+                                                    color: Colors.purple,
+                                                    size: 30.0,
+                                                  )),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        const Icon(Icons.error),
+                                              ),
                                             ),
                                           )
                                         : Builder(
